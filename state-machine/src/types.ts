@@ -13,7 +13,8 @@ export enum Pitches {
     STRIKE_FOUL_CAUGHT, // fielder catches ball in foul territory
 
     // IN PLAY
-    INPLAY_INFIELD_OUT,
+    INPLAY_INFIELD_GRD_OUT,
+    INPLAY_INFIELD_LINE_OUT,
     INPLAY_INFIELD_OUT_DP_SUCCESS,
     INPLAY_INFIELD_OUT_DP_FAIL,
     INPLAY_INFIELD_ERROR,
@@ -55,15 +56,72 @@ export enum Bases {
     HOME
 }
 
-export interface Batter {
+// https://www.mlb.com/glossary/standard-stats
+export interface OffenseStats {
+    atbats: number;
+    hits: number;
+    strikeoutsSwinging: number;
+    strikeoutsLooking: number;
+    walks: number;
+    singles: number;
+    doubles: number;
+    triples: number;
+    homeruns: number;
+    RBI: number;
+    runs: number;
+}
+
+export interface DefenseStats {
+    strikeoutsSwinging: number;
+    strikeoutsLooking: number;
+    walks: number;
+    saves: number;
+    earnedRuns: number;
+    inningsPitched: number;
+    infieldErrors: number;
+    groundOuts: number;
+    flyOuts: number;
+    DPA: number;
+    DPSuccess: number;
+}
+
+export interface Player {
     name: string;
+    offenseStats: OffenseStats;
+    defenseStats: DefenseStats;
 }
 
 export interface GameMoment {
     boxScore: Score[];
     inning: Inning;
     outs: number; // maybe consider -> 0 | 1 | 2 | 3, but we probably want to account for goofy games
-    atBat: Batter;
+    atBat: Player;
     count: CountMoment;
     bases: Record<Bases, number>;
 }
+
+export type BattingOrder = string[];
+
+export enum Position {
+    Infield,
+    Outfield
+};
+
+export interface Team {
+    roster: Record<string, Player>;
+    lineup: BattingOrder;
+    defense: {
+        pitcher: string;
+        fielders: {
+            player: string;
+            position: Position;
+        }[];
+        bench: string[];
+    }
+};
+
+export interface Game {
+    home: Team;
+    away: Team;
+    state: GameMoment;
+};

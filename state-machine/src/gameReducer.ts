@@ -1,5 +1,5 @@
-import { mergeDeepRight } from 'ramda';
-import { Bases, GameMoment, Inning, InningHalf } from './types';
+import mergeDeepRight from 'ramda/src/mergeDeepRight.js';
+import { Bases, Game, GameMoment, Inning, InningHalf } from './types';
 import { Pitches } from './types';
 
 export const MAX_BALLS = 4;
@@ -11,6 +11,7 @@ enum OptionalRules {
     RunnersAdvanceExtraOn2Outs,
     CaughtLookingRule,
     FoulToTheZoneIsStrikeOut,
+    ThirdBaseCanTag,
 }
 
 const Rules: Record<OptionalRules, boolean> = {
@@ -18,6 +19,7 @@ const Rules: Record<OptionalRules, boolean> = {
     [OptionalRules.RunnersAdvanceExtraOn2Outs]: true,
     [OptionalRules.CaughtLookingRule]: true,
     [OptionalRules.FoulToTheZoneIsStrikeOut]: true,
+    [OptionalRules.ThirdBaseCanTag]: true,
 };
 
 const NEW_COUNT: GameMoment['count'] = {
@@ -120,6 +122,19 @@ const foulBall = (state: GameMoment): GameMoment => {
     };
 }
 
+const out = (state: GameMoment): GameMoment => {
+    return outsReducer({
+        ...state,
+        outs: state.outs + 1,
+        count: NEW_COUNT,
+    });
+}
+
+export const runnersOn = (state: GameMoment): number => {
+    const { [Bases.FIRST]: first, [Bases.SECOND]: second, [Bases.THIRD]: third } = state.bases;
+    return first + second + third;
+};
+
 // state transitions, this is just a reducer
 export function pitch(state: GameMoment, pitch: Pitches): GameMoment {
     switch (pitch) {
@@ -168,13 +183,22 @@ export function pitch(state: GameMoment, pitch: Pitches): GameMoment {
             // just another foul otherwise
             return foulBall(state);
         case Pitches.STRIKE_FOUL_CAUGHT:
-        case Pitches.INPLAY_INFIELD_OUT:
+        case Pitches.INPLAY_INFIELD_GRD_OUT:
+        case Pitches.INPLAY_INFIELD_LINE_OUT:
+            return out(state);
         case Pitches.INPLAY_OUTFIELD_OUT:
-            return outsReducer({
-                ...state,
-                outs: state.outs + 1,
-                count: NEW_COUNT,
-            });
+            const next = out(state);
+            if (state.bases[Bases.THIRD] === 1 && state.outs < MAX_OUTS - 1) {
+                return basesReducer({
+                    ...next,
+                    bases: {
+                        ...next.bases,
+                        [Bases.THIRD]: 0,
+                        [Bases.HOME]: next.bases[Bases.HOME] + 1
+                    },
+                })
+            };
+            return next;
         case Pitches.STRIKE_FOUL:
             return foulBall(state);
         case Pitches.INPLAY_INFIELD_OUT_DP_SUCCESS: {
