@@ -68,8 +68,13 @@ export interface OffenseStats {
     doubles: number;
     triples: number;
     homeruns: number;
+    grandslams: number;
     RBI: number;
+    LOB: number;
     runs: number;
+    groundOuts: number;
+    flyOuts: number;
+    doublePlays: number;
     sacrificeFly: number;
     reachedOnError: number;
 }

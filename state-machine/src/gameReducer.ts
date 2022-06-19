@@ -6,7 +6,7 @@ export const MAX_BALLS = 4;
 export const MAX_STRIKES = 3;
 export const MAX_OUTS = 3;
 
-enum OptionalRules {
+export enum OptionalRules {
     RunnersAdvanceOnWildPitch,
     RunnersAdvanceExtraOn2Outs,
     CaughtLookingRule,
@@ -14,7 +14,7 @@ enum OptionalRules {
     ThirdBaseCanTag,
 }
 
-const Rules: Record<OptionalRules, boolean> = {
+export const Rules: Record<OptionalRules, boolean> = {
     [OptionalRules.RunnersAdvanceOnWildPitch]: true,
     [OptionalRules.RunnersAdvanceExtraOn2Outs]: true,
     [OptionalRules.CaughtLookingRule]: true,
@@ -291,14 +291,17 @@ export function pitch(state: GameMoment, pitch: Pitches): GameMoment {
 // counts can "overflow" and cascade into outs and bases
 function countReducer(state: GameMoment): GameMoment {
     if (state.count.balls >= MAX_BALLS) {
+        // is WALK, how do I signal that for the stats?
         return basesReducer(mergeDeepRight(state, {
-            count: NEW_COUNT, bases: {
+            count: NEW_COUNT,
+            bases: {
                 ...advanceRunners(state.bases, 1),
                 [Bases.FIRST]: 1,
             }
         }));
     }
     if (state.count.strikes >= MAX_STRIKES) {
+        // is STRIKE OUT, how do I signal that for the stats?
         return outsReducer(mergeDeepRight(state, { outs: state.outs + 1, count: NEW_COUNT }));
     }
     return state;
@@ -307,6 +310,7 @@ function countReducer(state: GameMoment): GameMoment {
 // bases can "overflow" and cascade into runs
 function basesReducer(state: GameMoment): GameMoment {
     if (state.bases[Bases.HOME] > 0) {
+        // RBIs, how do I signal that for the stats?
         const newScore = [...state.boxScore];
         const offense = state.inning.half === InningHalf.TOP ? 'away' : 'home';
         newScore[state.inning.number - 1][offense] += state.bases[Bases.HOME];
@@ -321,12 +325,14 @@ function basesReducer(state: GameMoment): GameMoment {
 
 // runs can "overflow" and cascade into innings
 function runsReducer(state: GameMoment): GameMoment {
+    // TODO implement run limit
     return state;
 }
 
 // outs can "overflow" and cascade into innings
 function outsReducer(state: GameMoment): GameMoment {
     if (state.outs >= MAX_OUTS) {
+        // end of inning, calc LOB, relay to stats
         return inningsReducer(mergeDeepRight(state, nextInning(state.inning)));
     }
     return state;
@@ -334,5 +340,6 @@ function outsReducer(state: GameMoment): GameMoment {
 
 // innings can "overflow" and casacde into `game over`
 function inningsReducer(state: GameMoment): GameMoment {
+    // TODO calculate end of game
     return state;
 }

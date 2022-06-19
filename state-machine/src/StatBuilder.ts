@@ -5,6 +5,8 @@ interface StatBuilder {
     offense: (stat: keyof OffenseStats, amt: number) => StatBuilder;
     plateAppearance: () => StatBuilder;
     atBat: () => StatBuilder;
+    strikeoutSwinging: () => StatBuilder;
+    strikeoutLooking: () => StatBuilder;
     single: (rbi?: number) => StatBuilder;
     double: (rbi?: number) => StatBuilder;
     triple: (rbi?: number) => StatBuilder;
@@ -13,7 +15,7 @@ interface StatBuilder {
 }
 
 export const record = (player: Player): StatBuilder => {
-    let internalPlayer = {...player};
+    let internalPlayer = { ...player };
     const builder: StatBuilder = {
         player: internalPlayer,
         offense: (stat: keyof OffenseStats, amt: number) => {
@@ -32,26 +34,40 @@ export const record = (player: Player): StatBuilder => {
         atBat: () => {
             return builder.offense('atbats', 1);
         },
+        strikeoutSwinging: () => {
+            return builder
+                .offense('atbats', 1)
+                .offense('strikeoutsSwinging', 1);
+        },
+        strikeoutLooking: () => {
+            return builder
+                .offense('atbats', 1)
+                .offense('strikeoutsLooking', 1);
+        },
         single: (rbi = 0) => {
             return builder
+                .offense('atbats', 1)
                 .offense('singles', 1)
                 .offense('hits', 1)
                 .offense('RBI', rbi);
         },
         double: (rbi = 0) => {
             return builder
+                .offense('atbats', 1)
                 .offense('doubles', 1)
                 .offense('hits', 1)
                 .offense('RBI', rbi);
         },
         triple: (rbi = 0) => {
             return builder
+                .offense('atbats', 1)
                 .offense('triples', 1)
                 .offense('hits', 1)
                 .offense('RBI', rbi);
         },
         homerun: (rbi = 1) => {
             return builder
+                .offense('atbats', 1)
                 .offense('homeruns', 1)
                 .offense('hits', 1)
                 .offense('RBI', rbi)
