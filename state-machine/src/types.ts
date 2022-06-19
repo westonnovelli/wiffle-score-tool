@@ -58,6 +58,7 @@ export enum Bases {
 
 // https://www.mlb.com/glossary/standard-stats
 export interface OffenseStats {
+    plateAppearance: number;
     atbats: number;
     hits: number;
     strikeoutsSwinging: number;
@@ -69,6 +70,8 @@ export interface OffenseStats {
     homeruns: number;
     RBI: number;
     runs: number;
+    sacrificeFly: number;
+    reachedOnError: number;
 }
 
 export interface DefenseStats {

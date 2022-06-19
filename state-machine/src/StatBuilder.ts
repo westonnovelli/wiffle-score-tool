@@ -3,6 +3,8 @@ import { Player, OffenseStats } from './types';
 interface StatBuilder {
     player: Player;
     offense: (stat: keyof OffenseStats, amt: number) => StatBuilder;
+    plateAppearance: () => StatBuilder;
+    atBat: () => StatBuilder;
     single: (rbi?: number) => StatBuilder;
     double: (rbi?: number) => StatBuilder;
     triple: (rbi?: number) => StatBuilder;
@@ -23,6 +25,12 @@ export const record = (player: Player): StatBuilder => {
                 },
             };
             return builder;
+        },
+        plateAppearance: () => {
+            return builder.offense('plateAppearance', 1);
+        },
+        atBat: () => {
+            return builder.offense('atbats', 1);
         },
         single: (rbi = 0) => {
             return builder

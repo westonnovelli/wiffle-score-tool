@@ -4,7 +4,6 @@ import { record } from './StatBuilder';
 import { GameMoment, Team } from './types';
 import { Pitches } from './types';
 
-
 export function recordStats(team: Team, game: GameMoment, pitch: Pitches): Team {
     const playerAtBat = team.roster[game.atBat.name];
     if (!playerAtBat) return team;

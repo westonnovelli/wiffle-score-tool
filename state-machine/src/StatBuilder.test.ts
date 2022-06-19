@@ -6,6 +6,7 @@ const defaultPlayer = (): Player => {
     return {
         name: 'test',
         offenseStats: {
+            plateAppearance: 0,
             atbats: 0,
             hits: 0,
             strikeoutsSwinging: 0,
@@ -17,6 +18,8 @@ const defaultPlayer = (): Player => {
             homeruns: 0,
             RBI: 0,
             runs: 0,
+            sacrificeFly: 0,
+            reachedOnError: 0,
         },
         defenseStats: {
             strikeoutsSwinging: 0,
