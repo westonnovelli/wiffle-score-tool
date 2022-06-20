@@ -1,5 +1,7 @@
+import { stat } from 'fs';
 import mergeDeepRight from 'ramda/src/mergeDeepRight.js';
-import { Bases, Game, GameMoment, Inning, InningHalf } from './types';
+import { offenseStats } from './statsReducer';
+import { Bases, Game, GameMoment, Inning, InningHalf, StatEvent, Team } from './types';
 import { Pitches } from './types';
 
 export const MAX_BALLS = 4;
@@ -135,211 +137,238 @@ export const runnersOn = (state: GameMoment): number => {
     return first + second + third;
 };
 
+const whoisNextBatter = (state: GameMoment): string => {
+    const offense = getOffense(state);
+    const currentBatterOrder = offense.lineup.indexOf(state.atBat);
+    return currentBatterOrder >= 0 ? offense.lineup[currentBatterOrder + 1] : offense.lineup[0];
+};
+
+const batterUp = (state: GameMoment, inningChange: boolean = false): GameMoment => {
+    const onDeck = inningChange ? state.nextHalfAtBat : whoisNextBatter(state);
+    offenseStats(getOffense(state), state, StatEvent.PLATE_APPEARANCE);
+    return {
+        ...state,
+        atBat: onDeck,
+    };
+}
+
 // state transitions, this is just a reducer
-export function pitch(state: GameMoment, pitch: Pitches): GameMoment {
+export function pitch(stateWithLoggedPitch: GameMoment, pitch: Pitches): GameMoment {
     switch (pitch) {
         case Pitches.BALL:
             return countReducer({
-                ...state,
+                ...stateWithLoggedPitch,
                 count: {
-                    ...state.count,
-                    balls: state.count.balls + 1
+                    ...stateWithLoggedPitch.count,
+                    balls: stateWithLoggedPitch.count.balls + 1
                 }
             });
         case Pitches.BALL_WILD: {
-            const notAWalk = Rules[OptionalRules.RunnersAdvanceOnWildPitch] && state.count.balls < MAX_BALLS - 1;
+            const notAWalk = Rules[OptionalRules.RunnersAdvanceOnWildPitch] && stateWithLoggedPitch.count.balls < MAX_BALLS - 1;
             // if isn't a walk, advance the runners (count reducer will handle walk simulation)
             return basesReducer(countReducer({
-                ...state,
-                bases: advanceRunners(state.bases, notAWalk ? 1 : 0),
+                ...stateWithLoggedPitch,
+                bases: advanceRunners(stateWithLoggedPitch.bases, notAWalk ? 1 : 0),
                 count: {
-                    ...state.count,
-                    balls: state.count.balls + 1
+                    ...stateWithLoggedPitch.count,
+                    balls: stateWithLoggedPitch.count.balls + 1
                 }
             }));
         }
         case Pitches.STRIKE_SWINGING:
-            return strike(state);
+            return strike(stateWithLoggedPitch);
         case Pitches.STRIKE_LOOKING:
             // if enabled, acts as a strikeout
             if (Rules[OptionalRules.CaughtLookingRule]) {
-                return outsReducer({
-                    ...state,
-                    outs: state.outs + 1,
+                return batterUp(outsReducer({
+                    ...stateWithLoggedPitch,
+                    outs: stateWithLoggedPitch.outs + 1,
                     count: NEW_COUNT,
-                });
+                }));
             }
             // just another strike otherwise
-            return strike(state);
+            return strike(stateWithLoggedPitch);
         case Pitches.STRIKE_FOUL_ZONE:
             // if enabled, acts like a strikeout
-            if (Rules[OptionalRules.FoulToTheZoneIsStrikeOut] && state.count.strikes === MAX_STRIKES - 1) {
-                return outsReducer({
-                    ...state,
-                    outs: state.outs + 1,
+            if (Rules[OptionalRules.FoulToTheZoneIsStrikeOut] && stateWithLoggedPitch.count.strikes === MAX_STRIKES - 1) {
+                return batterUp(outsReducer({
+                    ...stateWithLoggedPitch,
+                    outs: stateWithLoggedPitch.outs + 1,
                     count: NEW_COUNT,
-                });
+                }));
             }
             // just another foul otherwise
-            return foulBall(state);
+            return foulBall(stateWithLoggedPitch);
         case Pitches.STRIKE_FOUL_CAUGHT:
         case Pitches.INPLAY_INFIELD_GRD_OUT:
         case Pitches.INPLAY_INFIELD_LINE_OUT:
-            return out(state);
+            return batterUp(out(stateWithLoggedPitch));
         case Pitches.INPLAY_OUTFIELD_OUT:
-            const next = out(state);
-            if (state.bases[Bases.THIRD] === 1 && state.outs < MAX_OUTS - 1) {
-                return basesReducer({
+            const next = out(stateWithLoggedPitch);
+            if (stateWithLoggedPitch.bases[Bases.THIRD] === 1 && stateWithLoggedPitch.outs < MAX_OUTS - 1) {
+                return batterUp(basesReducer({
                     ...next,
                     bases: {
                         ...next.bases,
                         [Bases.THIRD]: 0,
                         [Bases.HOME]: next.bases[Bases.HOME] + 1
                     },
-                })
-            };
-            return next;
-        case Pitches.STRIKE_FOUL:
-            return foulBall(state);
-        case Pitches.INPLAY_INFIELD_OUT_DP_SUCCESS: {
-            const forced = forcedRunner(state.bases);
-            if (forced === undefined) {
-                console.warn('double play attemped without a forced runner', state);
-                return state;
+                }));
             }
-            return basesReducer(outsReducer({
-                ...state,
-                outs: state.outs + 2,
+            return batterUp(next);
+        case Pitches.STRIKE_FOUL:
+            return foulBall(stateWithLoggedPitch);
+        case Pitches.INPLAY_INFIELD_OUT_DP_SUCCESS: {
+            const forced = forcedRunner(stateWithLoggedPitch.bases);
+            if (forced === undefined) {
+                console.warn('double play attemped without a forced runner', stateWithLoggedPitch);
+                return stateWithLoggedPitch;
+            }
+            return batterUp(basesReducer(outsReducer({
+                ...stateWithLoggedPitch,
+                outs: stateWithLoggedPitch.outs + 2,
                 count: NEW_COUNT,
                 bases: {
-                    ...advanceRunners(state.bases, 1),
+                    ...advanceRunners(stateWithLoggedPitch.bases, 1),
                     [forced + 1]: 0,
                 }
-            }));
+            })));
         }
         case Pitches.INPLAY_INFIELD_OUT_DP_FAIL: {
-            const forced = forcedRunner(state.bases);
+            const forced = forcedRunner(stateWithLoggedPitch.bases);
             if (forced === undefined) {
-                console.warn('double play attemped without a forced runner', state);
-                return state;
+                console.warn('double play attemped without a forced runner', stateWithLoggedPitch);
+                return stateWithLoggedPitch;
             }
-            return basesReducer(outsReducer({
-                ...state,
-                outs: state.outs + 1,
+            return batterUp(basesReducer(outsReducer({
+                ...stateWithLoggedPitch,
+                outs: stateWithLoggedPitch.outs + 1,
                 count: NEW_COUNT,
                 bases: {
-                    ...advanceRunners(state.bases, 1),
+                    ...advanceRunners(stateWithLoggedPitch.bases, 1),
                     [forced + 1]: 0,
                     [Bases.FIRST]: 1,
                 }
-            }));
+            })));
         }
         case Pitches.INPLAY_INFIELD_ERROR:
         case Pitches.INPLAY_INFIELD_SINGLE:
-            return basesReducer({
-                ...state,
+            return batterUp(basesReducer({
+                ...stateWithLoggedPitch,
                 count: NEW_COUNT,
                 bases: {
-                    ...advanceRunners(state.bases, 1),
+                    ...advanceRunners(stateWithLoggedPitch.bases, 1),
                     [Bases.FIRST]: 1,
                 },
-            });
+            }));
         case Pitches.INPLAY_OUTFIELD_SINGLE: {
-            const extraBase = Rules[OptionalRules.RunnersAdvanceExtraOn2Outs] && state.outs === 2;
-            return basesReducer({
-                ...state,
+            const extraBase = Rules[OptionalRules.RunnersAdvanceExtraOn2Outs] && stateWithLoggedPitch.outs === 2;
+            return batterUp(basesReducer({
+                ...stateWithLoggedPitch,
                 count: NEW_COUNT,
                 bases: {
-                    ...advanceRunners(state.bases, extraBase ? 2 : 1),
+                    ...advanceRunners(stateWithLoggedPitch.bases, extraBase ? 2 : 1),
                     [Bases.FIRST]: 1,
                 },
-            });
+            }));
         }
         case Pitches.INPLAY_DOUBLE: {
-            const extraBase = Rules[OptionalRules.RunnersAdvanceExtraOn2Outs] && state.outs === 2;
-            return basesReducer({
-                ...state,
+            const extraBase = Rules[OptionalRules.RunnersAdvanceExtraOn2Outs] && stateWithLoggedPitch.outs === 2;
+            return batterUp(basesReducer({
+                ...stateWithLoggedPitch,
                 count: NEW_COUNT,
                 bases: {
-                    ...advanceRunners(state.bases, extraBase ? 3 : 2),
+                    ...advanceRunners(stateWithLoggedPitch.bases, extraBase ? 3 : 2),
                     [Bases.SECOND]: 1,
                 },
-            });
+            }));
         }
         case Pitches.INPLAY_TRIPLE:
-            return basesReducer({
-                ...state,
+            return batterUp(basesReducer({
+                ...stateWithLoggedPitch,
                 count: NEW_COUNT,
                 bases: {
-                    ...advanceRunners(state.bases, 3),
+                    ...advanceRunners(stateWithLoggedPitch.bases, 3),
                     [Bases.THIRD]: 1,
                 },
-            });
+            }));
         case Pitches.INPLAY_HOMERUN: {
-            return basesReducer({
-                ...state,
+            return batterUp(basesReducer({
+                ...stateWithLoggedPitch,
                 count: NEW_COUNT,
-                bases: advanceRunners(state.bases, 4),
-            });
+                bases: advanceRunners(stateWithLoggedPitch.bases, 4),
+            }));
         }
         default:
             console.warn('PITCH NOT IMPLEMENTED', pitch);
-            return state;
+            return stateWithLoggedPitch;
     }
 }
 
+const getOffense = (game: GameMoment): Team => {
+    return game.inning.half === InningHalf.TOP ? game.awayTeam : game.homeTeam;
+}
+
+// **********************
+//   SECONDARY REDUCERS
+// **********************
+
 // counts can "overflow" and cascade into outs and bases
-function countReducer(state: GameMoment): GameMoment {
-    if (state.count.balls >= MAX_BALLS) {
-        // is WALK, how do I signal that for the stats?
-        return basesReducer(mergeDeepRight(state, {
+function countReducer(intermediate: GameMoment): GameMoment {
+    if (intermediate.count.balls >= MAX_BALLS) {
+        offenseStats(getOffense(intermediate), intermediate, StatEvent.WALK);
+        return batterUp(basesReducer(mergeDeepRight(intermediate, {
             count: NEW_COUNT,
             bases: {
-                ...advanceRunners(state.bases, 1),
+                ...advanceRunners(intermediate.bases, 1),
                 [Bases.FIRST]: 1,
             }
-        }));
+        })));
     }
-    if (state.count.strikes >= MAX_STRIKES) {
-        // is STRIKE OUT, how do I signal that for the stats?
-        return outsReducer(mergeDeepRight(state, { outs: state.outs + 1, count: NEW_COUNT }));
+    if (intermediate.count.strikes >= MAX_STRIKES) {
+        return outsReducer(mergeDeepRight(intermediate, { outs: intermediate.outs + 1, count: NEW_COUNT }));
     }
-    return state;
+    return intermediate;
 }
 
 // bases can "overflow" and cascade into runs
-function basesReducer(state: GameMoment): GameMoment {
-    if (state.bases[Bases.HOME] > 0) {
-        // RBIs, how do I signal that for the stats?
-        const newScore = [...state.boxScore];
-        const offense = state.inning.half === InningHalf.TOP ? 'away' : 'home';
-        newScore[state.inning.number - 1][offense] += state.bases[Bases.HOME];
-        return runsReducer(mergeDeepRight(state, {
+function basesReducer(intermediate: GameMoment): GameMoment {
+    if (intermediate.bases[Bases.HOME] > 0) {
+        offenseStats(getOffense(intermediate), intermediate, StatEvent.RBI);
+        const newScore = [...intermediate.boxScore];
+        const offense = intermediate.inning.half === InningHalf.TOP ? 'away' : 'home';
+        newScore[intermediate.inning.number - 1][offense] += intermediate.bases[Bases.HOME];
+        return runsReducer(mergeDeepRight(intermediate, {
             bases: {
                 [Bases.HOME]: 0,
             },
         }));
     }
-    return state;
+    return intermediate;
 }
 
 // runs can "overflow" and cascade into innings
-function runsReducer(state: GameMoment): GameMoment {
-    // TODO implement run limit
-    return state;
+function runsReducer(intermediate: GameMoment): GameMoment {
+    // TODO implement run limit, next batter won't be up
+    return intermediate;
 }
 
 // outs can "overflow" and cascade into innings
-function outsReducer(state: GameMoment): GameMoment {
-    if (state.outs >= MAX_OUTS) {
-        // end of inning, calc LOB, relay to stats
-        return inningsReducer(mergeDeepRight(state, nextInning(state.inning)));
+function outsReducer(intermediate: GameMoment): GameMoment {
+    if (intermediate.outs >= MAX_OUTS) {
+        // end of inning, signal for LOB stats
+        offenseStats(getOffense(intermediate), intermediate, StatEvent.INNING_END);
+        const needsBatterSwitch: GameMoment = mergeDeepRight(intermediate, {
+             ...nextInning(intermediate.inning),
+        });
+        return batterUp(needsBatterSwitch, true);
     }
-    return state;
+    return intermediate;
 }
 
 // innings can "overflow" and casacde into `game over`
-function inningsReducer(state: GameMoment): GameMoment {
+function inningsReducer(intermediate: GameMoment): GameMoment {
     // TODO calculate end of game
-    return state;
+    offenseStats(getOffense(intermediate), intermediate, StatEvent.PLATE_APPEARANCE);
+    return intermediate;
 }

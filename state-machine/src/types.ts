@@ -29,6 +29,14 @@ export enum Pitches {
     INTERFERENCE, // or otherwise screwed up play, that you want to log (just skip it if its not important)
 }
 
+export enum StatEvent {
+    PLATE_APPEARANCE,
+    RBI,
+    INNING_END,
+    WALK,
+    WALK_OFF,
+}
+
 export enum InningHalf {
     TOP,
     BOTTOM
@@ -103,9 +111,13 @@ export interface GameMoment {
     boxScore: Score[];
     inning: Inning;
     outs: number; // maybe consider -> 0 | 1 | 2 | 3, but we probably want to account for goofy games
-    atBat: Player;
+    atBat: string;
+    nextHalfAtBat: string;
     count: CountMoment;
     bases: Record<Bases, number>;
+    homeTeam: Team;
+    awayTeam: Team;
+    pitches: Pitches[];
 }
 
 export type BattingOrder = string[];

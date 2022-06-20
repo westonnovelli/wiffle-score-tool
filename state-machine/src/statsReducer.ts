@@ -1,17 +1,46 @@
 import { MAX_OUTS, MAX_STRIKES, OptionalRules, Rules, runnersOn, } from './gameReducer';
 import { record } from './StatBuilder';
-import { Bases, GameMoment, Team } from './types';
+import { Bases, GameMoment, StatEvent, Team } from './types';
 import { Pitches } from './types';
 
-export function recordStats(team: Team, game: GameMoment, pitch: Pitches): Team {
-    const playerAtBat = team.roster[game.atBat.name];
+export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | StatEvent): Team {
+    const playerAtBat = team.roster[game.atBat];
     if (!playerAtBat) return team;
     const batter = playerAtBat.name;
 
     switch (pitch) {
         // case Pitches.BALL: // when is it a ball, how again to do calc ABs and RBIs with walks?
         // case Pitches.BALL_WILD:
-
+        case StatEvent.WALK:
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [batter]: record(team.roster[batter])
+                        .walk()
+                        .done(),
+                }
+            };
+        case StatEvent.RBI:
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [batter]: record(team.roster[batter])
+                        .offense('RBI', game.bases[Bases.HOME])
+                        .done(),
+                }
+            };
+        case StatEvent.INNING_END:
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [batter]: record(team.roster[batter])
+                        .offense('LOB', runnersOn(game))
+                        .done(),
+                }
+            };
         case Pitches.STRIKE_FOUL_ZONE:
         case Pitches.STRIKE_SWINGING:
             if (game.count.strikes >= MAX_STRIKES) {
@@ -129,4 +158,8 @@ export function recordStats(team: Team, game: GameMoment, pitch: Pitches): Team 
         default:
             return team;
     }
+};
+
+export function defenseStats(team: Team, game: GameMoment, pitch: Pitches): Team {
+    return team;
 };

@@ -7,6 +7,7 @@ interface StatBuilder {
     atBat: () => StatBuilder;
     strikeoutSwinging: () => StatBuilder;
     strikeoutLooking: () => StatBuilder;
+    walk: () => StatBuilder;
     single: (rbi?: number) => StatBuilder;
     double: (rbi?: number) => StatBuilder;
     triple: (rbi?: number) => StatBuilder;
@@ -43,6 +44,10 @@ export const record = (player: Player): StatBuilder => {
             return builder
                 .offense('atbats', 1)
                 .offense('strikeoutsLooking', 1);
+        },
+        walk: () => {
+            return builder
+                .offense('walks', 1);
         },
         single: (rbi = 0) => {
             return builder

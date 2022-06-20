@@ -2,7 +2,7 @@ import mergeDeepRight from 'ramda/src/mergeDeepRight.js';
 
 import { GameMoment, DeepPartial, Pitches, InningHalf, Bases } from './types';
 import { pitch as logPitch } from './gameReducer';
-import { defaultGame } from './utils';
+import { defaultGame } from './factory';
 
 type atBat = {
     pitch: Pitches,
