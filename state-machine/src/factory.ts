@@ -77,6 +77,7 @@ export const defaultPlayer = (name: string = 'mockPlayer'): Player => {
             groundOuts: 0,
             flyOuts: 0,
             doublePlays: 0,
+            doublePlayFails: 0,
             sacrificeFly: 0,
             reachedOnError: 0,
         },

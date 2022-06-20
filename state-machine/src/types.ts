@@ -83,6 +83,7 @@ export interface OffenseStats {
     groundOuts: number;
     flyOuts: number;
     doublePlays: number;
+    doublePlayFails: number;
     sacrificeFly: number;
     reachedOnError: number;
 }

@@ -61,14 +61,5 @@ const determineTeams = (game: GameMoment, homeTeam: Team, awayTeam: Team): { off
 }
 
 const handlePitch = (thrownPitch: Pitches) => {
-    const { offense, defense } = determineTeams(game, homeTeam, awayTeam);
     game = pitch(log(game, thrownPitch), thrownPitch);
-    // wtf is this... X-0
-    if (offense === homeTeam) {
-        homeTeam = offenseStats(offense, game, thrownPitch);
-        awayTeam = defenseStats(defense, game, thrownPitch);   
-    } else {
-        awayTeam = offenseStats(offense, game, thrownPitch);
-        homeTeam = defenseStats(defense, game, thrownPitch);
-    }
 };

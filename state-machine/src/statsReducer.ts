@@ -111,6 +111,7 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
                     ...team.roster,
                     [batter]: record(team.roster[batter])
                         .atBat()
+                        .offense('doublePlayFails', 1)
                         .done(),
                 }
             };

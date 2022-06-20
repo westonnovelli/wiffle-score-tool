@@ -1,16 +1,39 @@
 import mergeDeepRight from 'ramda/src/mergeDeepRight.js';
+import omit from 'ramda/src/omit.js';
 
 import { GameMoment, DeepPartial, Pitches, InningHalf, Bases } from './types';
 import { MAX_BALLS, MAX_STRIKES, pitch } from './gameReducer';
 import { defaultGame } from './factory';
 
+const gm = (state: GameMoment): Pick<GameMoment,
+    | 'boxScore'
+    | 'inning'
+    | 'outs'
+    | 'atBat'
+    | 'nextHalfAtBat'
+    | 'count'
+    | 'bases'
+    | 'pitches'
+> => {
+    return omit(['awayTeam', 'homeTeam'], state);
+};
+
 describe('[5.02]', () => {
     test('a 3rd out ends an inning half (TOP becomes BOTTOM)', () => {
         const initial: GameMoment = mergeDeepRight(defaultGame(), { outs: 2 });
         const thrown: Pitches = Pitches.INPLAY_OUTFIELD_OUT;
-        const diff: DeepPartial<GameMoment> = { outs: 0, inning: { number: 1, half: InningHalf.BOTTOM }, atBat: 'playerA', nextHalfAtBat: 'playerB' };
+        const diff: DeepPartial<GameMoment> = {
+            outs: 0,
+            inning: {
+                number: 1,
+                half: InningHalf.BOTTOM
+            },
+            atBat: 'playerA',
+            nextHalfAtBat: 'playerB'
+        };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('an ending of a inning bottom becomes the top of the next', () => {
@@ -18,7 +41,8 @@ describe('[5.02]', () => {
         const thrown: Pitches = Pitches.INPLAY_OUTFIELD_OUT;
         const diff: DeepPartial<GameMoment> = { outs: 0, inning: { number: 2, half: InningHalf.TOP }, atBat: 'playerA', nextHalfAtBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 });
 
@@ -36,7 +60,8 @@ describe('[5.03]', () => {
         const thrown: Pitches = Pitches.BALL;
         const diff: DeepPartial<GameMoment> = { count: { balls: 0 }, bases: { [Bases.FIRST]: 1 }, atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('S: a strike (swinging) increments strike count', () => {
@@ -60,7 +85,8 @@ describe('[5.03]', () => {
         const thrown: Pitches = Pitches.STRIKE_LOOKING;
         const diff: DeepPartial<GameMoment> = { outs: 0, inning: { number: 1, half: InningHalf.BOTTOM }, atBat: 'playerA', nextHalfAtBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('F: a strike (foul) increments strike count', () => {
@@ -76,7 +102,8 @@ describe('[5.03]', () => {
         const thrown: Pitches = Pitches.STRIKE_FOUL;
         const diff: DeepPartial<GameMoment> = {};
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('K*: with 2 strikes, a strike (foul into the zone) is an out, resets count', () => {
@@ -84,7 +111,8 @@ describe('[5.03]', () => {
         const thrown: Pitches = Pitches.STRIKE_FOUL_ZONE;
         const diff: DeepPartial<GameMoment> = { outs: 1, count: { strikes: 0, balls: 0 }, atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     describe('[5.03.01]', () => {
@@ -93,7 +121,8 @@ describe('[5.03]', () => {
             const thrown: Pitches = Pitches.STRIKE_LOOKING;
             const diff: DeepPartial<GameMoment> = { outs: 1, count: { strikes: 0, balls: 0 }, atBat: 'playerB' };
 
-            expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+            const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+            expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
         });
     });
 
@@ -103,7 +132,8 @@ describe('[5.03]', () => {
             const thrown: Pitches = Pitches.BALL_WILD;
             const diff: DeepPartial<GameMoment> = { count: { balls: 1 } };
 
-            expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+            const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+            expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
         });
 
         test('WP: all runners advance 1 base on a wild pitch, runners can score', () => {
@@ -118,7 +148,8 @@ describe('[5.03]', () => {
             const thrown2: Pitches = Pitches.BALL_WILD;
             const diff2: DeepPartial<GameMoment> = { bases: { [Bases.THIRD]: 0 }, boxScore: [{ home: 0, away: 1 }], count: { balls: 1, strikes: 0 } };
 
-            expect(pitch(initial2, thrown2)).toEqual(mergeDeepRight(initial2, diff2));
+            const expected: GameMoment = mergeDeepRight(initial2, diff2) as GameMoment;
+            expect(gm(pitch(initial2, thrown2))).toEqual(gm(expected));
         });
 
         test('WP: that is a walk, runners only move the single base', () => {
@@ -137,7 +168,8 @@ describe('[6.01]', () => {
         const thrown: Pitches = Pitches.INPLAY_INFIELD_GRD_OUT;
         const diff: DeepPartial<GameMoment> = { outs: 1, count: { strikes: 0, balls: 0 }, atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 });
 
@@ -147,7 +179,8 @@ describe('[6.02]', () => {
         const thrown: Pitches = Pitches.INPLAY_INFIELD_ERROR;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 1 }, atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.100: an infield error advances all runners 1 base', () => {
@@ -155,7 +188,8 @@ describe('[6.02]', () => {
         const thrown: Pitches = Pitches.INPLAY_INFIELD_ERROR;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1 }, atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.020: an infield error advances all runners 1 base', () => {
@@ -163,7 +197,8 @@ describe('[6.02]', () => {
         const thrown: Pitches = Pitches.INPLAY_INFIELD_ERROR;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 0, [Bases.THIRD]: 1, }, atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.003: an infield error advances all runners 1 base', () => {
@@ -171,7 +206,8 @@ describe('[6.02]', () => {
         const thrown: Pitches = Pitches.INPLAY_INFIELD_ERROR;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 1, [Bases.THIRD]: 0, }, boxScore: [{ home: 0, away: 1 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.120: an infield error advances all runners 1 base', () => {
@@ -179,7 +215,8 @@ describe('[6.02]', () => {
         const thrown: Pitches = Pitches.INPLAY_INFIELD_ERROR;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.THIRD]: 1, }, atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.103: an infield error advances all runners 1 base', () => {
@@ -187,7 +224,8 @@ describe('[6.02]', () => {
         const thrown: Pitches = Pitches.INPLAY_INFIELD_ERROR;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.SECOND]: 1, [Bases.THIRD]: 0, }, boxScore: [{ home: 0, away: 1 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.023: an infield error advances all runners 1 base', () => {
@@ -195,7 +233,8 @@ describe('[6.02]', () => {
         const thrown: Pitches = Pitches.INPLAY_INFIELD_ERROR;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 0, }, boxScore: [{ home: 0, away: 1 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.123: an infield error advances all runners 1 base', () => {
@@ -203,7 +242,8 @@ describe('[6.02]', () => {
         const thrown: Pitches = Pitches.INPLAY_INFIELD_ERROR;
         const diff: DeepPartial<GameMoment> = { boxScore: [{ home: 0, away: 1 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 });
 
@@ -213,7 +253,8 @@ describe('[6.03]', () => {
         const thrown: Pitches = Pitches.INPLAY_INFIELD_SINGLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 1 }, atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.100: an infield single advances all runners 1 base', () => {
@@ -221,7 +262,8 @@ describe('[6.03]', () => {
         const thrown: Pitches = Pitches.INPLAY_INFIELD_SINGLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1 }, atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.020: an infield single advances all runners 1 base', () => {
@@ -229,7 +271,8 @@ describe('[6.03]', () => {
         const thrown: Pitches = Pitches.INPLAY_INFIELD_SINGLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 0, [Bases.THIRD]: 1, }, atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.003: an infield single advances all runners 1 base', () => {
@@ -237,7 +280,8 @@ describe('[6.03]', () => {
         const thrown: Pitches = Pitches.INPLAY_INFIELD_SINGLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 1, [Bases.THIRD]: 0, }, boxScore: [{ home: 0, away: 1 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.120: an infield single advances all runners 1 base', () => {
@@ -245,7 +289,8 @@ describe('[6.03]', () => {
         const thrown: Pitches = Pitches.INPLAY_INFIELD_SINGLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.THIRD]: 1, }, atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.103: an infield single advances all runners 1 base', () => {
@@ -253,7 +298,8 @@ describe('[6.03]', () => {
         const thrown: Pitches = Pitches.INPLAY_INFIELD_SINGLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.SECOND]: 1, [Bases.THIRD]: 0, }, boxScore: [{ home: 0, away: 1 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.023: an infield single advances all runners 1 base', () => {
@@ -261,7 +307,8 @@ describe('[6.03]', () => {
         const thrown: Pitches = Pitches.INPLAY_INFIELD_SINGLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 0, }, boxScore: [{ home: 0, away: 1 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.123: an infield single advances all runners 1 base', () => {
@@ -269,7 +316,8 @@ describe('[6.03]', () => {
         const thrown: Pitches = Pitches.INPLAY_INFIELD_SINGLE;
         const diff: DeepPartial<GameMoment> = { boxScore: [{ home: 0, away: 1 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 });
 
@@ -279,7 +327,8 @@ describe('[caught in the air]', () => {
         const thrown: Pitches = Pitches.STRIKE_FOUL_CAUGHT;
         const diff: DeepPartial<GameMoment> = { outs: 1, count: { strikes: 0, balls: 0 }, atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('O: an infield line out, is an out, resets count', () => {
@@ -287,7 +336,8 @@ describe('[caught in the air]', () => {
         const thrown: Pitches = Pitches.INPLAY_INFIELD_LINE_OUT;
         const diff: DeepPartial<GameMoment> = { outs: 1, count: { strikes: 0, balls: 0 }, atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('O: an outfield out, is an out, resets count', () => {
@@ -295,7 +345,8 @@ describe('[caught in the air]', () => {
         const thrown: Pitches = Pitches.INPLAY_OUTFIELD_OUT;
         const diff: DeepPartial<GameMoment> = { outs: 1, count: { strikes: 0, balls: 0 }, atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 });
 
@@ -305,7 +356,8 @@ describe('[6.04]', () => {
         const thrown: Pitches = Pitches.INPLAY_OUTFIELD_SINGLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 1 }, atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 });
 
@@ -315,7 +367,8 @@ describe('[6.06]', () => {
         const thrown: Pitches = Pitches.INPLAY_DOUBLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.SECOND]: 1 }, atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 });
 
@@ -325,7 +378,8 @@ describe('[6.07]', () => {
         const thrown: Pitches = Pitches.INPLAY_TRIPLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.THIRD]: 1 }, atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 });
 
@@ -335,7 +389,8 @@ describe('[6.08]', () => {
         const thrown: Pitches = Pitches.INPLAY_HOMERUN;
         const diff: DeepPartial<GameMoment> = { boxScore: [{ home: 0, away: 1 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 });
 
@@ -352,7 +407,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.020: with a runner on 2nd, a single puts runners on the corners', () => {
@@ -367,7 +423,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.003: with a runner on 3rd, a single scores the runner, and puts a runner on 1st', () => {
@@ -382,7 +439,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('2.100: with a runner on 1st, a double puts runners on 2nd and 3rd', () => {
@@ -397,7 +455,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('2.020: with a runner on 2nd, a double scores the runner, and puts a runner on 2nd', () => {
@@ -410,7 +469,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('2.003: with a runner on 3rd, a double scores the runner, and puts a runner on 2nd', () => {
@@ -425,7 +485,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('3.100: with a runner on 1st, a triple scores the runner, and puts runners on 3rd', () => {
@@ -441,7 +502,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('3.020: with a runner on 2nd, a triple scores the runner, and puts a runner on 3rd', () => {
@@ -456,7 +518,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('3.003: with a runner on 3rd, a triple scores the runner, and puts a runner on 3rd', () => {
@@ -467,7 +530,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
 
@@ -482,7 +546,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('H.020: with a runner on 2nd, a homerun scores the runner and batter', () => {
@@ -496,7 +561,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('H.003: with a runner on 3rd, a homerun scores the runner and batter', () => {
@@ -510,7 +576,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.120: with a runner on 1st and 2nd, a single loads the bases', () => {
@@ -525,7 +592,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.103: with a runner on 1st and 3rd, a single scores the runner on 3rd, and puts runners on 1st and 2nd', () => {
@@ -543,7 +611,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.023: with a runner on 2nd and 3rd, a single scores the runner on 3rd, and puts runners on the corners', () => {
@@ -561,7 +630,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.123: with the bases loaded, a single scores the runner on 3rd, and loads the bases', () => {
@@ -579,7 +649,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('2.120: with a runner on 1st and 2nd, a double scores the runner on second, and puts runners on 2nd and 3rd', () => {
@@ -597,7 +668,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('2.103: with a runner on 1st and 3rd, a double scores the runner on 3rd, and puts runners on 2nd and 3rd', () => {
@@ -615,7 +687,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('2.023: with a runner on 2nd and 3rd, a double scores both runners, and puts a runner on 2nd', () => {
@@ -631,7 +704,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('2.123: with the bases loaded, a double scores the runner on 3rd, and puts runners on 2nd and 3rd', () => {
@@ -649,7 +723,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('3.120: with a runner on 1st and 2nd, a triple scores both runners, and puts a runner on 3rd', () => {
@@ -667,7 +742,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('3.103: with a runner on 1st and 3rd, a triple scores both runners, and puts a runner on 3rd', () => {
@@ -683,7 +759,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('3.023: with a runner on 2nd and 3rd, a triple scores both runners, and puts a runner on 3rd', () => {
@@ -699,7 +776,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('3.123: with the bases loaded, a triple clears the bases, and puts a runner on 3rd', () => {
@@ -717,7 +795,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
 
@@ -735,7 +814,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('H.103: with a runner on 1st and 3rd, a homerun scores 3 runs', () => {
@@ -752,7 +832,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('H.023: with a runner on 2nd and 3rd, a homerun scores 3 runs', () => {
@@ -769,7 +850,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('H.123: with the bases loaded, a homerun scores 4 runs, a grand slam!', () => {
@@ -787,7 +869,8 @@ describe('[7.00]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 });
 
@@ -856,7 +939,8 @@ describe('[7.00 - 2 outs]', () => {
         const thrown: Pitches = Pitches.INPLAY_OUTFIELD_SINGLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 1, [Bases.THIRD]: 1 }, atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.020.2: with a runner on 2nd and 2 outs, a single advances the runner 2 bases, scoring a run', () => {
@@ -864,7 +948,8 @@ describe('[7.00 - 2 outs]', () => {
         const thrown: Pitches = Pitches.INPLAY_OUTFIELD_SINGLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 0 }, boxScore: [{ home: 0, away: 1 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.003.2: with a runner on 3rd and 2 outs, a single advances the runner 2 bases, scoring a run', () => {
@@ -872,7 +957,8 @@ describe('[7.00 - 2 outs]', () => {
         const thrown: Pitches = Pitches.INPLAY_OUTFIELD_SINGLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 1, [Bases.THIRD]: 0 }, boxScore: [{ home: 0, away: 1 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.120.2: with a runner on 1st and 2nd and 2 outs, a single advances the runners 2 bases, scoring a run', () => {
@@ -880,7 +966,8 @@ describe('[7.00 - 2 outs]', () => {
         const thrown: Pitches = Pitches.INPLAY_OUTFIELD_SINGLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 0, [Bases.THIRD]: 1 }, boxScore: [{ home: 0, away: 1 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.103.2: with a runner on 1st and 3rd and 2 outs, a single advances the runners 2 bases, scoring a run', () => {
@@ -888,7 +975,8 @@ describe('[7.00 - 2 outs]', () => {
         const thrown: Pitches = Pitches.INPLAY_OUTFIELD_SINGLE;
         const diff: DeepPartial<GameMoment> = { boxScore: [{ home: 0, away: 1 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('1.023.2: with a runner on 2nd and 3rd and 2 outs, a single advances the runners 2 bases, scoring 2 runs', () => {
@@ -896,7 +984,8 @@ describe('[7.00 - 2 outs]', () => {
         const thrown: Pitches = Pitches.INPLAY_OUTFIELD_SINGLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 0, [Bases.THIRD]: 0 }, boxScore: [{ home: 0, away: 2 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('2.123.2: with the bases loaded and 2 outs, a single advances the runners 2 bases, scoring 2 runs', () => {
@@ -904,7 +993,8 @@ describe('[7.00 - 2 outs]', () => {
         const thrown: Pitches = Pitches.INPLAY_OUTFIELD_SINGLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.SECOND]: 0 }, boxScore: [{ home: 0, away: 2 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('2.100.2: with a runner on first and 2 outs, a double advances the runner 3 bases, scoring a run', () => {
@@ -912,7 +1002,8 @@ describe('[7.00 - 2 outs]', () => {
         const thrown: Pitches = Pitches.INPLAY_DOUBLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 0, [Bases.SECOND]: 1, }, boxScore: [{ home: 0, away: 1 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('2.020.2: with a runner on 2nd and 2 outs, a double advances the runner 3 bases, scoring a run', () => {
@@ -920,7 +1011,8 @@ describe('[7.00 - 2 outs]', () => {
         const thrown: Pitches = Pitches.INPLAY_DOUBLE;
         const diff: DeepPartial<GameMoment> = { boxScore: [{ home: 0, away: 1 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('2.003.2: with a runner on 3rd and 2 outs, a double advances the runner 3 bases, scoring a run', () => {
@@ -928,7 +1020,8 @@ describe('[7.00 - 2 outs]', () => {
         const thrown: Pitches = Pitches.INPLAY_DOUBLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.SECOND]: 1, [Bases.THIRD]: 0, }, boxScore: [{ home: 0, away: 1 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('2.120.2: with a runner on 1st and 2nd and 2 outs, a double advances the runners 3 bases, scoring 2 runs', () => {
@@ -936,7 +1029,8 @@ describe('[7.00 - 2 outs]', () => {
         const thrown: Pitches = Pitches.INPLAY_DOUBLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 0, }, boxScore: [{ home: 0, away: 2 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('2.103.2: with a runner on 1st and 3rd and 2 outs, a double advances the runners 3 bases, scoring 2 runs', () => {
@@ -944,7 +1038,8 @@ describe('[7.00 - 2 outs]', () => {
         const thrown: Pitches = Pitches.INPLAY_DOUBLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 0, [Bases.SECOND]: 1, [Bases.THIRD]: 0, }, boxScore: [{ home: 0, away: 2 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('2.023.2: with a runner on 2nd and 3rd and 2 outs, a double advances the runners 3 bases, scoring 2 runs', () => {
@@ -952,7 +1047,8 @@ describe('[7.00 - 2 outs]', () => {
         const thrown: Pitches = Pitches.INPLAY_DOUBLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.THIRD]: 0 }, boxScore: [{ home: 0, away: 2 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('2.123.2: with the bases loaded and 2 outs, a double advances the runners 3 bases, scoring 3 runs', () => {
@@ -960,7 +1056,8 @@ describe('[7.00 - 2 outs]', () => {
         const thrown: Pitches = Pitches.INPLAY_DOUBLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 0, [Bases.THIRD]: 0 }, boxScore: [{ home: 0, away: 3 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('3.100.2: with a runner on first and 2 outs, a triple advances the runner 4 bases, scoring a run', () => {
@@ -968,7 +1065,8 @@ describe('[7.00 - 2 outs]', () => {
         const thrown: Pitches = Pitches.INPLAY_TRIPLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 0, [Bases.THIRD]: 1 }, boxScore: [{ home: 0, away: 1 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('3.020.2: with a runner on 2nd and 2 outs, a triple advances the runner 4 bases, scoring a run', () => {
@@ -976,7 +1074,8 @@ describe('[7.00 - 2 outs]', () => {
         const thrown: Pitches = Pitches.INPLAY_TRIPLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.SECOND]: 0, [Bases.THIRD]: 1, }, boxScore: [{ home: 0, away: 1 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('3.003.2: with a runner on 3rd and 2 outs, a triple advances the runner 4 bases, scoring a run', () => {
@@ -984,7 +1083,8 @@ describe('[7.00 - 2 outs]', () => {
         const thrown: Pitches = Pitches.INPLAY_TRIPLE;
         const diff: DeepPartial<GameMoment> = { boxScore: [{ home: 0, away: 1 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('3.120.2: with a runner on 1st and 2nd and 2 outs, a triple advances the runners 4 bases, scoring 2 runs', () => {
@@ -992,7 +1092,8 @@ describe('[7.00 - 2 outs]', () => {
         const thrown: Pitches = Pitches.INPLAY_TRIPLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 0, [Bases.SECOND]: 0, [Bases.THIRD]: 1 }, boxScore: [{ home: 0, away: 2 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('3.103.2: with a runner on 1st and 3rd and 2 outs, a triple advances the runners 4 bases, scoring 2 runs', () => {
@@ -1000,7 +1101,8 @@ describe('[7.00 - 2 outs]', () => {
         const thrown: Pitches = Pitches.INPLAY_TRIPLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 0, }, boxScore: [{ home: 0, away: 2 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('3.023.2: with a runner on 2nd and 3rd and 2 outs, a triple advances the runners 4 bases, scoring 2 runs', () => {
@@ -1008,7 +1110,8 @@ describe('[7.00 - 2 outs]', () => {
         const thrown: Pitches = Pitches.INPLAY_TRIPLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.SECOND]: 0, }, boxScore: [{ home: 0, away: 2 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('3.123.2: with the bases loaded and 2 outs, a triple advances the runners 3 bases, scoring 3 runs', () => {
@@ -1016,7 +1119,8 @@ describe('[7.00 - 2 outs]', () => {
         const thrown: Pitches = Pitches.INPLAY_TRIPLE;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 0, [Bases.SECOND]: 0 }, boxScore: [{ home: 0, away: 3 }], atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 });
 
@@ -1026,7 +1130,8 @@ describe('[7.01]', () => {
         const thrown: Pitches = Pitches.INPLAY_INFIELD_GRD_OUT;
         const diff: DeepPartial<GameMoment> = { outs: 1, atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('G.020: an unforced runner will not advance on an infield ground out, the lead forced runner is out', () => {
@@ -1034,7 +1139,8 @@ describe('[7.01]', () => {
         const thrown: Pitches = Pitches.INPLAY_INFIELD_GRD_OUT;
         const diff: DeepPartial<GameMoment> = { outs: 1, atBat: 'playerB' };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 });
 
@@ -1049,7 +1155,8 @@ describe('[7.02]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 });
 
@@ -1065,7 +1172,8 @@ describe('[7.03]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('FC.100: with a runner on first, a failed doubleplay (fielder\'s choice), results in the lead runner out, a runner on 1st', () => {
@@ -1076,7 +1184,8 @@ describe('[7.03]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('DP.120: with a runner on 1st and 2nd, a successful doubleplay, results in the lead runner out and batter out, a runner on 2nd', () => {
@@ -1090,7 +1199,8 @@ describe('[7.03]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('FC.120: with a runner on 1st and 2nd, a failed doubleplay (fielder\'s choice), results in the lead runner out, a runner on 1st and 2nd', () => {
@@ -1101,7 +1211,8 @@ describe('[7.03]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('DP.123: with the bases loaded, a successful doubleplay, results in the lead runner out and batter out, a runner on 2nd and 3rd', () => {
@@ -1115,7 +1226,8 @@ describe('[7.03]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('FC.123: with the bases loaded, a failed doubleplay (fielder\'s choice), results in the lead runner out, the bases loaded', () => {
@@ -1126,7 +1238,8 @@ describe('[7.03]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('DP.103: with a runner on 1st and 3rd, a successful doubleplay, results in the runner on 1st out and batter out, runner on 3rd run scores', () => {
@@ -1142,7 +1255,8 @@ describe('[7.03]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 
     test('FC.103: with a runner on 1st and 3rd, a failed doubleplay (fielder\'s choice), results in the runner on 1st out, a runner on 1st, runner on 3rd run scores', () => {
@@ -1157,6 +1271,7 @@ describe('[7.03]', () => {
             atBat: 'playerB'
         };
 
-        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        const expected: GameMoment = mergeDeepRight(initial, diff) as GameMoment;
+        expect(gm(pitch(initial, thrown))).toEqual(gm(expected));
     });
 });

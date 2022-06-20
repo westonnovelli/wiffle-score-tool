@@ -146,11 +146,16 @@ const whoisNextBatter = (state: GameMoment, offense: boolean = true): string => 
 
 const batterUp = (state: GameMoment, inningChange: boolean = false): GameMoment => {
     const onDeck = inningChange ? state.nextHalfAtBat : whoisNextBatter(state);
-    offenseStats(getOffense(state), state, StatEvent.PLATE_APPEARANCE);
-    return {
+
+    const next: GameMoment = {
         ...state,
         atBat: onDeck,
         nextHalfAtBat: inningChange ? whoisNextBatter(state, true) : state.nextHalfAtBat,
+    };
+    const offenseStatsTeam = inningChange ? getDefenseKey(next) : getOffenseKey(next)
+    return {
+        ...next,
+        [offenseStatsTeam]: offenseStats(getOffense(state), state, StatEvent.PLATE_APPEARANCE),
     };
 };
 
@@ -311,8 +316,16 @@ const getOffense = (game: GameMoment): Team => {
     return game.inning.half === InningHalf.TOP ? game.awayTeam : game.homeTeam;
 };
 
+const getOffenseKey = (game: GameMoment): keyof Pick<GameMoment, 'awayTeam' | 'homeTeam'> => {
+    return game.inning.half === InningHalf.TOP ? 'awayTeam' : 'homeTeam';
+};
+
 const getDefense = (game: GameMoment): Team => {
     return game.inning.half === InningHalf.TOP ? game.homeTeam : game.awayTeam;
+};
+
+const getDefenseKey = (game: GameMoment): keyof Pick<GameMoment, 'awayTeam' | 'homeTeam'> => {
+    return game.inning.half === InningHalf.TOP ? 'homeTeam' : 'awayTeam';
 };
 
 // **********************
@@ -324,11 +337,14 @@ function countReducer(intermediate: GameMoment): GameMoment {
     // TODO need to shake out when the stats reducers get the pitch to evaluate,
     // sometimes it may need intermediate gameMoments
     if (intermediate.count.balls >= MAX_BALLS) {
-        offenseStats(getOffense(intermediate), intermediate, StatEvent.WALK);
-        return batterUp(basesReducer(mergeDeepRight(intermediate, {
+        const withStats = {
+            ...intermediate,
+            [getOffenseKey(intermediate)]: offenseStats(getOffense(intermediate), intermediate, StatEvent.WALK),
+        };
+        return batterUp(basesReducer(mergeDeepRight(withStats, {
             count: NEW_COUNT,
             bases: {
-                ...advanceRunners(intermediate.bases, 1),
+                ...advanceRunners(withStats.bases, 1),
                 [Bases.FIRST]: 1,
             }
         })));
@@ -342,11 +358,14 @@ function countReducer(intermediate: GameMoment): GameMoment {
 // bases can "overflow" and cascade into runs
 function basesReducer(intermediate: GameMoment): GameMoment {
     if (intermediate.bases[Bases.HOME] > 0) {
-        offenseStats(getOffense(intermediate), intermediate, StatEvent.RBI);
-        const newScore = [...intermediate.boxScore];
-        const offense = intermediate.inning.half === InningHalf.TOP ? 'away' : 'home';
-        newScore[intermediate.inning.number - 1][offense] += intermediate.bases[Bases.HOME];
-        return runsReducer(mergeDeepRight(intermediate, {
+        const withStats = {
+            ...intermediate,
+            [getOffenseKey(intermediate)]: offenseStats(getOffense(intermediate), intermediate, StatEvent.RBI),
+        };
+        const newScore = [...withStats.boxScore];
+        const offense = withStats.inning.half === InningHalf.TOP ? 'away' : 'home';
+        newScore[withStats.inning.number - 1][offense] += withStats.bases[Bases.HOME];
+        return runsReducer(mergeDeepRight(withStats, {
             bases: {
                 [Bases.HOME]: 0,
             },
@@ -365,9 +384,12 @@ function runsReducer(intermediate: GameMoment): GameMoment {
 function outsReducer(intermediate: GameMoment): GameMoment {
     if (intermediate.outs >= MAX_OUTS) {
         // end of inning, signal for LOB stats
-        offenseStats(getOffense(intermediate), intermediate, StatEvent.INNING_END);
-        const needsBatterSwitch: GameMoment = mergeDeepRight(intermediate, {
-             ...nextInning(intermediate.inning),
+        const withStats = {
+            ...intermediate,
+            [getOffenseKey(intermediate)]: offenseStats(getOffense(intermediate), intermediate, StatEvent.INNING_END),
+        };
+        const needsBatterSwitch: GameMoment = mergeDeepRight(withStats, {
+            ...nextInning(withStats.inning),
         });
         return batterUp(needsBatterSwitch, true);
     }
@@ -377,6 +399,9 @@ function outsReducer(intermediate: GameMoment): GameMoment {
 // innings can "overflow" and casacde into `game over`
 function inningsReducer(intermediate: GameMoment): GameMoment {
     // TODO calculate end of game
-    offenseStats(getOffense(intermediate), intermediate, StatEvent.PLATE_APPEARANCE);
-    return intermediate;
+    const withStats = {
+        ...intermediate,
+        [getOffenseKey(intermediate)]: offenseStats(getOffense(intermediate), intermediate, StatEvent.PLATE_APPEARANCE),
+    };
+    return withStats;
 }

@@ -236,6 +236,7 @@ describe('[offenseStats]', () => {
                     'playerA': {
                         offenseStats: {
                             atbats: 1,
+                            doublePlayFails: 1,
                         }
                     }
                 }
