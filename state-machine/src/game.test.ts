@@ -1,7 +1,7 @@
 import mergeDeepRight from 'ramda/src/mergeDeepRight.js';
 
 import { GameMoment, DeepPartial, Pitches, InningHalf, Bases } from './types';
-import { pitch as logPitch } from './gameReducer';
+import { pitch as simPitch } from './gameReducer';
 import { defaultGame } from './factory';
 
 type atBat = {
@@ -32,7 +32,7 @@ test('1st batter: Lead off walk', () => {
     ];
 
     atBat.forEach(({ pitch, expected }) => {
-        game = logPitch(game, pitch);
+        game = simPitch(game, pitch);
         expect(game).toEqual(mergeDeepRight(defaultGame(), expected));
     });
 });
@@ -58,7 +58,7 @@ test('2nd batter: single on 1,2 count', () => {
     ];
 
     atBat.forEach(({ pitch, expected }) => {
-        game = logPitch(game, pitch);
+        game = simPitch(game, pitch);
         expect(game).toEqual(mergeDeepRight(defaultGame(), expected));
     });
 });
@@ -72,7 +72,7 @@ test('3rd batter: groud out on first pitch', () => {
     ];
 
     atBat.forEach(({ pitch, expected }) => {
-        game = logPitch(game, pitch);
+        game = simPitch(game, pitch);
         expect(game).toEqual(mergeDeepRight(defaultGame(), expected));
     });
 });
@@ -94,7 +94,7 @@ test('4th batter: strikeout looking on 2,0 count', () => {
     ];
 
     atBat.forEach(({ pitch, expected }) => {
-        game = logPitch(game, pitch);
+        game = simPitch(game, pitch);
         expect(game).toEqual(mergeDeepRight(defaultGame(), expected));
     });
 });
@@ -120,7 +120,7 @@ test('5th batter: foul, foul, foul, infield error', () => {
     ];
 
     atBat.forEach(({ pitch, expected }) => {
-        game = logPitch(game, pitch);
+        game = simPitch(game, pitch);
         expect(game).toEqual(mergeDeepRight(defaultGame(), expected));
     });
 });
@@ -134,7 +134,7 @@ test('6th batter: grand slam! first pitch', () => {
     ];
 
     atBat.forEach(({ pitch, expected }) => {
-        game = logPitch(game, pitch);
+        game = simPitch(game, pitch);
         expect(game).toEqual(mergeDeepRight(defaultGame(), expected));
     });
 });
@@ -153,7 +153,7 @@ test('7th batter: fly out on 1,0, ends the inning', () => {
     ];
 
     atBat.forEach(({ pitch, expected }) => {
-        game = logPitch(game, pitch);
+        game = simPitch(game, pitch);
         expect(game).toEqual(mergeDeepRight(defaultGame(), expected));
     });
 });

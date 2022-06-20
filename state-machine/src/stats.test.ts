@@ -75,7 +75,7 @@ describe('[offenseStats]', () => {
             expect(offenseStats(initial, game, event)).toEqual(mergeDeepRight(initial, diff));
         });
 
-        test.skip('a walk off updates the stat for the batter)', () => {
+        test.skip('a walk off updates the stat for the batter', () => {
             const initial: Team = defaultTeam();
             const event: StatEvent = StatEvent.WALK_OFF;
             const diff: DeepPartial<Team> = {
@@ -166,7 +166,7 @@ describe('[offenseStats]', () => {
             expect(offenseStats(initial, defaultGame(), thrown)).toEqual(mergeDeepRight(initial, {}));
         });
 
-        test.skip('a foul, caught for an out, updates the batter (AB)', () => {
+        test('a foul, caught for an out, updates the batter (AB)', () => {
             const initial: Team = defaultTeam();
             const thrown: Pitches = Pitches.STRIKE_FOUL_CAUGHT;
             const diff: DeepPartial<Team> = {
@@ -174,6 +174,7 @@ describe('[offenseStats]', () => {
                     'playerA': {
                         offenseStats: {
                             atbats: 1,
+                            flyOuts: 1,
                         }
                     }
                 }
@@ -199,7 +200,7 @@ describe('[offenseStats]', () => {
             expect(offenseStats(initial, defaultGame(), thrown)).toEqual(mergeDeepRight(initial, diff));
         });
 
-        test.skip('a ground out into a doubleplay updates for the batter (AB, GrdDP)', () => {
+        test('a ground out into a doubleplay updates for the batter (AB, GrdDP)', () => {
             const initial: Team = defaultTeam();
             const game = mergeDeepRight(defaultGame(), {
                 bases: {
@@ -222,7 +223,7 @@ describe('[offenseStats]', () => {
             expect(offenseStats(initial, game, thrown)).toEqual(mergeDeepRight(initial, diff));
         });
 
-        test.skip('a fielder\'s choice updates for the batter (AB, H, 1B)', () => {
+        test('a fielder\'s choice updates for the batter (AB)', () => {
             const initial: Team = defaultTeam();
             const game = mergeDeepRight(defaultGame(), {
                 bases: {
@@ -235,8 +236,6 @@ describe('[offenseStats]', () => {
                     'playerA': {
                         offenseStats: {
                             atbats: 1,
-                            hits: 1,
-                            singles: 1,
                         }
                     }
                 }
@@ -333,6 +332,30 @@ describe('[offenseStats]', () => {
             expect(offenseStats(initial, defaultGame(), thrown)).toEqual(mergeDeepRight(initial, diff));
         });
 
+        test('an outfield single with a runner on 3rd updates for the batter (AB, H, 1B)', () => {
+            const initial: Team = defaultTeam();
+            const game = mergeDeepRight(defaultGame(), {
+                bases: {
+                    [Bases.HOME]: 1,
+                }
+            });
+            const thrown: Pitches = Pitches.INPLAY_OUTFIELD_SINGLE;
+            const diff: DeepPartial<Team> = {
+                roster: {
+                    'playerA': {
+                        offenseStats: {
+                            atbats: 1,
+                            hits: 1,
+                            singles: 1,
+                            RBI: 1,
+                        }
+                    }
+                }
+            };
+
+            expect(offenseStats(initial, game, thrown)).toEqual(mergeDeepRight(initial, diff));
+        });
+
         test('a double updates for the batter (AB, H, 2B)', () => {
             const initial: Team = defaultTeam();
             const thrown: Pitches = Pitches.INPLAY_DOUBLE;
@@ -351,6 +374,30 @@ describe('[offenseStats]', () => {
             expect(offenseStats(initial, defaultGame(), thrown)).toEqual(mergeDeepRight(initial, diff));
         });
 
+        test('a double updates for the batter (AB, H, 2B, RBI)', () => {
+            const initial: Team = defaultTeam();
+            const game = mergeDeepRight(defaultGame(), {
+                bases: {
+                    [Bases.HOME]: 2,
+                }
+            });
+            const thrown: Pitches = Pitches.INPLAY_DOUBLE;
+            const diff: DeepPartial<Team> = {
+                roster: {
+                    'playerA': {
+                        offenseStats: {
+                            atbats: 1,
+                            hits: 1,
+                            doubles: 1,
+                            RBI: 2
+                        }
+                    }
+                }
+            };
+
+            expect(offenseStats(initial, game, thrown)).toEqual(mergeDeepRight(initial, diff));
+        });
+
         test('a triple updates for the batter (AB, H, 3B)', () => {
             const initial: Team = defaultTeam();
             const thrown: Pitches = Pitches.INPLAY_TRIPLE;
@@ -367,6 +414,78 @@ describe('[offenseStats]', () => {
             };
 
             expect(offenseStats(initial, defaultGame(), thrown)).toEqual(mergeDeepRight(initial, diff));
+        });
+
+        test('a triple with a runner on updates for the batter (AB, H, 3B, RBI)', () => {
+            const initial: Team = defaultTeam();
+            const game = mergeDeepRight(defaultGame(), {
+                bases: {
+                    [Bases.HOME]: 1,
+                }
+            });
+            const thrown: Pitches = Pitches.INPLAY_TRIPLE;
+            const diff: DeepPartial<Team> = {
+                roster: {
+                    'playerA': {
+                        offenseStats: {
+                            atbats: 1,
+                            hits: 1,
+                            triples: 1,
+                            RBI: 1
+                        }
+                    }
+                }
+            };
+
+            expect(offenseStats(initial, game, thrown)).toEqual(mergeDeepRight(initial, diff));
+        });
+
+        test('a triple with 2 runners on updates for the batter (AB, H, 3B, RBI)', () => {
+            const initial: Team = defaultTeam();
+            const game = mergeDeepRight(defaultGame(), {
+                bases: {
+                    [Bases.HOME]: 2,
+                }
+            });
+            const thrown: Pitches = Pitches.INPLAY_TRIPLE;
+            const diff: DeepPartial<Team> = {
+                roster: {
+                    'playerA': {
+                        offenseStats: {
+                            atbats: 1,
+                            hits: 1,
+                            triples: 1,
+                            RBI: 2
+                        }
+                    }
+                }
+            };
+
+            expect(offenseStats(initial, game, thrown)).toEqual(mergeDeepRight(initial, diff));
+        });
+
+        test('a triple with the bases loaded updates for the batter (AB, H, 3B, RBI)', () => {
+            const initial: Team = defaultTeam();
+            const game = mergeDeepRight(defaultGame(), {
+                bases: {
+                    [Bases.HOME]: 3,
+                }
+            });
+            const thrown: Pitches = Pitches.INPLAY_TRIPLE;
+            const diff: DeepPartial<Team> = {
+                roster: {
+                    'playerA': {
+                        offenseStats: {
+                            atbats: 1,
+                            hits: 1,
+                            triples: 1,
+                            RBI: 3
+                        }
+                    }
+                }
+            };
+
+            expect(offenseStats(initial, game, thrown)).toEqual(mergeDeepRight(initial, diff));
         });
 
         test('a homerun updates for the batter (AB, H, HR, RBI, R)', () => {
@@ -389,6 +508,81 @@ describe('[offenseStats]', () => {
             expect(offenseStats(initial, defaultGame(), thrown)).toEqual(mergeDeepRight(initial, diff));
         });
 
+        test('a 2 run homerun updates for the batter (AB, H, HR, RBI, R)', () => {
+            const initial: Team = defaultTeam();
+            const game = mergeDeepRight(defaultGame(), {
+                bases: {
+                    [Bases.HOME]: 1,
+                }
+            });
+            const thrown: Pitches = Pitches.INPLAY_HOMERUN;
+            const diff: DeepPartial<Team> = {
+                roster: {
+                    'playerA': {
+                        offenseStats: {
+                            atbats: 1,
+                            hits: 1,
+                            homeruns: 1,
+                            RBI: 2,
+                            runs: 1,
+                        }
+                    }
+                }
+            };
+
+            expect(offenseStats(initial, game, thrown)).toEqual(mergeDeepRight(initial, diff));
+        });
+
+        test('a 3 run homerun updates for the batter (AB, H, HR, RBI, R)', () => {
+            const initial: Team = defaultTeam();
+            const game = mergeDeepRight(defaultGame(), {
+                bases: {
+                    [Bases.HOME]: 2,
+                }
+            });
+            const thrown: Pitches = Pitches.INPLAY_HOMERUN;
+            const diff: DeepPartial<Team> = {
+                roster: {
+                    'playerA': {
+                        offenseStats: {
+                            atbats: 1,
+                            hits: 1,
+                            homeruns: 1,
+                            RBI: 3,
+                            runs: 1,
+                        }
+                    }
+                }
+            };
+
+            expect(offenseStats(initial, game, thrown)).toEqual(mergeDeepRight(initial, diff));
+        });
+
+        test('a grand slam updates for the batter (AB, H, HR, RBI, R)', () => {
+            const initial: Team = defaultTeam();
+            const game = mergeDeepRight(defaultGame(), {
+                bases: {
+                    [Bases.HOME]: 3,
+                }
+            });
+            const thrown: Pitches = Pitches.INPLAY_HOMERUN;
+            const diff: DeepPartial<Team> = {
+                roster: {
+                    'playerA': {
+                        offenseStats: {
+                            atbats: 1,
+                            hits: 1,
+                            homeruns: 1,
+                            RBI: 4,
+                            runs: 1,
+                            grandslams: 1,
+                        }
+                    }
+                }
+            };
+
+            expect(offenseStats(initial, game, thrown)).toEqual(mergeDeepRight(initial, diff));
+        });
     });
 });
 

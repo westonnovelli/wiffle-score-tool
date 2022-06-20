@@ -9,8 +9,6 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
     const batter = playerAtBat.name;
 
     switch (pitch) {
-        // case Pitches.BALL: // when is it a ball, how again to do calc ABs and RBIs with walks?
-        // case Pitches.BALL_WILD:
         case StatEvent.PLATE_APPEARANCE:
             return {
                 ...team,
@@ -62,7 +60,6 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
                 }
             };
         case Pitches.STRIKE_SWINGING: {
-            console.log('strikes: ', game.count.strikes);
             if (game.count.strikes < MAX_STRIKES) return team;
             return {
                 ...team,
@@ -84,10 +81,6 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
                         .done(),
                 }
             };
-
-        // case Pitches.STRIKE_FOUL:
-        // case Pitches.STRIKE_FOUL_CAUGHT:
-
         case Pitches.INPLAY_INFIELD_GRD_OUT:
             return {
                 ...team,
@@ -111,7 +104,17 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
                         .done(),
                 }
             };
-        // case Pitches.INPLAY_INFIELD_OUT_DP_FAIL: // how do you score this?
+        case Pitches.INPLAY_INFIELD_OUT_DP_FAIL:
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [batter]: record(team.roster[batter])
+                        .atBat()
+                        .done(),
+                }
+            };
+        case Pitches.STRIKE_FOUL_CAUGHT:
         case Pitches.INPLAY_OUTFIELD_OUT:
         case Pitches.INPLAY_INFIELD_LINE_OUT:
             const runnerTaggedAndScored = (
