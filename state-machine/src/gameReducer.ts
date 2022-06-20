@@ -137,10 +137,11 @@ export const runnersOn = (state: GameMoment): number => {
     return first + second + third;
 };
 
-const whoisNextBatter = (state: GameMoment): string => {
-    const offense = getOffense(state);
-    const currentBatterOrder = offense.lineup.indexOf(state.atBat);
-    return currentBatterOrder >= 0 ? offense.lineup[currentBatterOrder + 1] : offense.lineup[0];
+// returns the next batter in the lineup for the offense, or the "next due up" for the defense
+const whoisNextBatter = (state: GameMoment, offense: boolean = true): string => {
+    const team = offense ? getOffense(state) : getDefense(state);
+    const currentBatterOrder = team.lineup.indexOf(state.atBat);
+    return currentBatterOrder >= 0 ? team.lineup[currentBatterOrder + (offense ? 1 : 0)] : team.lineup[0];
 };
 
 const batterUp = (state: GameMoment, inningChange: boolean = false): GameMoment => {
@@ -149,8 +150,9 @@ const batterUp = (state: GameMoment, inningChange: boolean = false): GameMoment 
     return {
         ...state,
         atBat: onDeck,
+        nextHalfAtBat: inningChange ? whoisNextBatter(state, true) : state.nextHalfAtBat,
     };
-}
+};
 
 // state transitions, this is just a reducer
 export function pitch(stateWithLoggedPitch: GameMoment, pitch: Pitches): GameMoment {
@@ -180,42 +182,42 @@ export function pitch(stateWithLoggedPitch: GameMoment, pitch: Pitches): GameMom
         case Pitches.STRIKE_LOOKING:
             // if enabled, acts as a strikeout
             if (Rules[OptionalRules.CaughtLookingRule]) {
-                return batterUp(outsReducer({
+                return outsReducer({
                     ...stateWithLoggedPitch,
                     outs: stateWithLoggedPitch.outs + 1,
                     count: NEW_COUNT,
-                }));
+                });
             }
             // just another strike otherwise
             return strike(stateWithLoggedPitch);
         case Pitches.STRIKE_FOUL_ZONE:
             // if enabled, acts like a strikeout
             if (Rules[OptionalRules.FoulToTheZoneIsStrikeOut] && stateWithLoggedPitch.count.strikes === MAX_STRIKES - 1) {
-                return batterUp(outsReducer({
+                return outsReducer({
                     ...stateWithLoggedPitch,
                     outs: stateWithLoggedPitch.outs + 1,
                     count: NEW_COUNT,
-                }));
+                });
             }
             // just another foul otherwise
             return foulBall(stateWithLoggedPitch);
         case Pitches.STRIKE_FOUL_CAUGHT:
         case Pitches.INPLAY_INFIELD_GRD_OUT:
         case Pitches.INPLAY_INFIELD_LINE_OUT:
-            return batterUp(out(stateWithLoggedPitch));
+            return out(stateWithLoggedPitch);
         case Pitches.INPLAY_OUTFIELD_OUT:
             const next = out(stateWithLoggedPitch);
             if (stateWithLoggedPitch.bases[Bases.THIRD] === 1 && stateWithLoggedPitch.outs < MAX_OUTS - 1) {
-                return batterUp(basesReducer({
+                return basesReducer({
                     ...next,
                     bases: {
                         ...next.bases,
                         [Bases.THIRD]: 0,
                         [Bases.HOME]: next.bases[Bases.HOME] + 1
                     },
-                }));
+                });
             }
-            return batterUp(next);
+            return next;
         case Pitches.STRIKE_FOUL:
             return foulBall(stateWithLoggedPitch);
         case Pitches.INPLAY_INFIELD_OUT_DP_SUCCESS: {
@@ -224,7 +226,7 @@ export function pitch(stateWithLoggedPitch: GameMoment, pitch: Pitches): GameMom
                 console.warn('double play attemped without a forced runner', stateWithLoggedPitch);
                 return stateWithLoggedPitch;
             }
-            return batterUp(basesReducer(outsReducer({
+            return basesReducer(outsReducer({
                 ...stateWithLoggedPitch,
                 outs: stateWithLoggedPitch.outs + 2,
                 count: NEW_COUNT,
@@ -232,7 +234,7 @@ export function pitch(stateWithLoggedPitch: GameMoment, pitch: Pitches): GameMom
                     ...advanceRunners(stateWithLoggedPitch.bases, 1),
                     [forced + 1]: 0,
                 }
-            })));
+            }));
         }
         case Pitches.INPLAY_INFIELD_OUT_DP_FAIL: {
             const forced = forcedRunner(stateWithLoggedPitch.bases);
@@ -240,7 +242,7 @@ export function pitch(stateWithLoggedPitch: GameMoment, pitch: Pitches): GameMom
                 console.warn('double play attemped without a forced runner', stateWithLoggedPitch);
                 return stateWithLoggedPitch;
             }
-            return batterUp(basesReducer(outsReducer({
+            return basesReducer(outsReducer({
                 ...stateWithLoggedPitch,
                 outs: stateWithLoggedPitch.outs + 1,
                 count: NEW_COUNT,
@@ -249,7 +251,7 @@ export function pitch(stateWithLoggedPitch: GameMoment, pitch: Pitches): GameMom
                     [forced + 1]: 0,
                     [Bases.FIRST]: 1,
                 }
-            })));
+            }));
         }
         case Pitches.INPLAY_INFIELD_ERROR:
         case Pitches.INPLAY_INFIELD_SINGLE:
@@ -307,7 +309,11 @@ export function pitch(stateWithLoggedPitch: GameMoment, pitch: Pitches): GameMom
 
 const getOffense = (game: GameMoment): Team => {
     return game.inning.half === InningHalf.TOP ? game.awayTeam : game.homeTeam;
-}
+};
+
+const getDefense = (game: GameMoment): Team => {
+    return game.inning.half === InningHalf.TOP ? game.homeTeam : game.awayTeam;
+};
 
 // **********************
 //   SECONDARY REDUCERS
@@ -315,6 +321,8 @@ const getOffense = (game: GameMoment): Team => {
 
 // counts can "overflow" and cascade into outs and bases
 function countReducer(intermediate: GameMoment): GameMoment {
+    // TODO need to shake out when the stats reducers get the pitch to evaluate,
+    // sometimes it may need intermediate gameMoments
     if (intermediate.count.balls >= MAX_BALLS) {
         offenseStats(getOffense(intermediate), intermediate, StatEvent.WALK);
         return batterUp(basesReducer(mergeDeepRight(intermediate, {
@@ -326,7 +334,7 @@ function countReducer(intermediate: GameMoment): GameMoment {
         })));
     }
     if (intermediate.count.strikes >= MAX_STRIKES) {
-        return outsReducer(mergeDeepRight(intermediate, { outs: intermediate.outs + 1, count: NEW_COUNT }));
+        return batterUp(outsReducer(mergeDeepRight(intermediate, { outs: intermediate.outs + 1, count: NEW_COUNT })));
     }
     return intermediate;
 }
@@ -363,7 +371,7 @@ function outsReducer(intermediate: GameMoment): GameMoment {
         });
         return batterUp(needsBatterSwitch, true);
     }
-    return intermediate;
+    return batterUp(intermediate);
 }
 
 // innings can "overflow" and casacde into `game over`

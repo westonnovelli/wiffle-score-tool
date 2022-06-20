@@ -30,11 +30,11 @@ export enum Pitches {
 }
 
 export enum StatEvent {
-    PLATE_APPEARANCE,
-    RBI,
-    INNING_END,
-    WALK,
-    WALK_OFF,
+    PLATE_APPEARANCE = 'PA',
+    RBI = 'RBI',
+    INNING_END = 'INNING',
+    WALK = 'W',
+    WALK_OFF = 'WO',
 }
 
 export enum InningHalf {

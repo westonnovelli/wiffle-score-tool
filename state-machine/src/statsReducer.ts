@@ -11,6 +11,16 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
     switch (pitch) {
         // case Pitches.BALL: // when is it a ball, how again to do calc ABs and RBIs with walks?
         // case Pitches.BALL_WILD:
+        case StatEvent.PLATE_APPEARANCE:
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [batter]: record(team.roster[batter])
+                        .plateAppearance()
+                        .done(),
+                }
+            };
         case StatEvent.WALK:
             return {
                 ...team,
@@ -42,19 +52,28 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
                 }
             };
         case Pitches.STRIKE_FOUL_ZONE:
-        case Pitches.STRIKE_SWINGING:
-            if (game.count.strikes >= MAX_STRIKES) {
-                return {
-                    ...team,
-                    roster: {
-                        ...team.roster,
-                        [batter]: record(team.roster[batter])
-                            .strikeoutSwinging()
-                            .done(),
-                    }
-                };
-            }
-            return team;
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [batter]: record(team.roster[batter])
+                        .strikeoutSwinging()
+                        .done(),
+                }
+            };
+        case Pitches.STRIKE_SWINGING: {
+            console.log('strikes: ', game.count.strikes);
+            if (game.count.strikes < MAX_STRIKES) return team;
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [batter]: record(team.roster[batter])
+                        .strikeoutSwinging()
+                        .done(),
+                }
+            };
+        }
         case Pitches.STRIKE_LOOKING:
             return {
                 ...team,
@@ -75,6 +94,7 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
                 roster: {
                     ...team.roster,
                     [batter]: record(team.roster[batter])
+                        .atBat()
                         .offense('groundOuts', 1)
                         .done(),
                 }
@@ -85,6 +105,7 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
                 roster: {
                     ...team.roster,
                     [batter]: record(team.roster[batter])
+                        .atBat()
                         .offense('groundOuts', 1)
                         .offense('doublePlays', 1)
                         .done(),
@@ -104,6 +125,7 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
                 roster: {
                     ...team.roster,
                     [batter]: record(team.roster[batter])
+                        .atBat()
                         .offense('flyOuts', 1)
                         .offense('RBI', runnerTaggedAndScored ? 1 : 0)
                         .offense('sacrificeFly', runnerTaggedAndScored ? 1 : 0)
