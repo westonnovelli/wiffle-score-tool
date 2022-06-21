@@ -184,11 +184,13 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
                 }
             };
         }
+        // TODO Walkoff stats
         default:
             return team;
     }
 };
 
 export function defenseStats(team: Team, game: GameMoment, pitch: Pitches): Team {
+    // TODO defense stats
     return team;
 };

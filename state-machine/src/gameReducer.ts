@@ -359,7 +359,7 @@ function basesReducer(intermediate: GameMoment): GameMoment {
 
 // runs can "overflow" and cascade into innings
 function runsReducer(intermediate: GameMoment): GameMoment {
-    // TODO implement run limit, next batter won't be up
+    // TODO implement run limit, next batter won't be up until next inning
     return intermediate;
 }
 

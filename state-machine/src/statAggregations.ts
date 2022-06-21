@@ -1,5 +1,7 @@
 import { Player } from "./types";
 
+// TODO stat aggregation tests
+
 // https://www.mlb.com/glossary/standard-stats/batting-average
 const battingAverage = ({ offenseStats }: Player): number => {
     const { hits, atbats } = offenseStats;
