@@ -1,4 +1,5 @@
-import { GameMoment, Player, Position, Team } from './types';
+import { mergeDeepRight } from 'ramda';
+import { GameConfig, GameMoment, OptionalRules, Player, Position, Team } from './types';
 import { InningHalf, Bases } from './types';
 
 export const defaultTeam = (): Team => ({
@@ -52,6 +53,7 @@ export const defaultGame = (awayTeam: Team = defaultTeam(), homeTeam: Team = def
         },
         awayTeam,
         homeTeam,
+        configuration: defaultConfiguration(),
         pitches: [],
     }
 };
@@ -96,3 +98,27 @@ export const defaultPlayer = (name: string = 'mockPlayer'): Player => {
         }
     };
 };
+
+export const defaultConfiguration = (): GameConfig => {
+    return {
+        maxStrikes: 3,
+        maxBalls: 4,
+        maxOuts: 3,
+        maxInnings: 5,
+        maxRuns: 5,
+        rules: defaultRules(),
+        recordingStats: true,
+    };
+};
+
+export const defaultRules = (): Record<OptionalRules, boolean> => {
+    return {
+        [OptionalRules.RunnersAdvanceOnWildPitch]: true,
+        [OptionalRules.RunnersAdvanceExtraOn2Outs]: true,
+        [OptionalRules.CaughtLookingRule]: true,
+        [OptionalRules.FoulToTheZoneIsStrikeOut]: true,
+        [OptionalRules.ThirdBaseCanTag]: true,
+    };
+};
+
+export const noStatsGame = () => mergeDeepRight(defaultGame(), { configuration: { recordingStats: false }});

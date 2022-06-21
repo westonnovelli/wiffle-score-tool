@@ -118,7 +118,26 @@ export interface GameMoment {
     bases: Record<Bases, number>;
     homeTeam: Team;
     awayTeam: Team;
+    configuration: GameConfig;
     pitches: Pitches[];
+}
+
+export interface GameConfig {
+    maxStrikes: number;
+    maxBalls: number;
+    maxOuts: number;
+    maxRuns: number;
+    maxInnings: number;
+    recordingStats: boolean;
+    rules: Record<OptionalRules, boolean>;
+}
+
+export enum OptionalRules {
+    RunnersAdvanceOnWildPitch,
+    RunnersAdvanceExtraOn2Outs,
+    CaughtLookingRule,
+    FoulToTheZoneIsStrikeOut,
+    ThirdBaseCanTag,
 }
 
 export type BattingOrder = string[];

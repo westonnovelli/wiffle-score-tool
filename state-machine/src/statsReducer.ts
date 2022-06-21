@@ -1,11 +1,14 @@
-import { MAX_OUTS, MAX_STRIKES, OptionalRules, Rules, runnersOn, } from './gameReducer';
+import { runnersOn, } from './gameReducer';
 import { record } from './StatBuilder';
 import { Bases, GameMoment, StatEvent, Team } from './types';
-import { Pitches } from './types';
+import { Pitches, OptionalRules } from './types';
 
 export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | StatEvent): Team {
+    if (!game.configuration.recordingStats) return team;
+
     const playerAtBat = team.roster[game.atBat];
     if (!playerAtBat) return team;
+
     const batter = playerAtBat.name;
 
     switch (pitch) {
@@ -60,7 +63,7 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
                 }
             };
         case Pitches.STRIKE_SWINGING: {
-            if (game.count.strikes < MAX_STRIKES) return team;
+            if (game.count.strikes < game.configuration.maxStrikes) return team;
             return {
                 ...team,
                 roster: {
@@ -119,9 +122,9 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
         case Pitches.INPLAY_OUTFIELD_OUT:
         case Pitches.INPLAY_INFIELD_LINE_OUT:
             const runnerTaggedAndScored = (
-                Rules[OptionalRules.ThirdBaseCanTag]
+                game.configuration.rules[OptionalRules.ThirdBaseCanTag]
                 && pitch === Pitches.INPLAY_OUTFIELD_OUT
-                && game.outs <= MAX_OUTS - 2 // we've already added an additional out for this play
+                && game.outs <= game.configuration.maxOuts - 2 // we've already added an additional out for this play
                 && game.bases[Bases.THIRD] > 1
             );
             return {
