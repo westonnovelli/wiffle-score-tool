@@ -120,7 +120,7 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
             };
         case Pitches.STRIKE_FOUL_CAUGHT:
         case Pitches.INPLAY_OUTFIELD_OUT:
-        case Pitches.INPLAY_INFIELD_LINE_OUT:
+        case Pitches.INPLAY_INFIELD_AIR_OUT:
             const runnerTaggedAndScored = (
                 game.configuration.rules[OptionalRules.ThirdBaseCanTag]
                 && pitch === Pitches.INPLAY_OUTFIELD_OUT

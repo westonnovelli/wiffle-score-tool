@@ -2,37 +2,43 @@ import { mergeDeepRight } from 'ramda';
 import { GameConfig, GameMoment, OptionalRules, Player, Position, Team } from './types';
 import { InningHalf, Bases } from './types';
 
-export const defaultTeam = (): Team => ({
-    roster: {
-        'playerA': defaultPlayer('playerA'),
-        'playerB': defaultPlayer('playerB'),
-        'playerC': defaultPlayer('playerC'),
-    },
-    lineup: [
-        'playerA',
-        'playerB',
-        'playerC',
-    ],
-    defense: {
-        pitcher: 'playerA',
-        fielders: [{
-            player: 'playerB',
-            position: Position.Infield,
-        }, {
-            player: 'playerC',
-            position: Position.Outfield,
-        }],
-        bench: []
-    },
-});
+export const defaultTeam = (name: string = ''): Team => {
+    const lineup: string[] = [
+        `${name && `${name} - `}playerA`,
+        `${name && `${name} - `}playerB`,
+        `${name && `${name} - `}playerC`,
+        `${name && `${name} - `}playerD`,
+    ];
 
-export const defaultGame = (awayTeam: Team = defaultTeam(), homeTeam: Team = defaultTeam()): GameMoment => {
+    const roster: Team['roster'] = lineup.reduce<Team['roster']>((acc, player) => {
+        acc[player] = defaultPlayer(player);
+        return acc;
+    }, {});
+
+    return {
+        roster,
+        lineup,
+        defense: {
+            pitcher: lineup[0],
+            fielders: [{
+                player: lineup[1],
+                position: Position.Infield,
+            }, {
+                player: lineup[2],
+                position: Position.Outfield,
+            }],
+            bench: [lineup[3]]
+        },
+    };
+};
+
+export const defaultGame = (awayTeam: Team = defaultTeam('away'), homeTeam: Team = defaultTeam('home')): GameMoment => {
     const firstBatter = awayTeam.lineup[0] ?? 'mockBatter';
     const homesFirstBatter = homeTeam.lineup[0] ?? 'mockBatterHome';
     return {
         boxScore: [{
-            home: 0,
-            away: 0
+            homeTeam: 0,
+            awayTeam: 0
         }],
         inning: {
             number: 1,
@@ -118,7 +124,8 @@ export const defaultRules = (): Record<OptionalRules, boolean> => {
         [OptionalRules.CaughtLookingRule]: true,
         [OptionalRules.FoulToTheZoneIsStrikeOut]: true,
         [OptionalRules.ThirdBaseCanTag]: true,
+        [OptionalRules.AllowSinglePlayRunsToPassLimit]: false,
     };
 };
 
-export const noStatsGame = () => mergeDeepRight(defaultGame(), { configuration: { recordingStats: false }});
+export const noStatsGame = () => mergeDeepRight(defaultGame(), { configuration: { recordingStats: false } });

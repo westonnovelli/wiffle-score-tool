@@ -14,7 +14,7 @@ export enum Pitches {
 
     // IN PLAY
     INPLAY_INFIELD_GRD_OUT,
-    INPLAY_INFIELD_LINE_OUT,
+    INPLAY_INFIELD_AIR_OUT, // caught in the in-field, in the air
     INPLAY_INFIELD_OUT_DP_SUCCESS,
     INPLAY_INFIELD_OUT_DP_FAIL,
     INPLAY_INFIELD_ERROR,
@@ -47,13 +47,14 @@ export interface Inning {
     half: InningHalf
 }
 
+// intentionally the same key's as the GameMoment refs to the team objects
 export interface Score {
-    home: number;
-    away: number;
+    homeTeam: number;
+    awayTeam: number;
 }
 
 export interface CountMoment {
-    balls: number; // again, 0 -> 4, but let's not constrain ourselves via types
+    balls: number;
     strikes: number;
 }
 
@@ -111,7 +112,7 @@ export interface Player {
 export interface GameMoment {
     boxScore: Score[];
     inning: Inning;
-    outs: number; // maybe consider -> 0 | 1 | 2 | 3, but we probably want to account for goofy games
+    outs: number;
     atBat: string;
     nextHalfAtBat: string;
     count: CountMoment;
@@ -138,6 +139,7 @@ export enum OptionalRules {
     CaughtLookingRule,
     FoulToTheZoneIsStrikeOut,
     ThirdBaseCanTag,
+    AllowSinglePlayRunsToPassLimit,
 }
 
 export type BattingOrder = string[];

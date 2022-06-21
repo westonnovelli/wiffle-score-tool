@@ -264,7 +264,7 @@ describe('[offenseStats]', () => {
 
         test('an infield lineout updates the stat for the batter (AB, FLO)', () => {
             const initial: Team = defaultTeam();
-            const thrown: Pitches = Pitches.INPLAY_INFIELD_LINE_OUT;
+            const thrown: Pitches = Pitches.INPLAY_INFIELD_AIR_OUT;
             const diff: DeepPartial<Team> = {
                 roster: {
                     'playerA': {

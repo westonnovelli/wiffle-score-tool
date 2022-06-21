@@ -129,7 +129,7 @@ test('6th batter: grand slam! first pitch', () => {
     const atBat: atBat = [
         {
             pitch: Pitches.INPLAY_HOMERUN,
-            expected: { outs: 2, boxScore: [{ home: 0, away: 4 }] }
+            expected: { outs: 2, boxScore: [{ homeTeam: 0, awayTeam: 4 }] }
         },
     ];
 
@@ -143,12 +143,12 @@ test('7th batter: fly out on 1,0, ends the inning', () => {
     const atBat: atBat = [
         {
             pitch: Pitches.BALL,
-            expected: { count: { balls: 1 }, outs: 2, boxScore: [{ home: 0, away: 4 }]}
+            expected: { count: { balls: 1 }, outs: 2, boxScore: [{ homeTeam: 0, awayTeam: 4 }]}
 
         },
         {
             pitch: Pitches.INPLAY_OUTFIELD_OUT,
-            expected: { inning: { half: InningHalf.BOTTOM }, boxScore: [{ home: 0, away: 4 }] }
+            expected: { inning: { half: InningHalf.BOTTOM }, boxScore: [{ homeTeam: 0, awayTeam: 4 }] }
         },
     ];
 
