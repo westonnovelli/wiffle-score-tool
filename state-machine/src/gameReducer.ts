@@ -1,6 +1,8 @@
+import findLast from 'ramda/src/findLast.js';
 import mergeDeepRight from 'ramda/src/mergeDeepRight.js';
-import { offenseStats } from './statsReducer';
-import { Bases, Game, GameMoment, Inning, InningHalf, OptionalRules, Score, StatEvent, Team } from './types';
+import { log } from './pitchLog';
+import { defenseStats, offenseStats } from './statsReducer';
+import { Bases, GameMoment, InningHalf, OptionalRules, Score, StatEvent, Team } from './types';
 import { Pitches } from './types';
 
 const NEW_COUNT: GameMoment['count'] = {
@@ -138,29 +140,56 @@ export const runnersOn = (state: GameMoment): number => {
 const whoisNextBatter = (state: GameMoment, offense: boolean = true): string => {
     const team = offense ? getOffense(state) : getDefense(state);
     const currentBatterOrder = team.lineup.indexOf(state.atBat);
-    return currentBatterOrder >= 0 ? team.lineup[currentBatterOrder + 1] : team.lineup[0];
+    return currentBatterOrder >= 0 ? team.lineup[(currentBatterOrder + 1) % team.lineup.length] : team.lineup[0];
 };
+
+// future proofing for when GameMoment['pitches'] includes other types of events
+const lastPitch = (state: GameMoment): Pitches => {
+    return findLast((candidate) => {
+        return Object.values(Pitches).includes(candidate)
+    }, state.pitches) ?? -1;
+};
+
+// log stats from last pitch, assumes pitch last pitch is in log
+const logStats = (state: GameMoment, inningChange: boolean = false): GameMoment => {
+    const offenseStatsTeam = inningChange ? getDefenseKey(state) : getOffenseKey(state);
+    const defenseStatsTeam = inningChange ? getOffenseKey(state) : getDefenseKey(state);
+    const thrown = lastPitch(state);
+    return {
+        ...state,
+        [offenseStatsTeam]: offenseStats(state[offenseStatsTeam], state, thrown),
+        [defenseStatsTeam]: defenseStats(state[defenseStatsTeam], state, thrown),
+    };
+}
 
 const batterUp = (state: GameMoment, inningChange: boolean = false): GameMoment => {
     // if inningChange, assumes inning half has switched, but batters have not
     const onDeck = inningChange ? state.nextHalfAtBat : whoisNextBatter(state);
     const onDeckNextInning = inningChange ? whoisNextBatter(state, false) : state.nextHalfAtBat;
 
-    const next: GameMoment = {
-        ...state,
+    const next: GameMoment = mergeDeepRight({
+        ...logStats(state, inningChange),
+        // also switch batters
         atBat: onDeck,
         nextHalfAtBat: onDeckNextInning,
-    };
-    const offenseStatsTeam = inningChange ? getDefenseKey(next) : getOffenseKey(next);
+    }, {
+        // and clear the play's runs scored
+        bases: {
+            [Bases.HOME]: 0,
+        },
+    });
+
+    // update new batter with plate appearance stat
+    const offenseStatsTeam = inningChange ? getDefenseKey(state) : getOffenseKey(state);
     return {
         ...next,
-        [offenseStatsTeam]: offenseStats(state[offenseStatsTeam], state, StatEvent.PLATE_APPEARANCE),
+        [offenseStatsTeam]: offenseStats(next[offenseStatsTeam], next, StatEvent.PLATE_APPEARANCE),
     };
 };
 
 // state transitions, this is just a reducer
-export function pitch(stateWithLoggedPitch: GameMoment, pitch: Pitches): GameMoment {
-    const state = stateWithLoggedPitch;
+export function pitch(initial: GameMoment, pitch: Pitches): GameMoment {
+    const state = log(initial, pitch);
     switch (pitch) {
         case Pitches.BALL:
             return countReducer({
@@ -182,18 +211,20 @@ export function pitch(stateWithLoggedPitch: GameMoment, pitch: Pitches): GameMom
                     balls: state.count.balls + 1
                 }
             });
-            return proceed ? basesReducer(next).next : next;
+            const { next: needsHomeCleared, proceed: notRunLimit } = proceed ? basesReducer(next) : { next, proceed };
+            return notRunLimit ? mergeDeepRight(needsHomeCleared, { bases: { [Bases.HOME]: 0 } }) : needsHomeCleared;
         }
         case Pitches.STRIKE_SWINGING:
             return strike(state).next;
         case Pitches.STRIKE_LOOKING: {
             // if enabled, acts as a strikeout
             if (state.configuration.rules[OptionalRules.CaughtLookingRule]) {
-                return outsReducer({
+                const { next, proceed } = outsReducer({
                     ...state,
                     outs: state.outs + 1,
                     count: NEW_COUNT,
-                }).next;
+                });
+                return proceed ? batterUp(next) : next;
             }
             // just another strike otherwise
             return strike(state).next;
@@ -202,32 +233,35 @@ export function pitch(stateWithLoggedPitch: GameMoment, pitch: Pitches): GameMom
             // if enabled, acts like a strikeout
             if (state.configuration.rules[OptionalRules.FoulToTheZoneIsStrikeOut]
                 && state.count.strikes === state.configuration.maxStrikes - 1) {
-                return outsReducer({
+                const { next, proceed } = outsReducer({
                     ...state,
                     outs: state.outs + 1,
                     count: NEW_COUNT,
-                }).next;
+                });
+                return proceed ? batterUp(next) : next;
             }
             // just another foul otherwise
             return foulBall(state);
         }
         case Pitches.STRIKE_FOUL_CAUGHT:
         case Pitches.INPLAY_INFIELD_GRD_OUT:
-        case Pitches.INPLAY_INFIELD_AIR_OUT:
-            return out(state).next;
-        case Pitches.INPLAY_OUTFIELD_OUT: {
+        case Pitches.INPLAY_INFIELD_AIR_OUT: {
             const { next, proceed } = out(state);
-            if (proceed && state.bases[Bases.THIRD] === 1) {
-                return basesReducer({
-                    ...next,
+            return proceed ? batterUp(next) : next;
+        }
+        case Pitches.INPLAY_OUTFIELD_OUT: {
+            const { next: inningContinues, proceed: checkForRuns } = out(state);
+            const { next, proceed } = (checkForRuns && state.bases[Bases.THIRD] === 1)
+                ? basesReducer({
+                    ...inningContinues,
                     bases: {
-                        ...next.bases,
+                        ...inningContinues.bases,
                         [Bases.THIRD]: 0,
-                        [Bases.HOME]: next.bases[Bases.HOME] + 1
+                        [Bases.HOME]: inningContinues.bases[Bases.HOME] + 1
                     },
-                }).next;
-            }
-            return next;
+                })
+                : { next: inningContinues, proceed: checkForRuns };
+            return proceed ? batterUp(next) : next;
         }
         case Pitches.STRIKE_FOUL:
             return foulBall(state);
@@ -237,7 +271,7 @@ export function pitch(stateWithLoggedPitch: GameMoment, pitch: Pitches): GameMom
                 console.warn('double play attemped without a forced runner', state);
                 return state;
             }
-            const { next, proceed } = outsReducer({
+            const { next: inningContinues, proceed: checkForRuns } = outsReducer({
                 ...state,
                 outs: state.outs + 2,
                 count: NEW_COUNT,
@@ -246,7 +280,10 @@ export function pitch(stateWithLoggedPitch: GameMoment, pitch: Pitches): GameMom
                     [forced + 1]: 0,
                 }
             });
-            return proceed ? basesReducer(next).next : next;
+            const { next, proceed } = checkForRuns
+                ? basesReducer(inningContinues)
+                : { next: inningContinues, proceed: checkForRuns };
+            return proceed ? batterUp(next) : next;
         }
         case Pitches.INPLAY_INFIELD_OUT_DP_FAIL: {
             const forced = forcedRunner(state.bases);
@@ -254,7 +291,7 @@ export function pitch(stateWithLoggedPitch: GameMoment, pitch: Pitches): GameMom
                 console.warn('double play attemped without a forced runner', state);
                 return state;
             }
-            const { next, proceed } = outsReducer({
+            const { next: inningContinues, proceed: checkForRuns } = outsReducer({
                 ...state,
                 outs: state.outs + 1,
                 count: NEW_COUNT,
@@ -264,7 +301,10 @@ export function pitch(stateWithLoggedPitch: GameMoment, pitch: Pitches): GameMom
                     [Bases.FIRST]: 1,
                 }
             });
-            return proceed ? basesReducer(next).next : next;
+            const { next, proceed } = checkForRuns
+                ? basesReducer(inningContinues)
+                : { next: inningContinues, proceed: checkForRuns };
+            return proceed ? batterUp(next) : next;
         }
         case Pitches.INPLAY_INFIELD_ERROR:
         case Pitches.INPLAY_INFIELD_SINGLE: {
@@ -329,19 +369,19 @@ export function pitch(stateWithLoggedPitch: GameMoment, pitch: Pitches): GameMom
     }
 }
 
-const getOffense = (game: GameMoment): Team => {
+export const getOffense = (game: GameMoment): Team => {
     return game.inning.half === InningHalf.TOP ? game.awayTeam : game.homeTeam;
 };
 
-const getOffenseKey = (game: GameMoment): keyof Pick<GameMoment, 'awayTeam' | 'homeTeam'> => {
+export const getOffenseKey = (game: GameMoment): keyof Pick<GameMoment, 'awayTeam' | 'homeTeam'> => {
     return game.inning.half === InningHalf.TOP ? 'awayTeam' : 'homeTeam';
 };
 
-const getDefense = (game: GameMoment): Team => {
+export const getDefense = (game: GameMoment): Team => {
     return game.inning.half === InningHalf.TOP ? game.homeTeam : game.awayTeam;
 };
 
-const getDefenseKey = (game: GameMoment): keyof Pick<GameMoment, 'awayTeam' | 'homeTeam'> => {
+export const getDefenseKey = (game: GameMoment): keyof Pick<GameMoment, 'awayTeam' | 'homeTeam'> => {
     return game.inning.half === InningHalf.TOP ? 'homeTeam' : 'awayTeam';
 };
 
@@ -356,6 +396,7 @@ interface ChainingReducer {
 
 // counts can "overflow" and cascade into outs and bases
 function countReducer(intermediate: GameMoment): ChainingReducer {
+    // is walk
     if (intermediate.count.balls >= intermediate.configuration.maxBalls) {
         const withStats = {
             ...intermediate,
@@ -370,15 +411,18 @@ function countReducer(intermediate: GameMoment): ChainingReducer {
         }));
         return { next: proceed ? batterUp(next) : next, proceed };
     }
+    // is strikeout
     if (intermediate.count.strikes >= intermediate.configuration.maxStrikes) {
         const { next, proceed } = outsReducer(mergeDeepRight(intermediate, { outs: intermediate.outs + 1, count: NEW_COUNT }));
         return { next: proceed ? batterUp(next) : next, proceed };
     }
-    return { next: intermediate, proceed: true };
+    // count continues
+    return { next: logStats(intermediate), proceed: true };
 }
 
 // bases can "overflow" and cascade into runs
 function basesReducer(intermediate: GameMoment): ChainingReducer {
+    // runners have scored
     if (intermediate.bases[Bases.HOME] > 0) {
         const withStats = {
             ...intermediate,
@@ -386,11 +430,7 @@ function basesReducer(intermediate: GameMoment): ChainingReducer {
         };
         const newScore = [...withStats.boxScore];
         newScore[withStats.inning.number - 1][getOffenseKey(withStats)] += withStats.bases[Bases.HOME];
-        return runsReducer(mergeDeepRight(withStats, {
-            bases: {
-                [Bases.HOME]: 0,
-            },
-        }));
+        return runsReducer(withStats);
     }
     return { next: intermediate, proceed: true };
 }
@@ -424,9 +464,10 @@ function runsReducer(intermediate: GameMoment): ChainingReducer {
         && intermediate.inning.half === InningHalf.BOTTOM
         && homeScore(intermediate) > awayScore(intermediate)
     ) {
+        const withStats = logStats(intermediate);
         return {
             next: {
-                ...intermediate,
+                ...withStats,
                 [getOffenseKey(intermediate)]: offenseStats(getOffense(intermediate), intermediate, StatEvent.WALK_OFF),
                 gameOver: true,
             },
@@ -452,7 +493,7 @@ function outsReducer(intermediate: GameMoment): ChainingReducer {
         const { next, proceed } = inningsReducer(needsBatterSwitch);
         return { next: proceed ? batterUp(next, true) : next, proceed: false };
     }
-    return { next: batterUp(intermediate), proceed: true };
+    return { next: intermediate, proceed: true };
 }
 
 const homeScore = (state: GameMoment): number => {
@@ -487,7 +528,7 @@ function inningsReducer(intermediate: GameMoment): ChainingReducer {
     if (lastInning && intermediate.inning.half === InningHalf.BOTTOM && homeWinning) {
         // game is over
         return {
-            next: { ...intermediate, gameOver: true, },
+            next: { ...logStats(intermediate), gameOver: true, },
             proceed: false
         };
     }

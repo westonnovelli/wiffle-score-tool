@@ -5,10 +5,10 @@ import { Pitches, OptionalRules } from './types';
 
 export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | StatEvent): Team {
     if (!game.configuration.recordingStats) return team;
-
+    
     const playerAtBat = team.roster[game.atBat];
     if (!playerAtBat) return team;
-
+    
     const batter = playerAtBat.name;
 
     switch (pitch) {
@@ -147,7 +147,7 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
                 roster: {
                     ...team.roster,
                     [batter]: record(team.roster[batter])
-                        .single(game.bases[Bases.HOME])
+                        .single()
                         .done(),
                 }
             };
@@ -157,7 +157,7 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
                 roster: {
                     ...team.roster,
                     [batter]: record(team.roster[batter])
-                        .double(game.bases[Bases.HOME])
+                        .double()
                         .done(),
                 }
             };
@@ -167,18 +167,18 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
                 roster: {
                     ...team.roster,
                     [batter]: record(team.roster[batter])
-                        .triple(game.bases[Bases.HOME])
+                        .triple()
                         .done(),
                 }
             };
         case Pitches.INPLAY_HOMERUN: {
-            const runs = game.bases[Bases.HOME] + 1;
+            const runs = game.bases[Bases.HOME]; // a homerun in the gameReducer has already included the batter
             return {
                 ...team,
                 roster: {
                     ...team.roster,
                     [batter]: record(team.roster[batter])
-                        .homerun(runs)
+                        .homerun()
                         .offense('grandslams', runs === 4 ? 1 : 0)
                         .done(),
                 }

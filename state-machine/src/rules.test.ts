@@ -1365,6 +1365,7 @@ describe('[game over]', () => {
         const thrown: Pitches = Pitches.INPLAY_HOMERUN;
         const diff: DeepPartial<GameMoment> = {
             boxScore: [{ awayTeam: 0, homeTeam: 1 }],
+            bases: { [Bases.HOME]: 1 },
             gameOver: true,
         };
 

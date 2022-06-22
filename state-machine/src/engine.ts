@@ -1,12 +1,13 @@
 import { GameMoment, Pitches } from "./types";
 import { defaultGame } from "./factory";
-import { pitch } from "./gameReducer";
+import { getDefense, getDefenseKey, getOffense, getOffenseKey, pitch } from "./gameReducer";
 import { log } from "./pitchLog";
+import { defenseStats, offenseStats } from "./statsReducer";
 
 let game = defaultGame();
 
-const handlePitch = (thrownPitch: Pitches) => {
-    game = pitch(log(game, thrownPitch), thrownPitch);
+export const handlePitch = (game: GameMoment, thrownPitch: Pitches) => {
+    return pitch(game, thrownPitch);
 };
 
 const hydrateGame = (gameStub: GameMoment): GameMoment => {

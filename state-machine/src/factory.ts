@@ -2,7 +2,7 @@ import { mergeDeepRight } from 'ramda';
 import { GameConfig, GameMoment, OptionalRules, Player, Position, Team } from './types';
 import { InningHalf, Bases } from './types';
 
-export const defaultTeam = (name: string = ''): Team => {
+export const defaultTeam = (name: string = '', alignment: 'home' | 'away' = 'away'): Team => {
     const lineup: string[] = [
         `${name && `${name} - `}playerA`,
         `${name && `${name} - `}playerB`,
@@ -10,8 +10,8 @@ export const defaultTeam = (name: string = ''): Team => {
         `${name && `${name} - `}playerD`,
     ];
 
-    const roster: Team['roster'] = lineup.reduce<Team['roster']>((acc, player) => {
-        acc[player] = defaultPlayer(player);
+    const roster: Team['roster'] = lineup.reduce<Team['roster']>((acc, player, index) => {
+        acc[player] = defaultPlayer(player, alignment === 'away' && index === 0);
         return acc;
     }, {});
 
@@ -32,7 +32,7 @@ export const defaultTeam = (name: string = ''): Team => {
     };
 };
 
-export const defaultGame = (awayTeam: Team = defaultTeam('away'), homeTeam: Team = defaultTeam('home')): GameMoment => {
+export const defaultGame = (awayTeam: Team = defaultTeam('away', 'away'), homeTeam: Team = defaultTeam('home')): GameMoment => {
     const firstBatter = awayTeam.lineup[0] ?? 'mockBatter';
     const homesFirstBatter = homeTeam.lineup[0] ?? 'mockBatterHome';
     return {
@@ -65,11 +65,11 @@ export const defaultGame = (awayTeam: Team = defaultTeam('away'), homeTeam: Team
     }
 };
 
-export const defaultPlayer = (name: string = 'mockPlayer'): Player => {
+export const defaultPlayer = (name: string = 'mockPlayer', leadOff: boolean = false): Player => {
     return {
         name,
         offenseStats: {
-            plateAppearance: 0,
+            plateAppearance: leadOff ? 1 : 0,
             atbats: 0,
             hits: 0,
             strikeoutsSwinging: 0,

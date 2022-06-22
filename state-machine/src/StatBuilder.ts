@@ -49,33 +49,29 @@ export const record = (player: Player): StatBuilder => {
             return builder
                 .offense('walks', 1);
         },
-        single: (rbi = 0) => {
+        single: () => {
             return builder
                 .offense('atbats', 1)
                 .offense('singles', 1)
-                .offense('hits', 1)
-                .offense('RBI', rbi);
+                .offense('hits', 1);
         },
-        double: (rbi = 0) => {
+        double: () => {
             return builder
                 .offense('atbats', 1)
                 .offense('doubles', 1)
-                .offense('hits', 1)
-                .offense('RBI', rbi);
+                .offense('hits', 1);
         },
-        triple: (rbi = 0) => {
+        triple: () => {
             return builder
                 .offense('atbats', 1)
                 .offense('triples', 1)
-                .offense('hits', 1)
-                .offense('RBI', rbi);
+                .offense('hits', 1);
         },
-        homerun: (rbi = 1) => {
+        homerun: () => {
             return builder
                 .offense('atbats', 1)
                 .offense('homeruns', 1)
                 .offense('hits', 1)
-                .offense('RBI', rbi)
                 .offense('runs', 1);
         },
         done: () => internalPlayer,
