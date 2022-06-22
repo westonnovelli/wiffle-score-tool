@@ -6,9 +6,9 @@
   "private": true,
   "scripts": {
     "build": "webpack",
-    "start": "webpack serve --port 3000",
-    "typecheck": "tsc --noEmit",
-    "test": "jest"
+    "lint": "tsc --noEmit",
+    "test": "jest",
+    "start": "webpack serve --port 3000"
   },
   "devDependencies": {
     "@babel/core": "^7.18.5",

@@ -1,0 +1,10 @@
+{
+    "private": true,
+    "workspaces": [
+        "state-machine",
+        "web-ui"
+    ],
+    "devDependencies": {
+        "turbo": "^1.2.16"
+    }
+}
