@@ -59,6 +59,7 @@ export const defaultGame = (awayTeam: Team = defaultTeam('away'), homeTeam: Team
         },
         awayTeam,
         homeTeam,
+        gameOver: false,
         configuration: defaultConfiguration(),
         pitches: [],
     }
@@ -87,7 +88,7 @@ export const defaultPlayer = (name: string = 'mockPlayer'): Player => {
             doublePlays: 0,
             doublePlayFails: 0,
             sacrificeFly: 0,
-            reachedOnError: 0,
+            walkoffs: 0,
         },
         defenseStats: {
             strikeoutsSwinging: 0,

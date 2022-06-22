@@ -1,7 +1,7 @@
 import mergeDeepRight from 'ramda/src/mergeDeepRight.js';
 
 import { GameMoment, DeepPartial, Pitches, InningHalf, Bases, OptionalRules } from './types';
-import { pitch } from './gameReducer';
+import { EMPTY_BOX, pitch } from './gameReducer';
 import { defaultConfiguration, defaultRules, noStatsGame } from './factory';
 
 describe('[5.02]', () => {
@@ -39,7 +39,7 @@ describe('[5.02]', () => {
             },
             atBat: 'away - playerB',
             nextHalfAtBat: 'home - playerB',
-                boxScore: [{
+            boxScore: [{
                 awayTeam: 0,
                 homeTeam: 0
             }, {
@@ -70,7 +70,7 @@ describe('[5.03]', () => {
     });
 
     test('W: a walk with an unforced runner does not advance the runner', () => {
-        const initial: GameMoment = mergeDeepRight(noStatsGame(), { count: { balls: 3 }, bases: { [Bases.THIRD]: 1 }});
+        const initial: GameMoment = mergeDeepRight(noStatsGame(), { count: { balls: 3 }, bases: { [Bases.THIRD]: 1 } });
         const thrown: Pitches = Pitches.BALL;
         const diff: DeepPartial<GameMoment> = { count: { balls: 0 }, bases: { [Bases.FIRST]: 1, [Bases.THIRD]: 1 }, atBat: 'away - playerB' };
 
@@ -1222,7 +1222,7 @@ describe('[Optional Rules]', () => {
                 atBat: 'home - playerA',
                 nextHalfAtBat: 'away - playerB',
             };
-    
+
             expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
         });
     });
@@ -1260,8 +1260,114 @@ describe('[Optional Rules]', () => {
                     [Bases.THIRD]: 0,
                 },
             };
-    
+
             expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
         });
+    });
+});
+
+describe('[game over]', () => {
+    test('if the bottom of the last inning ends and the score is not tied, the game ends', () => {
+        const initial: GameMoment = {
+            ...noStatsGame(),
+            boxScore: [
+                { ...EMPTY_BOX },
+                { ...EMPTY_BOX },
+                { ...EMPTY_BOX },
+                { awayTeam: 4, homeTeam: 0 }
+            ],
+            outs: 2,
+            inning: {
+                number: 5,
+                half: InningHalf.BOTTOM,
+            },
+            atBat: 'home - playerA',
+            nextHalfAtBat: 'away - playerC',
+        };
+        const thrown: Pitches = Pitches.INPLAY_INFIELD_GRD_OUT;
+        const diff: DeepPartial<GameMoment> = {
+            outs: 0,
+            gameOver: true,
+        };
+
+        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+    });
+
+    test('if the top of the last inning ends and the home team is winning, the game ends', () => {
+        const initial: GameMoment = {
+            ...noStatsGame(),
+            boxScore: [
+                { ...EMPTY_BOX },
+                { ...EMPTY_BOX },
+                { awayTeam: 0, homeTeam: 1 },
+                { ...EMPTY_BOX },
+                { ...EMPTY_BOX },
+            ],
+            outs: 2,
+            inning: {
+                number: 5,
+                half: InningHalf.TOP,
+            },
+        };
+        const thrown: Pitches = Pitches.INPLAY_INFIELD_GRD_OUT;
+        const diff: DeepPartial<GameMoment> = {
+            inning: {
+                half: InningHalf.BOTTOM,
+            },
+            outs: 0,
+            gameOver: true,
+        };
+
+        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+    });
+
+    test('if the last inning ends in a tie and extras are allowed, the game continues', () => {
+        const initial: GameMoment = mergeDeepRight(noStatsGame(), {
+            configuration: {
+                maxInnings: 1,
+            },
+            inning: {
+                half: InningHalf.BOTTOM
+            },
+            outs: 2,
+            atBat: 'home - playerA',
+            nextHalfAtBat: 'away - playerB',
+        });
+        const thrown: Pitches = Pitches.INPLAY_INFIELD_GRD_OUT;
+        const diff: DeepPartial<GameMoment> = {
+            boxScore: [
+                { ...EMPTY_BOX },
+                { ...EMPTY_BOX }
+            ],
+            inning: {
+                number: 2,
+                half: InningHalf.TOP,
+            },
+            outs: 0,
+            atBat: 'away - playerB',
+            nextHalfAtBat: 'home - playerB',
+        };
+
+        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+    });
+
+    test('a walk off run in the bottom of the last inning to take the lead ends the game', () => {
+        const initial: GameMoment = mergeDeepRight(noStatsGame(), {
+            configuration: {
+                maxInnings: 1,
+            },
+            inning: {
+                half: InningHalf.BOTTOM
+            },
+            atBat: 'home - playerA',
+            nextHalfAtBat: 'away - playerB',
+        });
+        const thrown: Pitches = Pitches.INPLAY_HOMERUN;
+        const diff: DeepPartial<GameMoment> = {
+            boxScore: [{ awayTeam: 0, homeTeam: 1 }],
+            gameOver: true,
+        };
+
+        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
     });
 });

@@ -184,7 +184,17 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
                 }
             };
         }
-        // TODO Walkoff stats
+        case StatEvent.WALK_OFF: {
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [batter]: record(team.roster[batter])
+                        .offense('walkoffs', 1)
+                        .done(),
+                }
+            };
+        }
         default:
             return team;
     }
