@@ -1,16 +1,32 @@
+import pickBy from 'ramda/src/pickBy.js';
 import mergeDeepRight from 'ramda/src/mergeDeepRight.js';
 import pick from 'ramda/src/pick.js';
-import { defaultGame } from './factory';
-import { GameMoment } from "./types";
+import { defaultConfiguration, defaultGame, defaultRules } from './factory';
+import { GameConfig, GameMoment } from "./types";
 
 export const serializeGame = (game: GameMoment): string => {
+    const standardConfig = defaultConfiguration();
+    const standardRules = defaultRules();
+
     const essentials = pick([
         'configuration',
         'homeTeam',
         'awayTeam',
         'pitches',
     ], game);
-    return btoa(JSON.stringify(essentials));
+    const configEssentials: Partial<GameConfig> = pickBy((value, key) => standardConfig[key] !== value, essentials.configuration);
+    const rulesEssentials: Partial<GameConfig['rules']> = pickBy((value, key) => standardRules[key] !== value, essentials.configuration.rules);
+    const awayTeamEssentials = pick(['lineup', 'defense'], essentials.awayTeam);
+    const homeTeamEssentials = pick(['lineup', 'defense'], essentials.homeTeam);
+    return btoa(JSON.stringify({
+        configuration: {
+            ...configEssentials,
+            rules: rulesEssentials,
+        },
+        awayTeam: awayTeamEssentials,
+        homeTeam: homeTeamEssentials,
+        pitches: essentials.pitches
+    }));
 };
 
 export const deserializeGame = (serialized: string): GameMoment => {

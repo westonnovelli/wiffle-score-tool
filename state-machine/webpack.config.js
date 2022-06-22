@@ -1,4 +1,3 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 
 module.exports = {
@@ -22,10 +21,5 @@ module.exports = {
         library: {
             type: 'module'
         }
-    },
-    plugins: [
-        new HtmlWebpackPlugin({
-            scriptLoading: 'module'
-        })
-    ]
+    }
 }

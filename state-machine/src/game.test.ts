@@ -1,9 +1,10 @@
 import mergeDeepRight from 'ramda/src/mergeDeepRight.js';
 
 import { GameMoment, DeepPartial, Pitches, InningHalf, Bases } from './types';
-import { handlePitch } from './engine';
+import { handlePitch, hydrateGame } from './engine';
 import { defaultGame } from './factory';
 import { EMPTY_BASES } from './gameReducer';
+import { deserializeGame, serializeGame } from './io';
 
 type atBat = {
     pitch: Pitches,
@@ -297,6 +298,7 @@ test('7th batter: fly out on 1,0, ends the inning', () => {
                         },
                     }
                 },
+                // TODO this probably needs to have a plate appearance for the homeTeam at the end of this
                 pitches: [...initial.pitches, Pitches.BALL, Pitches.INPLAY_OUTFIELD_OUT]
             }
         },
@@ -306,4 +308,12 @@ test('7th batter: fly out on 1,0, ends the inning', () => {
         game = handlePitch(game, pitch);
         expect(game).toEqual(mergeDeepRight(initial, expected));
     });
+});
+
+test('saving and loading the game results in the same state', () => {
+    const initial = { ...game };
+    const saved = serializeGame(game);
+    console.log(atob(saved));
+    console.log(saved.length);
+    expect(hydrateGame(deserializeGame(saved))).toEqual(initial);
 });
