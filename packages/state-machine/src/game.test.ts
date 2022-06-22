@@ -313,7 +313,5 @@ test('7th batter: fly out on 1,0, ends the inning', () => {
 test('saving and loading the game results in the same state', () => {
     const initial = { ...game };
     const saved = serializeGame(game);
-    console.log(atob(saved));
-    console.log(saved.length);
     expect(hydrateGame(deserializeGame(saved))).toEqual(initial);
 });

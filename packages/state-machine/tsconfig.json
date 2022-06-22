@@ -1,0 +1,9 @@
+{
+    "extends": "ts-config-wiffleball/js-library.json",
+    "include": ["."],
+    "exclude": [
+        "dist",
+        "build",
+        "node_modules"
+    ]
+}

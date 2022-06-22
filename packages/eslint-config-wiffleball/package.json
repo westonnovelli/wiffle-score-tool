@@ -1,0 +1,12 @@
+{
+    "name": "eslint-config-wiffleball",
+    "version": "0.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "private": true,
+    "dependencies": {
+        "eslint-config-next": "12.1.6",
+        "eslint-config-prettier": "8.5.0",
+        "eslint-plugin-react": "7.30.0"
+    }
+}

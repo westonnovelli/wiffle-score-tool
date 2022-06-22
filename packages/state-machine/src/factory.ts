@@ -1,6 +1,14 @@
 import { mergeDeepRight } from 'ramda';
-import { GameConfig, GameMoment, OptionalRules, Player, Position, Team } from './types';
-import { InningHalf, Bases } from './types';
+import {
+    Bases,
+    InningHalf,
+    OptionalRules,
+    Position,
+    type GameConfig,
+    type GameMoment,
+    type Player,
+    type Team,
+} from './types';
 
 export const defaultTeam = (name: string = '', alignment: 'home' | 'away' = 'away'): Team => {
     const lineup: string[] = [

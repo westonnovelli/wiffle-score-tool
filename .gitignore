@@ -23,6 +23,6 @@ yarn-debug.log*
 yarn-error.log*
 
 .turbo
-build/**
-dist/**
-.next/**
+build
+dist
+.next
