@@ -245,13 +245,27 @@ export function pitch(initial: GameMoment, pitch: Pitches): GameMoment {
         }
         case Pitches.STRIKE_FOUL_CAUGHT:
         case Pitches.INPLAY_INFIELD_GRD_OUT:
-        case Pitches.INPLAY_INFIELD_AIR_OUT: {
+        case Pitches.INPLAY_INFIELD_AIR_OUT_INFIELD_FLY: // TODO does this actually do anything different
+        case Pitches.INPLAY_INFIELD_AIR_OUT:
+        case Pitches.INPLAY_OUTFIELD_OUT: {
             const { next, proceed } = out(state);
             return proceed ? batterUp(next) : next;
         }
-        case Pitches.INPLAY_OUTFIELD_OUT: {
+        case Pitches.INPLAY_OUTFIELD_OUT_TAG_FAIL: {
+            const { next, proceed } = outsReducer({
+                ...state,
+                outs: state.outs + 2,
+                bases: {
+                    ...state.bases,
+                    [Bases.THIRD]: 0,
+                },
+            });
+            return proceed ? batterUp(next) : next;
+        }
+        case Pitches.INPLAY_OUTFIELD_OUT_TAG_SUCCESS: {
             const { next: inningContinues, proceed: checkForRuns } = out(state);
-            const { next, proceed } = (checkForRuns && state.bases[Bases.THIRD] === 1)
+            if (!checkForRuns) return inningContinues;
+            const { next, proceed } = state.bases[Bases.THIRD] === 1
                 ? basesReducer({
                     ...inningContinues,
                     bases: {
@@ -260,9 +274,9 @@ export function pitch(initial: GameMoment, pitch: Pitches): GameMoment {
                         [Bases.HOME]: inningContinues.bases[Bases.HOME] + 1
                     },
                 })
-                : { next: inningContinues, proceed: checkForRuns };
+                : { next: inningContinues, proceed: false };
             return proceed ? batterUp(next) : next;
-        }
+        }   
         case Pitches.STRIKE_FOUL:
             return foulBall(state);
         case Pitches.INPLAY_INFIELD_OUT_DP_SUCCESS: {

@@ -14,11 +14,14 @@ export enum Pitches {
 
     // IN PLAY
     INPLAY_INFIELD_GRD_OUT,
-    INPLAY_INFIELD_AIR_OUT, // caught in the in-field, in the air
+    INPLAY_INFIELD_AIR_OUT, // caught in the in-field, in the air (line drive or no infield fly call)
+    INPLAY_INFIELD_AIR_OUT_INFIELD_FLY,
     INPLAY_INFIELD_OUT_DP_SUCCESS,
     INPLAY_INFIELD_OUT_DP_FAIL,
     INPLAY_INFIELD_ERROR,
     INPLAY_OUTFIELD_OUT,
+    INPLAY_OUTFIELD_OUT_TAG_SUCCESS,
+    INPLAY_OUTFIELD_OUT_TAG_FAIL,
     INPLAY_INFIELD_SINGLE,
     INPLAY_OUTFIELD_SINGLE,
     INPLAY_DOUBLE,
@@ -121,7 +124,8 @@ export interface GameMoment {
     awayTeam: Team;
     gameOver: boolean;
     configuration: GameConfig;
-    pitches: Pitches[];
+    pitches: (Pitches | -1)[];
+    manualEdits: DeepPartial<GameMoment>[]
 }
 
 export interface GameConfig {
@@ -142,6 +146,7 @@ export enum OptionalRules {
     FoulToTheZoneIsStrikeOut,
     ThirdBaseCanTag,
     AllowSinglePlayRunsToPassLimit,
+    InFieldFly,
 }
 
 export type BattingOrder = string[];

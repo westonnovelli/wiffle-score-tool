@@ -13,19 +13,20 @@ export const serializeGame = (game: GameMoment): string => {
         'homeTeam',
         'awayTeam',
         'pitches',
+        'manualEdits'
     ], game);
     const configEssentials: Partial<GameConfig> = pickBy((value, key) => standardConfig[key] !== value, essentials.configuration);
     const rulesEssentials: Partial<GameConfig['rules']> = pickBy((value, key) => standardRules[key] !== value, essentials.configuration.rules);
     const awayTeamEssentials = pick(['lineup', 'defense'], essentials.awayTeam);
     const homeTeamEssentials = pick(['lineup', 'defense'], essentials.homeTeam);
     return btoa(JSON.stringify({
+        ...essentials,
         configuration: {
             ...configEssentials,
             rules: rulesEssentials,
         },
         awayTeam: awayTeamEssentials,
         homeTeam: homeTeamEssentials,
-        pitches: essentials.pitches
     }));
 };
 
@@ -45,5 +46,6 @@ export const deserializeGame = (serialized: string): GameMoment => {
     return {
         ...merged,
         pitches: parsed?.pitches ?? [],
+        manualEdits: parsed?.manualEdits ?? [],
     };
 };

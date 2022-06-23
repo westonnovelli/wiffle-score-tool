@@ -120,13 +120,8 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
             };
         case Pitches.STRIKE_FOUL_CAUGHT:
         case Pitches.INPLAY_OUTFIELD_OUT:
+        case Pitches.INPLAY_OUTFIELD_OUT_TAG_FAIL:
         case Pitches.INPLAY_INFIELD_AIR_OUT:
-            const runnerTaggedAndScored = (
-                game.configuration.rules[OptionalRules.ThirdBaseCanTag]
-                && pitch === Pitches.INPLAY_OUTFIELD_OUT
-                && game.outs <= game.configuration.maxOuts - 2 // we've already added an additional out for this play
-                && game.bases[Bases.THIRD] > 1
-            );
             return {
                 ...team,
                 roster: {
@@ -134,11 +129,23 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
                     [batter]: record(team.roster[batter])
                         .atBat()
                         .offense('flyOuts', 1)
-                        .offense('RBI', runnerTaggedAndScored ? 1 : 0)
-                        .offense('sacrificeFly', runnerTaggedAndScored ? 1 : 0)
                         .done(),
                 }
             };
+        case Pitches.INPLAY_OUTFIELD_OUT_TAG_SUCCESS: {
+            if (!game.configuration.rules[OptionalRules.ThirdBaseCanTag]) return team;
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [batter]: record(team.roster[batter])
+                        .atBat()
+                        .offense('flyOuts', 1)
+                        .offense('sacrificeFly', 1)
+                        .done(),
+                }
+            };
+        }
         case Pitches.INPLAY_INFIELD_ERROR:
         case Pitches.INPLAY_INFIELD_SINGLE:
         case Pitches.INPLAY_OUTFIELD_SINGLE:

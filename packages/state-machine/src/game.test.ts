@@ -5,6 +5,7 @@ import { handlePitch, hydrateGame } from './engine';
 import { defaultGame } from './factory';
 import { EMPTY_BASES } from './gameReducer';
 import { deserializeGame, serializeGame } from './io';
+import manualEdit from './manualEdit';
 
 type atBat = {
     pitch: Pitches,
@@ -63,7 +64,7 @@ test('2nd batter: single on 1,2 count', () => {
     const atBat: atBat = [
         {
             pitch: Pitches.BALL,
-            expected: { count: { balls: 1 }, bases: { [Bases.FIRST]: 1, }, pitches: [...initial.pitches, Pitches.BALL]}
+            expected: { count: { balls: 1 }, bases: { [Bases.FIRST]: 1, }, pitches: [...initial.pitches, Pitches.BALL] }
         },
         {
             pitch: Pitches.STRIKE_FOUL,
@@ -130,7 +131,8 @@ test('3rd batter: groud out on first pitch', () => {
                         }
                     }
                 },
-                pitches: [...initial.pitches, Pitches.INPLAY_INFIELD_GRD_OUT] }
+                pitches: [...initial.pitches, Pitches.INPLAY_INFIELD_GRD_OUT]
+            }
         },
     ];
 
@@ -145,11 +147,11 @@ test('4th batter: strikeout looking on 2,0 count', () => {
     const atBat: atBat = [
         {
             pitch: Pitches.BALL,
-            expected: { count: { balls: 1 }, outs: 1, bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1, }, pitches: [...initial.pitches, Pitches.BALL ] }
+            expected: { count: { balls: 1 }, outs: 1, bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1, }, pitches: [...initial.pitches, Pitches.BALL] }
         },
         {
             pitch: Pitches.BALL,
-            expected: { count: { balls: 2 }, outs: 1, bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1, }, pitches: [...initial.pitches, Pitches.BALL, Pitches.BALL ] }
+            expected: { count: { balls: 2 }, outs: 1, bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1, }, pitches: [...initial.pitches, Pitches.BALL, Pitches.BALL] }
         },
         {
             pitch: Pitches.STRIKE_LOOKING,
@@ -173,7 +175,8 @@ test('4th batter: strikeout looking on 2,0 count', () => {
                         }
                     }
                 },
-                pitches: [...initial.pitches, Pitches.BALL, Pitches.BALL, Pitches.STRIKE_LOOKING ] }
+                pitches: [...initial.pitches, Pitches.BALL, Pitches.BALL, Pitches.STRIKE_LOOKING]
+            }
         },
     ];
 
@@ -221,7 +224,8 @@ test('5th batter: foul, foul, foul, infield error', () => {
                         }
                     }
                 },
-                pitches: [...initial.pitches, Pitches.STRIKE_FOUL, Pitches.STRIKE_FOUL, Pitches.STRIKE_FOUL, Pitches.INPLAY_INFIELD_ERROR] }
+                pitches: [...initial.pitches, Pitches.STRIKE_FOUL, Pitches.STRIKE_FOUL, Pitches.STRIKE_FOUL, Pitches.INPLAY_INFIELD_ERROR]
+            }
         },
     ];
 
@@ -308,6 +312,92 @@ test('7th batter: fly out on 1,0, ends the inning', () => {
         game = handlePitch(game, pitch);
         expect(game).toEqual(mergeDeepRight(initial, expected));
     });
+});
+
+
+test('next inning - batter 1: triple, first pitch', () => {
+    const initial = { ...game };
+    const atBat: atBat = [
+        {
+            pitch: Pitches.INPLAY_TRIPLE,
+            expected: {
+                atBat: 'home - playerB',
+                bases: { [Bases.THIRD]: 1 },
+                homeTeam: {
+                    roster: {
+                        'home - playerA': {
+                            offenseStats: {
+                                plateAppearance: 1,
+                                atbats: 1,
+                                hits: 1,
+                                triples: 1,
+                            }
+                        },
+                        'home - playerB': {
+                            offenseStats: {
+                                plateAppearance: 1,
+                            }
+                        }
+                    }
+                },
+                pitches: [...initial.pitches, Pitches.INPLAY_TRIPLE]
+            }
+        },
+    ];
+
+    atBat.forEach(({ pitch, expected }) => {
+        game = handlePitch(game, pitch);
+        expect(game).toEqual(mergeDeepRight(initial, expected));
+    });
+});
+
+test('batter 2: sac fly, runner tags', () => {
+    const initial = { ...game };
+    const atBat: atBat = [
+        {
+            pitch: Pitches.INPLAY_OUTFIELD_OUT_TAG_SUCCESS,
+            expected: {
+                atBat: 'home - playerC',
+                bases: { [Bases.THIRD]: 0 },
+                outs: 1,
+                homeTeam: {
+                    roster: {
+                        'home - playerB': {
+                            offenseStats: {
+                                atbats: 1,
+                                flyOuts: 1,
+                                sacrificeFly: 1,
+                                RBI: 1
+                            }
+                        },
+                        'home - playerC': {
+                            offenseStats: {
+                                plateAppearance: 1,
+                            }
+                        }
+                    }
+                },
+                pitches: [...initial.pitches, Pitches.INPLAY_OUTFIELD_OUT_TAG_SUCCESS]
+            }
+        },
+    ];
+
+    atBat.forEach(({ pitch, expected }) => {
+        game = handlePitch(game, pitch);
+        expect(game).toEqual(mergeDeepRight(initial, expected));
+    });
+});
+
+test('manual edit adjusts the game state', () => {
+    const initial = { ...game };
+    const edit: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 1 } };
+    game = manualEdit(game, edit);
+    const expected = {
+        bases: { [Bases.FIRST]: 1 },
+        pitches: [...initial.pitches, -1],
+        manualEdits: [{ ...edit }],
+    }
+    expect(game).toEqual(mergeDeepRight(initial, expected));
 });
 
 test('saving and loading the game results in the same state', () => {

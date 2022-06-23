@@ -70,6 +70,7 @@ export const defaultGame = (awayTeam: Team = defaultTeam('away', 'away'), homeTe
         gameOver: false,
         configuration: defaultConfiguration(),
         pitches: [],
+        manualEdits: [],
     }
 };
 
@@ -134,6 +135,7 @@ export const defaultRules = (): Record<OptionalRules, boolean> => {
         [OptionalRules.FoulToTheZoneIsStrikeOut]: true,
         [OptionalRules.ThirdBaseCanTag]: true,
         [OptionalRules.AllowSinglePlayRunsToPassLimit]: false,
+        [OptionalRules.InFieldFly]: false,
     };
 };
 

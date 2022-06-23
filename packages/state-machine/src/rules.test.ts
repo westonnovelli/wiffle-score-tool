@@ -1085,13 +1085,36 @@ describe('[7.01]', () => {
 });
 
 describe('[7.02]', () => {
-    test('FLO.003: outfield fly out, with a runner on third, scores the runner', () => {
+    test('FLO.003: outfield fly out without tag, with a runner on third, does not score the runner', () => {
         const initial: GameMoment = mergeDeepRight(noStatsGame(), { bases: { [Bases.THIRD]: 1 } });
         const thrown: Pitches = Pitches.INPLAY_OUTFIELD_OUT;
         const diff: DeepPartial<GameMoment> = {
             outs: 1,
+            atBat: 'away - playerB'
+        };
+
+        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+    });
+    
+    test('FLO.003t!: outfield fly out with successful tag, with a runner on third, scores the runner', () => {
+        const initial: GameMoment = mergeDeepRight(noStatsGame(), { bases: { [Bases.THIRD]: 1 } });
+        const thrown: Pitches = Pitches.INPLAY_OUTFIELD_OUT_TAG_SUCCESS;
+        const diff: DeepPartial<GameMoment> = {
+            outs: 1,
             bases: { [Bases.THIRD]: 0, },
             boxScore: [{ homeTeam: 0, awayTeam: 1 }],
+            atBat: 'away - playerB'
+        };
+
+        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+    });
+
+    test('FLO.003t?: outfield fly out with failed tag, with a runner on third, results in second out', () => {
+        const initial: GameMoment = mergeDeepRight(noStatsGame(), { bases: { [Bases.THIRD]: 1 } });
+        const thrown: Pitches = Pitches.INPLAY_OUTFIELD_OUT_TAG_FAIL;
+        const diff: DeepPartial<GameMoment> = {
+            outs: 2,
+            bases: { [Bases.THIRD]: 0, },
             atBat: 'away - playerB'
         };
 
@@ -1175,7 +1198,7 @@ describe('[7.03]', () => {
         expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
     });
 
-    test('DP.103: with a runner on 1st and 3rd, a successful doubleplay, results in the runner on 1st out and batter out, runner on 3rd run scores', () => {
+    test('DP.103.0: with a runner on 1st and 3rd, a successful doubleplay, results in the runner on 1st out and batter out, runner on 3rd run scores if less than 1 out before', () => {
         const initial: GameMoment = mergeDeepRight(noStatsGame(), { bases: { [Bases.FIRST]: 1, [Bases.THIRD]: 1 } });
         const thrown: Pitches = Pitches.INPLAY_INFIELD_OUT_DP_SUCCESS;
         const diff: DeepPartial<GameMoment> = {
@@ -1186,6 +1209,25 @@ describe('[7.03]', () => {
             outs: 2,
             boxScore: [{ homeTeam: 0, awayTeam: 1 }],
             atBat: 'away - playerB'
+        };
+
+        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+    });
+
+    test('DP.103.1: with a runner on 1st and 3rd, a successful doubleplay, results in the runner on 1st out and batter out, runner on 3rd does not score because the inning ends', () => {
+        const initial: GameMoment = mergeDeepRight(noStatsGame(), { outs: 1, bases: { [Bases.FIRST]: 1, [Bases.THIRD]: 1 } });
+        const thrown: Pitches = Pitches.INPLAY_INFIELD_OUT_DP_SUCCESS;
+        const diff: DeepPartial<GameMoment> = {
+            bases: {
+                [Bases.FIRST]: 0,
+                [Bases.THIRD]: 0
+            },
+            outs: 0,
+            atBat: 'home - playerA',
+            nextHalfAtBat: 'away - playerB',
+            inning: {
+                half: InningHalf.BOTTOM,
+            },
         };
 
         expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
