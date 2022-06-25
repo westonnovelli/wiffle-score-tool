@@ -1,29 +1,24 @@
 import React from 'react';
-import logo from './logo.svg';
+// import logo from './logo.svg';
 import './App.css';
+// import Field from './Field';
+import Scoreboard from './Scoreboard';
+import Pitch from './Pitch';
 
-import { OptionalRules, defaultRules } from '@wiffleball/state-machine';
+import { defaultGame, Pitches, handlePitch as processPitch } from '@wiffleball/state-machine';
 
 function App() {
-  const standardRules = defaultRules();
+  const [game, setGame] = React.useState(defaultGame());
+
+  const handlePitch = (pitch: Pitches) => {
+    setGame(processPitch(game, pitch));
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <ul>
-          {Object.entries(standardRules).map(([ruleKey, value]) =>
-            <li key={ruleKey}>{OptionalRules[parseInt(ruleKey)]} = {JSON.stringify(value)}</li>
-          )}
-        </ul>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {/* <Field /> */}
+      <Scoreboard game={game} />
+      <Pitch onPitch={handlePitch} />
     </div>
   );
 }
