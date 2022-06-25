@@ -1,0 +1,24 @@
+.pitch {
+
+}
+
+
+.pitch-menu {}
+
+.pitch-menu button.pitch-btn {
+    border-radius: 50%;
+    border: 1px solid #6464f4;
+    background: #f1f1f1;
+    color: #1d1dca;
+    font-weight: 600;
+}
+
+.pitch-menu button.pitch-btn div {
+    font-size: 10px;
+    font-weight: 400;
+    color: #414040;
+}
+
+.pitch-menu button.pitch-btn:active {
+    background-color: #5c5c5c;
+}

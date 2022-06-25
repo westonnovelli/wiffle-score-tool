@@ -21,12 +21,14 @@ const Scoreboard: React.FC<Props> = ({ game }) => {
             </div>
             <div className="boxScore">
                 <table>
-                    <tr><td>AWAY</td><td>HOME</td></tr>
-                    {game.boxScore.map(({ awayTeam, homeTeam }, i) => {
-                        return (
-                            <tr key={i}><td>{awayTeam}</td><td>{homeTeam}</td></tr>
-                        );
-                    })}
+                    <thead><tr><td>AWAY</td><td>HOME</td></tr></thead>
+                    <tbody>
+                        {game.boxScore.map(({ awayTeam, homeTeam }, i) => {
+                            return (
+                                <tr key={i}><td>{awayTeam}</td><td>{homeTeam}</td></tr>
+                            );
+                        })}
+                    </tbody>
                 </table>
             </div>
             <div className="bases">

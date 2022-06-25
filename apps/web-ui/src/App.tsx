@@ -19,6 +19,7 @@ function App() {
       {/* <Field /> */}
       <Scoreboard game={game} />
       <Pitch onPitch={handlePitch} />
+      <button onClick={() => void setGame(defaultGame())}>reset game</button>
     </div>
   );
 }
