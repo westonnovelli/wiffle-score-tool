@@ -1,5 +1,6 @@
 import { Bases, GameMoment } from '@wiffleball/state-machine';
 import React from 'react';
+import './Scoreboard.css';
 
 
 interface Props {
@@ -14,24 +15,51 @@ const Scoreboard: React.FC<Props> = ({ game }) => {
     }, [0, 0]);
 
     return (
-        <div>
-            <div className="teams">
+        <div className="scoreboard">
+            {/* <div className="teams">
                 <div>AWAY - {awayScore}</div>
                 <div>HOME - {homeScore}</div>
-            </div>
+            </div> */}
             <div className="boxScore">
                 <table>
-                    <thead><tr><td>AWAY</td><td>HOME</td></tr></thead>
+                    <thead>
+                        <tr>
+                            <td></td>
+                            {Array.from(Array(game.boxScore.length)).map((_, i) => (
+                                <td key={i}>{i + 1}</td>
+                            ))}
+                            <td className="runs">R</td>
+                            <td>E</td>
+                            <td>L</td>
+                        </tr>
+                    </thead>
                     <tbody>
-                        {game.boxScore.map(({ awayTeam, homeTeam }, i) => {
-                            return (
-                                <tr key={i}><td>{awayTeam}</td><td>{homeTeam}</td></tr>
-                            );
-                        })}
+                        <tr className="awayScore">
+                            <th>AWAY</th>
+                            {game.boxScore.map(({ awayTeam }, i) => {
+                                return (
+                                    <td key={i}>{awayTeam}</td>
+                                );
+                            })}
+                            <th className="runs">{awayScore}</th>
+                            <td>0</td>
+                            <td>0</td>
+                        </tr>
+                        <tr className="homeScore">
+                            <th>HOME</th>
+                            {game.boxScore.map(({ homeTeam }, i) => {
+                                return (
+                                    <td key={i}>{homeTeam}</td>
+                                );
+                            })}
+                            <th className="runs">{homeScore}</th>
+                            <td>0</td>
+                            <td>0</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
-            <div className="bases">
+            <div className="bases" style={{ textAlign: 'center'}}>
                 <div style={{ display: 'flex', flexDirection: 'column', width: '40px' }}>
                     <div className="secondbase">{game.bases[Bases.SECOND] > 0 ? 'X' : '[]'}</div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>

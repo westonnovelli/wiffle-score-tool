@@ -17,7 +17,6 @@ function App() {
 
   return (
     <div className="App">
-      {/* <Field /> */}
       <Scoreboard game={game} />
       <Pitch onPitch={handlePitch} />
       <button onClick={() => void setGame(defaultGame())}>reset game</button>
