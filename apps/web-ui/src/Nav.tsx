@@ -1,12 +1,16 @@
 import React from 'react';
 import './Nav.css';
 
-const Nav: React.FC = () => {
+interface Props {
+    onSelectPitch: () => void;
+}
+
+const Nav: React.FC<Props> = ({ onSelectPitch }) => {
     return (
         <div className="nav">
-            <button className="nav-btn"></button>
-            <button className="nav-btn"></button>
-            <button className="nav-btn"></button>
+            <button className="nav-btn">Manage</button>
+            <button className="nav-btn pitch" onClick={onSelectPitch}>Pitch</button>
+            <button className="nav-btn">Stats</button>
         </div>
     );
 };

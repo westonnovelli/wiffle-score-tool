@@ -139,21 +139,21 @@ window.pitchlayout = 'layout2';
 
 const PitchSelector: React.FC<Props> = ({ onPitch, possiblePitches = [] }) => {
     return (
-        <div className={'pitch pitch-menu ' + 
+        <div className={'pitch pitch-menu ' +
             // @ts-expect-error
             `${window.pitchlayout}`
         }>
             {PITCH_LIST.map(({ pitch, gridArea, type, label, subtext }) =>
-                <button
-                    key={pitch}
-                    className={`pitch-btn ${type}`}
-                    style={{ gridArea }}
-                    onClick={() => onPitch(pitch)}
-                    disabled={possiblePitches.includes(pitch)}
-                >
+                <div key={pitch} style={{ gridArea }}>
+                    <button
+                        className={`pitch-btn ${type}`}
+                        onClick={() => onPitch(pitch)}
+                        disabled={possiblePitches.includes(pitch)}
+                    >
                         {label}
                         {subtext && (<div>{subtext}</div>)}
-                </button>
+                    </button>
+                </div>
             )}
         </div >
     );
