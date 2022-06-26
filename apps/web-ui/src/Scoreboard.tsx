@@ -1,4 +1,4 @@
-import { Bases, GameMoment } from '@wiffleball/state-machine';
+import { Bases, GameMoment, getDefense, InningHalf, Score } from '@wiffleball/state-machine';
 import React from 'react';
 import './Scoreboard.css';
 
@@ -8,73 +8,157 @@ interface Props {
 }
 
 const Scoreboard: React.FC<Props> = ({ game }) => {
-    const [awayScore, homeScore] = game.boxScore.reduce((total, inning) => {
+
+
+    return (
+        <div className="scoreboard">
+            <BoxScore 
+                maxInnings={game.configuration.maxInnings}
+                inningNumber={game.inning.number}
+                inningHalf={game.inning.half}
+                boxScore={game.boxScore}
+            />
+            <BasesRender
+                first={game.bases[Bases.FIRST]}
+                second={game.bases[Bases.SECOND]}
+                third={game.bases[Bases.THIRD]}
+            />
+            <Count
+                inningHalf={game.inning.half}
+                inningNumber={game.inning.number}
+                balls={game.count.balls}
+                strikes={game.count.strikes}
+                outs={game.outs}
+            />
+            <Players batter={game.atBat} pitcher={getDefense(game).defense.pitcher} />
+        </div>
+    );
+};
+
+type BoxScoreProps = {
+    maxInnings: number;
+    inningNumber: number;
+    inningHalf: InningHalf;
+    boxScore: GameMoment['boxScore'];
+};
+
+const BoxScore = React.memo(({inningNumber, inningHalf, maxInnings, boxScore}: BoxScoreProps) => {
+    const [awayScore, homeScore] = boxScore.reduce((total, inning) => {
         total[0] += inning.awayTeam;
         total[1] += inning.homeTeam;
         return total;
     }, [0, 0]);
 
+    const inningsToShow = Math.max(boxScore.length, maxInnings);
+    const inningsDiff = inningsToShow -boxScore.length;
     return (
-        <div className="scoreboard">
-            {/* <div className="teams">
-                <div>AWAY - {awayScore}</div>
-                <div>HOME - {homeScore}</div>
-            </div> */}
-            <div className="boxScore">
-                <table>
-                    <thead>
-                        <tr>
-                            <td></td>
-                            {Array.from(Array(game.boxScore.length)).map((_, i) => (
-                                <td key={i}>{i + 1}</td>
-                            ))}
-                            <td className="runs">R</td>
-                            <td>E</td>
-                            <td>L</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr className="awayScore">
-                            <th>AWAY</th>
-                            {game.boxScore.map(({ awayTeam }, i) => {
-                                return (
-                                    <td key={i}>{awayTeam}</td>
-                                );
-                            })}
-                            <th className="runs">{awayScore}</th>
-                            <td>0</td>
-                            <td>0</td>
-                        </tr>
-                        <tr className="homeScore">
-                            <th>HOME</th>
-                            {game.boxScore.map(({ homeTeam }, i) => {
-                                return (
-                                    <td key={i}>{homeTeam}</td>
-                                );
-                            })}
-                            <th className="runs">{homeScore}</th>
-                            <td>0</td>
-                            <td>0</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div className="bases" style={{ textAlign: 'center'}}>
-                <div style={{ display: 'flex', flexDirection: 'column', width: '40px' }}>
-                    <div className="secondbase">{game.bases[Bases.SECOND] > 0 ? 'X' : '[]'}</div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <div className="thirdbase">{game.bases[Bases.THIRD] > 0 ? 'X' : '[]'}</div>
-                        <div className="firstbase">{game.bases[Bases.FIRST] > 0 ? 'X' : '[]'}</div>
-                    </div>
-                    <div className="homeplate">[]</div>
-                </div>
-            </div>
-            <div className="count">
-                <div>{game.count.balls} - {game.count.strikes}</div>
-                <div>{game.outs} {game.outs === 1 ? 'out' : 'outs'}</div>
-            </div>
+        <div className="boxScore">
+            <table>
+                <thead>
+                    <tr>
+                        <td></td>
+                        {Array.from(Array(inningsToShow)).map((_, i) => (
+                            <td key={i}>{i + 1}</td>
+                        ))}
+                        <td className="runs">R</td>
+                        <td>H</td>
+                        <td>E</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr className="awayScore">
+                        <th>AWAY</th>
+                        {boxScore.map(({ awayTeam }, i) => {
+                            return (
+                                <td
+                                    key={i}
+                                    className={`${inningNumber === i + 1 && inningHalf === InningHalf.TOP
+                                        ? 'active' : ''
+                                        }`}
+                                >{awayTeam}</td>
+                            );
+                        })}
+                        {Array.from(Array(inningsDiff)).map((_, i) => (
+                            <td key={i}></td>
+                        ))}
+                        <th className="runs">{awayScore}</th>
+                        <td>0</td>
+                        <td>0</td>
+                    </tr>
+                    <tr className="homeScore">
+                        <th>HOME</th>
+                        {boxScore.map(({ homeTeam }, i) => {
+                            return (
+                                <td
+                                    key={i}
+                                    className={`${inningNumber === i + 1 && inningHalf === InningHalf.BOTTOM
+                                        ? 'active' : ''
+                                        }`}
+                                >{homeTeam}</td>
+                            );
+                        })}
+                        {Array.from(Array(inningsDiff)).map((_, i) => (
+                            <td key={i}></td>
+                        ))}
+                        <th className="runs">{homeScore}</th>
+                        <td>0</td>
+                        <td>0</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     );
-};
+});
+
+interface BasesProps {
+    first: number;
+    second: number;
+    third: number;
+}
+
+const BasesRender = React.memo(({ first, second, third }: BasesProps) => (
+    <div className="bases">
+        {/* <div className="crosshair vertical"></div> */}
+        {/* <div className="crosshair horizontal"></div> */}
+        <div className="base firstbase"><div className={`${first > 0 ? 'occupied' : ''}`} /></div>
+        <div className="base secondbase"><div className={`${second > 0 ? 'occupied' : ''}`} /></div>
+        <div className="base thirdbase"><div className={`${third > 0 ? 'occupied' : ''}`} /></div>
+        <div className={`homeplate`}><div /></div>
+    </div>
+));
+
+interface CountProps {
+    inningHalf: InningHalf;
+    inningNumber: number;
+    balls: number;
+    strikes: number;
+    outs: number;
+}
+
+const Count = React.memo(({
+    inningHalf,
+    inningNumber,
+    balls,
+    strikes,
+    outs
+}: CountProps) => (
+    <div className="count">
+        <div><span>{inningHalf === InningHalf.TOP ? '▲' : '▼'}</span>{inningNumber}</div>
+        <div>{balls} - {strikes}</div>
+        <div>{outs} {outs === 1 ? 'out' : 'outs'}</div>
+    </div>
+));
+
+interface PlayersProps {
+    batter: string;
+    pitcher: string;
+}
+
+const Players = React.memo(({ batter, pitcher }: PlayersProps) => (
+    <div className="players">
+        <div><span>batting:</span> {batter}</div>
+        <div><span>pitching:</span> {pitcher} </div>
+    </div>
+));
 
 export default Scoreboard;

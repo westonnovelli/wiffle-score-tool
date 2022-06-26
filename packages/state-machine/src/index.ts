@@ -4,8 +4,8 @@ export {
     Bases,
     OptionalRules,
     Position,
+    InningHalf,
     type Inning,
-    type InningHalf,
     type Score,
     type CountMoment,
     type OffenseStats,
@@ -18,3 +18,5 @@ export {
 } from './types';
 export { defaultRules, defaultGame, defaultConfiguration, defaultPlayer, defaultTeam } from './factory';
 export { handlePitch, hydrateGame } from './engine';
+export { getOffense, getDefense } from './gameReducer';
+

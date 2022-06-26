@@ -3,10 +3,11 @@ import React from 'react';
 import './colors.css';
 import './App.css';
 // import Field from './Field';
+import { defaultGame, Pitches, handlePitch as processPitch } from '@wiffleball/state-machine';
 import Scoreboard from './Scoreboard';
 import Pitch from './Pitch';
+import Nav from './Nav';
 
-import { defaultGame, Pitches, handlePitch as processPitch } from '@wiffleball/state-machine';
 
 function App() {
   const [game, setGame] = React.useState(defaultGame());
@@ -18,7 +19,8 @@ function App() {
   return (
     <div className="App">
       <Scoreboard game={game} />
-      <Pitch onPitch={handlePitch} />
+      <Nav />
+      {/* <Pitch onPitch={handlePitch} /> */}
       <button onClick={() => void setGame(defaultGame())}>reset game</button>
     </div>
   );

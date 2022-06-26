@@ -1,6 +1,6 @@
 .App {
 
-  background: #EEEEEE;
+  background: var(--color-primary);
 }
 
 .App-logo {
