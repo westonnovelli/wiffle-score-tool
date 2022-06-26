@@ -1,5 +1,6 @@
 import React from 'react';
 // import logo from './logo.svg';
+import './colors.css';
 import './App.css';
 // import Field from './Field';
 import Scoreboard from './Scoreboard';

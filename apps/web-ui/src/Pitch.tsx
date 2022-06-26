@@ -3,41 +3,158 @@ import { Pitches } from '@wiffleball/state-machine';
 import './Pitch.css';
 
 interface Props {
-    onPitch: (p: Pitches) => void
+    onPitch: (p: Pitches) => void;
+    possiblePitches?: number[];
 }
 
-const PitchSelector: React.FC<Props> = ({ onPitch }) => {
+type PitchList = {
+    pitch: Pitches;
+    gridArea: string;
+    type: 'justpitch' | 'inplayout' | 'inplayboth' | 'inplay';
+    label: string;
+    subtext?: string;
+    description?: string;
+}[];
+
+const PITCH_LIST: PitchList = [
+    {
+        pitch: Pitches.BALL,
+        gridArea: 'B',
+        type: 'justpitch',
+        label: 'B',
+    }, {
+        pitch: Pitches.BALL_WILD,
+        gridArea: 'W',
+        type: 'justpitch',
+        label: 'WP',
+    }, {
+        pitch: Pitches.STRIKE_SWINGING,
+        gridArea: 'S',
+        type: 'justpitch',
+        label: 'S',
+    }, {
+        pitch: Pitches.STRIKE_LOOKING,
+        gridArea: 'K',
+        type: 'inplayout',
+        label: 'ꓘ',
+    }, {
+        pitch: Pitches.STRIKE_FOUL,
+        gridArea: 'F',
+        type: 'justpitch',
+        label: 'Foul',
+    }, {
+        pitch: Pitches.STRIKE_FOUL_ZONE,
+        gridArea: 'Z',
+        type: 'inplayout',
+        label: 'Foul',
+        subtext: 'K',
+    }, {
+        pitch: Pitches.STRIKE_FOUL_CAUGHT,
+        gridArea: 'Q',
+        type: 'inplayout',
+        label: 'Foul',
+        subtext: 'caught',
+
+    }, {
+        pitch: Pitches.INPLAY_INFIELD_GRD_OUT,
+        gridArea: 'G',
+        type: 'inplayout',
+        label: 'Grd out',
+    }, {
+        pitch: Pitches.INPLAY_INFIELD_AIR_OUT,
+        gridArea: 'A',
+        type: 'inplayout',
+        label: 'Popup',
+        subtext: '(out)',
+    }, {
+        pitch: Pitches.INPLAY_INFIELD_AIR_OUT_INFIELD_FLY,
+        gridArea: 'I',
+        type: 'inplayboth',
+        label: 'Infield fly',
+    }, {
+        pitch: Pitches.INPLAY_INFIELD_OUT_DP_SUCCESS,
+        gridArea: 'D',
+        type: 'inplayout',
+        label: 'DP',
+    }, {
+        pitch: Pitches.INPLAY_INFIELD_OUT_DP_FAIL,
+        gridArea: 'C',
+        type: 'inplayboth',
+        label: 'FC',
+        subtext: '(DP fail)',
+    }, {
+        pitch: Pitches.INPLAY_INFIELD_ERROR,
+        gridArea: 'E',
+        type: 'inplay',
+        label: 'Error',
+        subtext: 'single',
+    }, {
+        pitch: Pitches.INPLAY_OUTFIELD_OUT,
+        gridArea: 'Y',
+        type: 'inplayout',
+        label: 'Fly out',
+    }, {
+        pitch: Pitches.INPLAY_OUTFIELD_OUT_TAG_SUCCESS,
+        gridArea: 'T',
+        type: 'inplayboth',
+        label: 'Fly out',
+        subtext: 'runner tagged',
+    }, {
+        pitch: Pitches.INPLAY_OUTFIELD_OUT_TAG_FAIL,
+        gridArea: 'O',
+        type: 'inplayboth',
+        label: 'Fly out',
+        subtext: 'runner thrown out',
+    }, {
+        pitch: Pitches.INPLAY_INFIELD_SINGLE,
+        gridArea: 'L',
+        type: 'inplay',
+        label: '1B',
+        subtext: '(infield)',
+    }, {
+        pitch: Pitches.INPLAY_OUTFIELD_SINGLE,
+        gridArea: 'single',
+        type: 'inplay',
+        label: '1B',
+    }, {
+        pitch: Pitches.INPLAY_DOUBLE,
+        gridArea: 'double',
+        type: 'inplay',
+        label: '2B',
+    }, {
+        pitch: Pitches.INPLAY_TRIPLE,
+        gridArea: 'triple',
+        type: 'inplay',
+        label: '3B',
+    }, {
+        pitch: Pitches.INPLAY_HOMERUN,
+        gridArea: 'H',
+        type: 'inplay',
+        label: 'HR',
+    }
+];
+
+// @ts-expect-error
+window.pitchlayout = 'layout2';
+
+const PitchSelector: React.FC<Props> = ({ onPitch, possiblePitches = [] }) => {
     return (
-        <div className="pitch pitch-menu"style={{
-            display: 'grid',
-            gridTemplateAreas: '"B S K" "W F Z" ". Q ." "G . E" "A I L" "Y T single" ". O double" "D . triple" "C . H"',
-            gridTemplateColumns: 'repeat(3, 80px)',
-            gridTemplateRows: 'repeat(9, 80px)',
-            gap: '8px',
-            margin: '16px'
-        }}
-        >
-            <button className="pitch-btn" style={{ gridArea: 'B' }} onClick={() => onPitch(Pitches.BALL)}>B</button>
-            <button className="pitch-btn" style={{ gridArea: 'W' }} onClick={() => onPitch(Pitches.BALL_WILD)}>WP</button>
-            <button className="pitch-btn" style={{ gridArea: 'S' }} onClick={() => onPitch(Pitches.STRIKE_SWINGING)}>S</button>
-            <button className="pitch-btn" style={{ gridArea: 'K' }} onClick={() => onPitch(Pitches.STRIKE_LOOKING)}>ꓘ</button>
-            <button className="pitch-btn" style={{ gridArea: 'F' }} onClick={() => onPitch(Pitches.STRIKE_FOUL)}>Foul</button>
-            <button className="pitch-btn" style={{ gridArea: 'Z' }} onClick={() => onPitch(Pitches.STRIKE_FOUL_ZONE)}>F <div>(K)</div></button>
-            <button className="pitch-btn" style={{ gridArea: 'Q' }} onClick={() => onPitch(Pitches.STRIKE_FOUL_CAUGHT)}>Foul <div>caught</div></button >
-            <button className="pitch-btn" style={{ gridArea: 'G' }} onClick={() => onPitch(Pitches.INPLAY_INFIELD_GRD_OUT)}>Grd out</button>
-            <button className="pitch-btn" style={{ gridArea: 'A' }} onClick={() => onPitch(Pitches.INPLAY_INFIELD_AIR_OUT)}>Popup <div>(out)</div></button >
-            <button className="pitch-btn" style={{ gridArea: 'I' }} onClick={() => onPitch(Pitches.INPLAY_INFIELD_AIR_OUT_INFIELD_FLY)}>Infield Fly</button>
-            <button className="pitch-btn" style={{ gridArea: 'D' }} onClick={() => onPitch(Pitches.INPLAY_INFIELD_OUT_DP_SUCCESS)}>DP</button>
-            <button className="pitch-btn" style={{ gridArea: 'C' }} onClick={() => onPitch(Pitches.INPLAY_INFIELD_OUT_DP_FAIL)}>FC <div>(DP fail)</div></button >
-            <button className="pitch-btn" style={{ gridArea: 'E' }} onClick={() => onPitch(Pitches.INPLAY_INFIELD_ERROR)}>Error</button>
-            <button className="pitch-btn" style={{ gridArea: 'Y' }} onClick={() => onPitch(Pitches.INPLAY_OUTFIELD_OUT)}>Fly Out</button>
-            <button className="pitch-btn" style={{ gridArea: 'T' }} onClick={() => onPitch(Pitches.INPLAY_OUTFIELD_OUT_TAG_SUCCESS)}>Fly Out <div>runner tagged</div></button >
-            <button className="pitch-btn" style={{ gridArea: 'O' }} onClick={() => onPitch(Pitches.INPLAY_OUTFIELD_OUT_TAG_FAIL)}>Fly Out <div>runner thrown out</div></button >
-            <button className="pitch-btn" style={{ gridArea: 'L' }} onClick={() => onPitch(Pitches.INPLAY_INFIELD_SINGLE)}>1B <div>(infield)</div></button >
-            <button className="pitch-btn" style={{ gridArea: 'single' }} onClick={() => onPitch(Pitches.INPLAY_OUTFIELD_SINGLE)}>1B</button>
-            <button className="pitch-btn" style={{ gridArea: 'double' }} onClick={() => onPitch(Pitches.INPLAY_DOUBLE)}>2B</button>
-            <button className="pitch-btn" style={{ gridArea: 'triple' }} onClick={() => onPitch(Pitches.INPLAY_TRIPLE)}>3B</button>
-            <button className="pitch-btn" style={{ gridArea: 'H' }} onClick={() => onPitch(Pitches.INPLAY_HOMERUN)}>HR</button>
+        <div className={'pitch pitch-menu ' + 
+            // @ts-expect-error
+            `${window.pitchlayout}`
+        }>
+            {PITCH_LIST.map(({ pitch, gridArea, type, label, subtext }) =>
+                <button
+                    key={pitch}
+                    className={`pitch-btn ${type}`}
+                    style={{ gridArea }}
+                    onClick={() => onPitch(pitch)}
+                    disabled={possiblePitches.includes(pitch)}
+                >
+                        {label}
+                        {subtext && (<div>{subtext}</div>)}
+                </button>
+            )}
         </div >
     );
 };
