@@ -12,7 +12,7 @@ const Scoreboard: React.FC<Props> = ({ game }) => {
 
     return (
         <div className="scoreboard">
-            <BoxScore 
+            <BoxScore
                 maxInnings={game.configuration.maxInnings}
                 inningNumber={game.inning.number}
                 inningHalf={game.inning.half}
@@ -31,7 +31,7 @@ const Scoreboard: React.FC<Props> = ({ game }) => {
                 outs={game.outs}
             />
             <Players batter={game.atBat} pitcher={getDefense(game).defense.pitcher} />
-        </div>
+        </div >
     );
 };
 
@@ -42,7 +42,7 @@ type BoxScoreProps = {
     boxScore: GameMoment['boxScore'];
 };
 
-const BoxScore = React.memo(({inningNumber, inningHalf, maxInnings, boxScore}: BoxScoreProps) => {
+const BoxScore = ({ inningNumber, inningHalf, maxInnings, boxScore }: BoxScoreProps) => {
     const [awayScore, homeScore] = boxScore.reduce((total, inning) => {
         total[0] += inning.awayTeam;
         total[1] += inning.homeTeam;
@@ -50,7 +50,8 @@ const BoxScore = React.memo(({inningNumber, inningHalf, maxInnings, boxScore}: B
     }, [0, 0]);
 
     const inningsToShow = Math.max(boxScore.length, maxInnings);
-    const inningsDiff = inningsToShow -boxScore.length;
+    const inningsDiff = inningsToShow - boxScore.length;
+    // TODO animate box score
     return (
         <div className="boxScore">
             <table>
@@ -108,7 +109,7 @@ const BoxScore = React.memo(({inningNumber, inningHalf, maxInnings, boxScore}: B
             </table>
         </div>
     );
-});
+};
 
 interface BasesProps {
     first: number;
@@ -117,6 +118,7 @@ interface BasesProps {
 }
 
 const BasesRender = React.memo(({ first, second, third }: BasesProps) => (
+    /* TODO animate base occupation */
     <div className="bases">
         {/* <div className="crosshair vertical"></div> */}
         {/* <div className="crosshair horizontal"></div> */}
@@ -142,6 +144,7 @@ const Count = React.memo(({
     strikes,
     outs
 }: CountProps) => (
+    /* TODO animate count ticks, etc */
     <div className="count">
         <div><span>{inningHalf === InningHalf.TOP ? '▲' : '▼'}</span>{inningNumber}</div>
         <div>{balls} - {strikes}</div>

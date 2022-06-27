@@ -2,6 +2,7 @@
     display: grid;
     gap: 8px;
     margin: 0 auto;
+    width: 80%;
 }
 
 .pitch-menu.layout1 {
@@ -13,10 +14,6 @@
     grid-template-areas: "B S K" "W F Z" "G Q E" "A I L" "Y T single" "D O double" "C H triple";
     grid-template-rows: repeat(7, 1fr);
     grid-template-columns: repeat(3, 1fr);
-}
-
-.pitch-menu.layout2 button.pitch-btn {
-
 }
 
 .pitch-menu div {
