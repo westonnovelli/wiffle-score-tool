@@ -4,6 +4,7 @@ import { GameMoment, Pitches } from '@wiffleball/state-machine';
 import Scoreboard from './Scoreboard/Scoreboard';
 import Feed from './Feed/Feed';
 import Pitch from './Pitch/Pitch';
+import './Main.css';
 
 
 const pitchSelectorAnimations = {

@@ -1,4 +1,4 @@
-import { Bases, GameMoment, getDefense, InningHalf, Score } from '@wiffleball/state-machine';
+import { Bases, GameMoment, getDefense, InningHalf } from '@wiffleball/state-machine';
 import React from 'react';
 import './Scoreboard.css';
 

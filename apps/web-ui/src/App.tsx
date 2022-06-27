@@ -16,6 +16,7 @@ import Manage from './Manage/Manage';
 import Stats from './Stats/Stats';
 import NewGame from './NewGame/NewGame';
 import Main from './Main';
+import Manual from './Manage/Manual';
 
 
 function App() {
@@ -43,9 +44,14 @@ function App() {
           <Route index element={
             <Main game={game} selectingPitch={selectingPitch} handlePitch={handlePitch} />
           } />
-          <Route path="/manage" element={<Manage game={game} />} />
-          <Route path="/stats" element={<Stats game={game} />} />
-          <Route path="/new" element={<NewGame />} />
+          <Route path="manage">
+            <Route index element={<Manage game={game} />}/>
+            <Route path="manual" element={<Manual />}/>
+            <Route path="pitching" element={<Manual />}/>
+            <Route path="fielder" element={<Manual />}/>
+          </Route>
+          <Route path="stats" element={<Stats game={game} />} />
+          <Route path="new" element={<NewGame />} />
         </Route>
       </Routes>
     </AnimatePresence>

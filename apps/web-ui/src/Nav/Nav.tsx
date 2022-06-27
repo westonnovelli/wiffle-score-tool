@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, useMatch } from 'react-router-dom';
+import { Link, useMatch, useNavigate } from 'react-router-dom';
 import './Nav.css';
 
 interface Props {
@@ -7,17 +7,19 @@ interface Props {
 }
 
 const Nav: React.FC<Props> = ({ onSelectPitch }) => {
-    const isManaging = useMatch('manage');
-    const isStats = useMatch('stats');
+    const navigate = useNavigate();
+    const isManaging = useMatch('manage/*');
+    const isStats = useMatch('stats/*');
 
     const isHome = !isManaging && !isStats;
+
     return (
         <div className="nav">
-            {!isManaging && <NavLink className={`nav-btn${!isHome ? ' disabled' : ''}`} to="manage">Manage</NavLink>}
-            {isManaging && <NavLink className="nav-btn" to="/">ᐸ Back</NavLink>}
+            {!isManaging && <Link className={`nav-btn${!isHome ? ' disabled' : ''}`} to="manage">Manage</Link>}
+            {isManaging && <button className="nav-btn" onClick={() => navigate(-1)}>ᐸ Back</button>}
             <button className="nav-btn pitch" onClick={onSelectPitch} disabled={!isHome}>Pitch</button>
-            {!isStats && <NavLink className={`nav-btn${!isHome ? ' disabled' : ''}`} to="stats">Stats</NavLink>}
-            {isStats && <NavLink className="nav-btn" to="/">Back ᐳ</NavLink>}
+            {!isStats && <Link className={`nav-btn${!isHome ? ' disabled' : ''}`} to="stats">Stats</Link>}
+            {isStats && <button className="nav-btn" onClick={() => navigate(-1)}>Back ᐳ</button>}
         </div>
     );
 };

@@ -1,0 +1,14 @@
+.pitch-container {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 128px;
+    background: rgba(200, 200, 200, 0.492);
+    backdrop-filter: blur(4px);
+    padding: 16px;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    justify-content: end;
+    border-radius: 25%;
+}

@@ -1,0 +1,25 @@
+.manage h1 {
+    color: var(--color-text);
+    text-align: center;
+    font-weight: 400;
+}
+
+.manage ul {
+    list-style: none;
+    padding: 16px;
+    margin: 0;
+}
+
+.manage ul li {
+    padding: 32px 16px;
+    margin-bottom: 8px;
+    box-shadow: 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12), 0 5px 5px -3px rgba(0,0,0,0.20);
+    font-size: 24px;
+    background-color: var(--color-primary-light);
+    color: var(--color-text);
+    border-radius: 4px;
+}
+
+.manage ul li[role="button"] {
+    cursor: pointer;
+}
