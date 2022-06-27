@@ -1,24 +1,22 @@
 import React from 'react';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
+import {
+  Routes,
+  Route,
+  Outlet,
+  useLocation,
+} from "react-router-dom";
 import './colors.css';
 import './App.css';
 
 import { defaultGame, Pitches, handlePitch as processPitch } from '@wiffleball/state-machine';
-import Scoreboard from './Scoreboard';
-import Pitch from './Pitch';
-import Nav from './Nav';
-import Feed from './Feed';
+import Nav from './Nav/Nav';
+import Manage from './Manage/Manage';
+import Stats from './Stats/Stats';
+import NewGame from './NewGame/NewGame';
+import Main from './Main';
 
-const variants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.01
-    }
-  }
-}
 
 function App() {
   const [game, setGame] = React.useState(defaultGame());
@@ -29,27 +27,28 @@ function App() {
     setSelectingPitch(false);
   };
 
+  const location = useLocation();
+
   return (
-    <div className="App">
-      <Scoreboard game={game} />
-      <Feed game={game} />
-      <Nav onSelectPitch={() => void setSelectingPitch(prev => !prev)} />
-      <AnimatePresence>
-        {selectingPitch && (
-          <motion.div
-            key="pitchSelect"
-            className="pitch-container"
-            variants={variants}
-            initial="hidden"
-            animate="show"
-            exit="hidden"
-          >
-            <Pitch onPitch={handlePitch} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-      {/* <button onClick={() => void setGame(defaultGame())}>reset game</button> */}
-    </div>
+    <AnimatePresence exitBeforeEnter>
+      <Routes key={location.pathname} location={location}>
+        <Route path="/" element={
+          <div className="App">
+            <Outlet />
+            <Nav
+              onSelectPitch={() => void setSelectingPitch(prev => !prev)}
+            />
+          </div>
+        }>
+          <Route index element={
+            <Main game={game} selectingPitch={selectingPitch} handlePitch={handlePitch} />
+          } />
+          <Route path="/manage" element={<Manage game={game} />} />
+          <Route path="/stats" element={<Stats game={game} />} />
+          <Route path="/new" element={<NewGame />} />
+        </Route>
+      </Routes>
+    </AnimatePresence>
   );
 }
 

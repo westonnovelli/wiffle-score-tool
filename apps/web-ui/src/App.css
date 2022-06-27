@@ -1,6 +1,7 @@
 .App {
   background: var(--color-primary);
   height: 100%;
+  overflow: hidden;
 }
 
 .pitch-container {

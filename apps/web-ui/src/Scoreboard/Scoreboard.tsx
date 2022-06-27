@@ -8,7 +8,7 @@ interface Props {
 }
 
 const Scoreboard: React.FC<Props> = ({ game }) => {
-
+    // todo animate enter/exit of each section
 
     return (
         <div className="scoreboard">

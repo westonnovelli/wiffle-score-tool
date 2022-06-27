@@ -11,25 +11,38 @@
     background-color: var(--color-primary);
 }
 
-.nav button.nav-btn {
+.nav button.nav-btn,
+.nav a.nav-btn {
     flex: 1;
     height: 70%;
     background: var(--color-primary-light);
     color: var(--color-text);
     font-size: 24px;
     border: none;
+    
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.nav button.nav-btn:first-child {
+.nav a.nav-btn:first-child {
     border-radius: 0 8px 0 0;
 }
 
-.nav button.nav-btn:last-child {
+.nav a.nav-btn:last-child {
     border-radius: 8px 0 0 0;
 }
 
-.nav button.nav-btn:active {
+.nav a.nav-btn:active {
     background: var(--color-primary-dark);
+}
+
+.nav a.nav-btn.disabled {
+    pointer-events: none;
+    touch-action: none;
+    background: var(--color-disabled);
+    color: var(--color-text-subtle);
 }
 
 .nav button.nav-btn.pitch {
@@ -45,4 +58,9 @@
 
 .nav button.nav-btn.pitch:active {
     background: var(--color-secondary-dark);
+}
+
+.nav button.nav-btn:disabled {
+    background: var(--color-disabled);
+    color: var(--color-text-subtle);
 }
