@@ -46,9 +46,9 @@ function App() {
           } />
           <Route path="manage">
             <Route index element={<Manage game={game} />}/>
-            <Route path="manual" element={<Manual />}/>
-            <Route path="pitching" element={<Manual />}/>
-            <Route path="fielder" element={<Manual />}/>
+            <Route path="manual" element={<Manual game={game}/>}/>
+            <Route path="pitching" element={<Manual game={game}/>}/>
+            <Route path="fielder" element={<Manual game={game}/>}/>
           </Route>
           <Route path="stats" element={<Stats game={game} />} />
           <Route path="new" element={<NewGame />} />

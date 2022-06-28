@@ -1,7 +1,13 @@
-import { Bases, GameMoment, getDefense, InningHalf } from '@wiffleball/state-machine';
+import {
+    Bases,
+    GameMoment,
+    getOffense,
+    getDefense,
+    getPitcher,
+    InningHalf
+} from '@wiffleball/state-machine';
 import React from 'react';
 import './Scoreboard.css';
-
 
 interface Props {
     game: GameMoment;
@@ -9,7 +15,9 @@ interface Props {
 
 const Scoreboard: React.FC<Props> = ({ game }) => {
     // todo animate enter/exit of each section
-
+    const offenseRoster = getOffense(game).roster;
+    const defenseRoster = getDefense(game).roster;
+    const pitcher = defenseRoster[getPitcher(getDefense(game))].name;
     return (
         <div className="scoreboard">
             <BoxScore
@@ -30,7 +38,7 @@ const Scoreboard: React.FC<Props> = ({ game }) => {
                 strikes={game.count.strikes}
                 outs={game.outs}
             />
-            <Players batter={game.atBat} pitcher={getDefense(game).defense.pitcher} />
+            <Players batter={offenseRoster[game.atBat].name} pitcher={pitcher} />
         </div >
     );
 };

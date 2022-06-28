@@ -133,7 +133,7 @@ export const defaultRules = (): Record<OptionalRules, boolean> => {
         [OptionalRules.FoulToTheZoneIsStrikeOut]: true,
         [OptionalRules.ThirdBaseCanTag]: true,
         [OptionalRules.AllowSinglePlayRunsToPassLimit]: false,
-        [OptionalRules.InFieldFly]: false,
+        [OptionalRules.InFieldFly]: true,
     };
 };
 

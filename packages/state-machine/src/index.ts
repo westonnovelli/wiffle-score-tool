@@ -19,4 +19,5 @@ export {
 export { defaultRules, defaultGame, defaultConfiguration, defaultPlayer, defaultTeam } from './factory';
 export { handlePitch, hydrateGame } from './engine';
 export { getOffense, getDefense } from './gameReducer';
+export { getPitcher } from './commonEdits';
 

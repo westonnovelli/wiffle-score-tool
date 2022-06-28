@@ -1,0 +1,52 @@
+.manual {
+    overflow: hidden;
+    padding: 16px;
+    width: calc(100% - 32px);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    color: var(--color-text);
+}
+
+.manual h1 {
+    margin-bottom: 0;
+}
+
+.manual .inning > div {
+    display: inline-block;
+}
+
+.manual .count {
+    display: flex;
+    align-items: center;
+}
+
+.manual .count label {
+    margin-right: 4px;
+}
+
+.manual .count input {
+    margin-right: 16px;
+}
+
+.manual .bases > div {
+    display: inline-block;
+    margin-right: 16px;
+}
+
+.manual .atBat {
+    display: flex;
+    align-items: center;
+}
+
+.manual .atBat label {
+    margin-right: 4px;
+}
+
+.manual .config {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+}
+
