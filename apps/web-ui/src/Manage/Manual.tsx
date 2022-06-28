@@ -1,4 +1,13 @@
-import { Bases, GameMoment, InningHalf, getOffense, OptionalRules } from "@wiffleball/state-machine";
+import {
+    Bases,
+    InningHalf,
+    OptionalRules,
+    EMPTY_BASES,
+    getOffense,
+    type GameMoment,
+    type DeepPartial,
+    type GameConfig,
+} from "@wiffleball/state-machine";
 import React from "react";
 import Structure from "./Structure";
 import './Manual.css';
@@ -6,10 +15,20 @@ import './Manual.css';
 
 interface Props {
     game: GameMoment;
+    handleEdit: (edit: DeepPartial<GameMoment>) => void;
 }
 
-// TODO manual edit
-const Manual: React.FC<Props> = ({ game }) => {
+const rulesThatDontMatch = (variant: GameConfig['rules'], control: GameConfig['rules']) => {
+    return Object.keys(OptionalRules).filter((key) => 
+        // @ts-expect-error
+        variant[key] !== control[key]
+    );
+}
+
+const Manual: React.FC<Props> = ({ game, handleEdit }) => {
+    const awayBatter = game.inning.half === InningHalf.TOP ? game.atBat : game.nextHalfAtBat;
+    const homeBatter = game.inning.half === InningHalf.BOTTOM ? game.atBat : game.nextHalfAtBat;
+        
     const [inningNumber, setInningNumber] = React.useState(game.inning.number);
     const [inningHalf, setInningHalf] = React.useState<InningHalf>(game.inning.half);
 
@@ -36,11 +55,102 @@ const Manual: React.FC<Props> = ({ game }) => {
     const [recordingStats, setRecordingStats] = React.useState(game.configuration.recordingStats);
 
     const submitEdit = () => {
-        // TODO handle edit submission
-        // diff/dirty
-        // callback to manualEdit()
-        console.log('manual edit submission not implemented');
+        const edit: DeepPartial<GameMoment> = {};
+        
+        const inning: Partial<GameMoment['inning']> = {};
+        if (inningNumber !== game.inning.number) {
+            inning.number = inningNumber;
+        }
+        if (inningHalf !== game.inning.half) {
+            inning.half = inningHalf;
+            edit.nextHalfAtBat = game.atBat;
+            edit.atBat = game.nextHalfAtBat;
+        }
+        if (Object.keys(inning).length > 0) {
+            edit.inning = inning;
+            edit.bases = EMPTY_BASES;
+        }
+
+        if (outs !== game.outs) {
+            edit.outs = outs;
+        }
+
+        const count: Partial<GameMoment['count']> = {};
+        if (balls !== game.count.balls) {
+            count.balls = balls;
+        }
+        if (strikes !== game.count.strikes) {
+            count.strikes = strikes;
+        }
+        if (Object.keys(count).length > 0) {
+            edit.count = count;
+        }
+
+        const bases: Partial<GameMoment['bases']> = {};
+        if (firstBase !== game.bases[Bases.FIRST]) {
+            bases[Bases.FIRST] = firstBase;
+        }
+        if (secondBase !== game.bases[Bases.SECOND]) {
+            bases[Bases.SECOND] = secondBase;
+        }
+        if (thirdBase !== game.bases[Bases.THIRD]) {
+            bases[Bases.THIRD] = thirdBase;
+        }
+        if (Object.keys(bases).length > 0) {
+            edit.bases = bases;
+        }
+
+        if (atBat !== game.atBat) {
+            edit.atBat = atBat;
+        }
+
+        const config: DeepPartial<GameConfig> = {};
+        if (maxStrikes !== game.configuration.maxStrikes) {
+            config.maxStrikes = maxStrikes;
+        }
+        if (maxBalls !== game.configuration.maxBalls) {
+            config.maxBalls = maxBalls;
+        }
+        if (maxOuts !== game.configuration.maxOuts) {
+            config.maxOuts = maxOuts;
+        }
+        if (maxRuns !== game.configuration.maxRuns) {
+            config.maxRuns = maxRuns;
+        }
+        if (maxInnings !== game.configuration.maxInnings) {
+            config.maxInnings = maxInnings;
+        }
+        if (maxFielders !== game.configuration.maxFielders) {
+            config.maxFielders = maxFielders;
+        }
+        if (allowExtras !== game.configuration.allowExtras) {
+            config.allowExtras = allowExtras;
+        }
+        if (recordingStats !== game.configuration.recordingStats) {
+            config.recordingStats = recordingStats;
+        }
+        rulesThatDontMatch(rules, game.configuration.rules).forEach((ruleKey) => {
+            // @ts-expect-error
+            config.rules[ruleKey] = rules[ruleKey];
+        });
+        if (Object.keys(config).length > 0) {
+            edit.configuration = config;
+        }
+        
+        console.log(edit);
+        handleEdit(edit);
     };
+
+    const wouldBeBatters = inningHalf === InningHalf.TOP ? game.awayTeam : game.homeTeam;
+    React.useEffect(function presetCorrectNextBatter() {
+        if (inningHalf === InningHalf.TOP) {
+            setAtBat(awayBatter);
+        } else {
+            setAtBat(homeBatter);
+        }
+    }, [inningHalf, awayBatter, homeBatter]);
+
+    // TODO extend box score if innings are added
 
     return (
         <Structure
@@ -53,7 +163,7 @@ const Manual: React.FC<Props> = ({ game }) => {
                     type="number"
                     name="inningNumber"
                     value={inningNumber}
-                    onChange={(e) => setInningNumber(e.target.valueAsNumber)}
+                    onChange={(e) => setInningNumber(parseInt(e.target.value))}
                     min={1}
                     max={20} // arbitrary but so be it
                 />
@@ -86,7 +196,7 @@ const Manual: React.FC<Props> = ({ game }) => {
                     type="number"
                     name="countBalls"
                     value={balls}
-                    onChange={(e) => void setBalls(e.target.valueAsNumber)}
+                    onChange={(e) => void setBalls(parseInt(e.target.value))}
                     max={game.configuration.maxBalls - 1}
                     min={0}
                 />
@@ -95,7 +205,7 @@ const Manual: React.FC<Props> = ({ game }) => {
                     type="number"
                     name="countStrikes"
                     value={strikes}
-                    onChange={(e) => void setStrikes(e.target.valueAsNumber)}
+                    onChange={(e) => void setStrikes(parseInt(e.target.value))}
                     max={game.configuration.maxStrikes - 1}
                     min={0}
                 />
@@ -104,7 +214,7 @@ const Manual: React.FC<Props> = ({ game }) => {
                     type="number"
                     name="outs"
                     value={outs}
-                    onChange={(e) => void setOuts(e.target.valueAsNumber)}
+                    onChange={(e) => void setOuts(parseInt(e.target.value))}
                     max={game.configuration.maxOuts - 1}
                     min={0}
                 />
@@ -115,9 +225,9 @@ const Manual: React.FC<Props> = ({ game }) => {
                     <input
                         type="checkbox"
                         name="firstbase"
-                        value={1}
+                        value="firstbase"
                         defaultChecked={firstBase === 1}
-                        onChange={(e) => void setFirstBase(e.target.valueAsNumber)}
+                        onChange={() => void setFirstBase(prev => prev === 1 ? 0 : 1)}
                     />
                     <label htmlFor="firstbase">1st</label>
                 </div>
@@ -125,9 +235,9 @@ const Manual: React.FC<Props> = ({ game }) => {
                     <input
                         type="checkbox"
                         name="secondbase"
-                        value={1}
+                        value="secondbase"
                         defaultChecked={secondBase === 1}
-                        onChange={(e) => void setSecondBase(e.target.valueAsNumber)}
+                        onChange={() => void setSecondBase(prev => prev === 1 ? 0 : 1)}
                     />
                     <label htmlFor="secondbase">2nd</label>
                 </div>
@@ -135,9 +245,9 @@ const Manual: React.FC<Props> = ({ game }) => {
                     <input
                         type="checkbox"
                         name="thirdbase"
-                        value={1}
+                        value="thirdbase"
                         defaultChecked={thirdBase === 1}
-                        onChange={(e) => void setThirdBase(e.target.valueAsNumber)}
+                        onChange={() => void setThirdBase(prev => prev === 1 ? 0 : 1)}
                     />
                     <label htmlFor="thirdbase">3rd</label>
                 </div>
@@ -148,9 +258,9 @@ const Manual: React.FC<Props> = ({ game }) => {
                     value={atBat}
                     onChange={(e) => void setAtBat(e.target.value)}
                 >
-                    {getOffense(game).lineup.map((id) => (
+                    {wouldBeBatters.lineup.map((id) => (
                         <option key={id} value={id}>
-                            {getOffense(game).roster[id].name}
+                            {wouldBeBatters.roster[id].name}
                         </option>
                     ))}
                 </select>
@@ -161,7 +271,7 @@ const Manual: React.FC<Props> = ({ game }) => {
                     <input
                         type="number"
                         value={maxStrikes}
-                        onChange={(e) => setMaxStrikes(e.target.valueAsNumber)}
+                        onChange={(e) => setMaxStrikes(parseInt(e.target.value))}
                         name="maxStrikes"
                         min={0}
                         max={10}
@@ -172,7 +282,7 @@ const Manual: React.FC<Props> = ({ game }) => {
                     <input
                         type="number"
                         value={maxBalls}
-                        onChange={(e) => setMaxBalls(e.target.valueAsNumber)}
+                        onChange={(e) => setMaxBalls(parseInt(e.target.value))}
                         name="maxBalls"
                         min={0}
                         max={10}
@@ -183,7 +293,7 @@ const Manual: React.FC<Props> = ({ game }) => {
                     <input
                         type="number"
                         value={maxOuts}
-                        onChange={(e) => setMaxOuts(e.target.valueAsNumber)}
+                        onChange={(e) => setMaxOuts(parseInt(e.target.value))}
                         name="maxOuts"
                         min={0}
                         max={10}
@@ -194,7 +304,7 @@ const Manual: React.FC<Props> = ({ game }) => {
                     <input
                         type="number"
                         value={maxRuns}
-                        onChange={(e) => setMaxRuns(e.target.valueAsNumber)}
+                        onChange={(e) => setMaxRuns(parseInt(e.target.value))}
                         name="maxRuns"
                         min={-1}
                         max={100}
@@ -205,7 +315,7 @@ const Manual: React.FC<Props> = ({ game }) => {
                     <input
                         type="number"
                         value={maxInnings}
-                        onChange={(e) => setMaxInnings(e.target.valueAsNumber)}
+                        onChange={(e) => setMaxInnings(parseInt(e.target.value))}
                         name="maxInnings"
                         min={0}
                         max={20}
@@ -216,7 +326,7 @@ const Manual: React.FC<Props> = ({ game }) => {
                     <input
                         type="number"
                         value={maxFielders}
-                        onChange={(e) => setMaxFielders(e.target.valueAsNumber)}
+                        onChange={(e) => setMaxFielders(parseInt(e.target.value))}
                         name="maxFielders"
                         min={0}
                         max={100}

@@ -15,9 +15,11 @@ export {
     type GameMoment,
     type BattingOrder,
     type Team,
+    type DeepPartial,
 } from './types';
 export { defaultRules, defaultGame, defaultConfiguration, defaultPlayer, defaultTeam } from './factory';
 export { handlePitch, hydrateGame } from './engine';
-export { getOffense, getDefense } from './gameReducer';
-export { getPitcher } from './commonEdits';
+export { getOffense, getDefense, EMPTY_BASES } from './gameReducer';
+export { default as manualEdit } from './manualEdit';
+export { getPitcher, getInfield, getOutfield, getBench, pitcherSwap, fielderSwap, fielderRotate } from './commonEdits';
 
