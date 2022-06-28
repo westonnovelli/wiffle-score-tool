@@ -107,6 +107,7 @@ export interface DefenseStats {
 }
 
 export interface Player {
+    id: string;
     name: string;
     offenseStats: OffenseStats;
     defenseStats: DefenseStats;
@@ -134,6 +135,7 @@ export interface GameConfig {
     maxOuts: number;
     maxRuns: number;
     maxInnings: number;
+    maxFielders: number;
     allowExtras?: boolean;
     recordingStats: boolean;
     rules: Record<OptionalRules, boolean>;
@@ -152,19 +154,14 @@ export enum OptionalRules {
 export type BattingOrder = string[];
 
 export enum Position {
+    Pitcher,
     Infield,
-    Outfield
+    Outfield,
+    Bench,
 };
 
 export interface Team {
     roster: Record<string, Player>;
     lineup: BattingOrder;
-    defense: {
-        pitcher: string;
-        fielders: {
-            player: string;
-            position: Position;
-        }[];
-        bench: string[];
-    }
+    defense: Record<string, Position>;
 };

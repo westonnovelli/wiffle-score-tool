@@ -32,16 +32,16 @@ test('1st batter: Lead off walk', () => {
             pitch: Pitches.BALL,
             expected: {
                 bases: { [Bases.FIRST]: 1 },
-                atBat: 'away - playerB',
+                atBat: '1',
                 awayTeam: {
                     roster: {
-                        'away - playerA': {
+                        '0': {
                             offenseStats: {
                                 plateAppearance: 1,
                                 walks: 1,
                             }
                         },
-                        'away - playerB': {
+                        '1': {
                             offenseStats: {
                                 plateAppearance: 1,
                             }
@@ -78,17 +78,17 @@ test('2nd batter: single on 1,2 count', () => {
             pitch: Pitches.INPLAY_OUTFIELD_SINGLE,
             expected: {
                 bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1, },
-                atBat: 'away - playerC',
+                atBat: '2',
                 awayTeam: {
                     roster: {
-                        'away - playerB': {
+                        '1': {
                             offenseStats: {
                                 atbats: 1,
                                 hits: 1,
                                 singles: 1,
                             }
                         },
-                        'away - playerC': {
+                        '2': {
                             offenseStats: {
                                 plateAppearance: 1,
                             }
@@ -114,17 +114,17 @@ test('3rd batter: groud out on first pitch', () => {
             expected: {
                 outs: 1,
                 bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1, },
-                atBat: 'away - playerD',
+                atBat: '3',
                 awayTeam: {
                     roster: {
-                        'away - playerC': {
+                        '2': {
                             offenseStats: {
                                 plateAppearance: 1,
                                 atbats: 1,
                                 groundOuts: 1,
                             }
                         },
-                        'away - playerD': {
+                        '3': {
                             offenseStats: {
                                 plateAppearance: 1,
                             }
@@ -158,17 +158,17 @@ test('4th batter: strikeout looking on 2,0 count', () => {
             expected: {
                 outs: 2,
                 bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1 },
-                atBat: 'away - playerA',
+                atBat: '0',
                 awayTeam: {
                     roster: {
-                        'away - playerD': {
+                        '3': {
                             offenseStats: {
                                 plateAppearance: 1,
                                 atbats: 1,
                                 strikeoutsLooking: 1,
                             }
                         },
-                        'away - playerA': {
+                        '0': {
                             offenseStats: {
                                 plateAppearance: 2,
                             }
@@ -206,10 +206,10 @@ test('5th batter: foul, foul, foul, infield error', () => {
             expected: {
                 outs: 2,
                 bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1, [Bases.THIRD]: 1, },
-                atBat: 'away - playerB',
+                atBat: '1',
                 awayTeam: {
                     roster: {
-                        'away - playerA': {
+                        '0': {
                             offenseStats: {
                                 plateAppearance: 2,
                                 atbats: 1,
@@ -217,7 +217,7 @@ test('5th batter: foul, foul, foul, infield error', () => {
                                 singles: 1,
                             }
                         },
-                        'away - playerB': {
+                        '1': {
                             offenseStats: {
                                 plateAppearance: 2,
                             }
@@ -244,10 +244,10 @@ test('6th batter: grand slam! first pitch', () => {
                 outs: 2,
                 boxScore: [{ homeTeam: 0, awayTeam: 4 }],
                 bases: { ...EMPTY_BASES },
-                atBat: 'away - playerC',
+                atBat: '2',
                 awayTeam: {
                     roster: {
-                        'away - playerB': {
+                        '1': {
                             offenseStats: {
                                 plateAppearance: 2,
                                 atbats: 2,
@@ -258,7 +258,7 @@ test('6th batter: grand slam! first pitch', () => {
                                 runs: 1,
                             }
                         },
-                        'away - playerC': {
+                        '2': {
                             offenseStats: {
                                 plateAppearance: 2,
                             }
@@ -290,11 +290,11 @@ test('7th batter: fly out on 1,0, ends the inning', () => {
                 boxScore: [{ homeTeam: 0, awayTeam: 4 }],
                 inning: { half: InningHalf.BOTTOM },
                 outs: 0,
-                atBat: 'home - playerA',
-                nextHalfAtBat: 'away - playerD',
+                atBat: '4',
+                nextHalfAtBat: '3',
                 awayTeam: {
                     roster: {
-                        'away - playerC': {
+                        '2': {
                             offenseStats: {
                                 atbats: 2,
                                 flyOuts: 1,
@@ -321,11 +321,11 @@ test('next inning - batter 1: triple, first pitch', () => {
         {
             pitch: Pitches.INPLAY_TRIPLE,
             expected: {
-                atBat: 'home - playerB',
+                atBat: '5',
                 bases: { [Bases.THIRD]: 1 },
                 homeTeam: {
                     roster: {
-                        'home - playerA': {
+                        '4': {
                             offenseStats: {
                                 plateAppearance: 1,
                                 atbats: 1,
@@ -333,7 +333,7 @@ test('next inning - batter 1: triple, first pitch', () => {
                                 triples: 1,
                             }
                         },
-                        'home - playerB': {
+                        '5': {
                             offenseStats: {
                                 plateAppearance: 1,
                             }
@@ -357,12 +357,12 @@ test('batter 2: sac fly, runner tags', () => {
         {
             pitch: Pitches.INPLAY_OUTFIELD_OUT_TAG_SUCCESS,
             expected: {
-                atBat: 'home - playerC',
+                atBat: '6',
                 bases: { [Bases.THIRD]: 0 },
                 outs: 1,
                 homeTeam: {
                     roster: {
-                        'home - playerB': {
+                        '5': {
                             offenseStats: {
                                 atbats: 1,
                                 flyOuts: 1,
@@ -370,7 +370,7 @@ test('batter 2: sac fly, runner tags', () => {
                                 RBI: 1
                             }
                         },
-                        'home - playerC': {
+                        '6': {
                             offenseStats: {
                                 plateAppearance: 1,
                             }

@@ -10,37 +10,31 @@ import {
     type Team,
 } from './types';
 
-export const defaultTeam = (name: string = '', alignment: 'home' | 'away' = 'away'): Team => {
-    const lineup: string[] = [
+let pid = 0;
+
+export const defaultTeam = (
+    name: string = '',
+    alignment: 'home' | 'away' = 'away',
+    playerNames?: string[]
+): Team => {
+    const names: string[] = playerNames || [
         `${name && `${name} - `}playerA`,
         `${name && `${name} - `}playerB`,
         `${name && `${name} - `}playerC`,
         `${name && `${name} - `}playerD`,
     ];
 
-    const roster: Team['roster'] = lineup.reduce<Team['roster']>((acc, player, index) => {
-        acc[player] = defaultPlayer(player, alignment === 'away' && index === 0);
+    return names.reduce<Team>((acc, player, index) => {
+        const newPlayer = defaultPlayer(player, alignment === 'away' && index === 0);
+        acc.roster[newPlayer.id] = newPlayer;
+        acc.lineup.push(newPlayer.id);
+        acc.defense[newPlayer.id] = index; // enum hack of Position
         return acc;
-    }, {});
-
-    return {
-        roster,
-        lineup,
-        defense: {
-            pitcher: lineup[0],
-            fielders: [{
-                player: lineup[1],
-                position: Position.Infield,
-            }, {
-                player: lineup[2],
-                position: Position.Outfield,
-            }],
-            bench: [lineup[3]]
-        },
-    };
+    }, { roster: {}, lineup: [], defense: {} });
 };
 
 export const defaultGame = (awayTeam: Team = defaultTeam('away', 'away'), homeTeam: Team = defaultTeam('home')): GameMoment => {
+    pid = 0;
     const firstBatter = awayTeam.lineup[0] ?? 'mockBatter';
     const homesFirstBatter = homeTeam.lineup[0] ?? 'mockBatterHome';
     return {
@@ -75,7 +69,10 @@ export const defaultGame = (awayTeam: Team = defaultTeam('away', 'away'), homeTe
 };
 
 export const defaultPlayer = (name: string = 'mockPlayer', leadOff: boolean = false): Player => {
+    const id = `${pid}`;
+    pid += 1;
     return {
+        id,
         name,
         offenseStats: {
             plateAppearance: leadOff ? 1 : 0,
@@ -122,6 +119,7 @@ export const defaultConfiguration = (): GameConfig => {
         maxOuts: 3,
         maxInnings: 5,
         maxRuns: 5,
+        maxFielders: 2, // Not including pitcher (there's always a pitcher)
         rules: defaultRules(),
         recordingStats: true,
     };

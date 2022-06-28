@@ -9,7 +9,7 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
     const playerAtBat = team.roster[game.atBat];
     if (!playerAtBat) return team;
     
-    const batter = playerAtBat.name;
+    const batter = playerAtBat.id;
 
     switch (pitch) {
         case StatEvent.PLATE_APPEARANCE:

@@ -4,7 +4,7 @@ import { BattingOrder, DeepPartial, GameMoment, Score } from "./types";
 
 type LooseBoxScore = ({ homeTeam?: number | undefined, awayTeam?: number | undefined } | undefined)[] | undefined;
 const isValidBoxScore = (candidate: LooseBoxScore): candidate is Score[] => {
-    return candidate?.every((box) => Boolean(box && box.awayTeam && box.awayTeam >= 0 && box.homeTeam && box.homeTeam >= 0)) ?? false;
+    return candidate?.every((box) => Boolean(box && (box?.awayTeam ?? -1) >= 0 && (box?.homeTeam ?? -1) >= 0)) ?? false;
 };
 
 type LooseBattingOrder = (string | undefined)[] | undefined;
@@ -13,20 +13,28 @@ const isValidLineup = (candidate: LooseBattingOrder): candidate is BattingOrder 
 };
 
 const manualEdit = (game: GameMoment, edit: DeepPartial<GameMoment>): GameMoment => {
-    // TODO merge team edits, despite lineup snafu
+    if (Object.keys(edit).length === 0) return game;
+
     const merged: GameMoment = {
         ...mergeDeepRight(game, omit(['boxScore', 'homeTeam', 'awayTeam'], edit)),
         pitches: [...game.pitches, -1],
         manualEdits: [...game.manualEdits, edit],
     };
+
     if (isValidBoxScore(edit.boxScore)) {
         merged.boxScore = edit.boxScore;
     }
-    if (edit.homeTeam && isValidLineup(edit.homeTeam.lineup)) {
-        merged.homeTeam.lineup = edit.homeTeam.lineup;
+    if (edit.homeTeam) {
+        merged.homeTeam = mergeDeepRight(game.homeTeam, omit(['lineup'], edit.homeTeam));
+        if (isValidLineup(edit.homeTeam.lineup)) {
+            merged.homeTeam.lineup = edit.homeTeam.lineup;
+        }
     }
-    if (edit.awayTeam && isValidLineup(edit.awayTeam.lineup)) {
-        merged.awayTeam.lineup = edit.awayTeam.lineup;
+    if (edit.awayTeam) {
+        merged.awayTeam = mergeDeepRight(game.awayTeam, omit(['lineup'], edit.awayTeam));
+        if (isValidLineup(edit.awayTeam.lineup)) {
+            merged.awayTeam.lineup = edit.awayTeam.lineup;
+        }
     }
     return merged;
 };
