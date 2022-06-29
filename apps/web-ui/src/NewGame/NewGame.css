@@ -48,3 +48,9 @@
     color: var(--color-text-dark);
     border-radius: 19px;
 }
+
+.newgame button.start {
+    height: 40px;
+    width: 80%;
+    margin: 32px;
+}

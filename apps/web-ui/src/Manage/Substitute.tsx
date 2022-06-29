@@ -1,4 +1,4 @@
-import { GameMoment, DeepPartial, getDefense, Team, Position } from '@wiffleball/state-machine';
+import { GameMoment, getDefense, Team, Position } from '@wiffleball/state-machine';
 import React from 'react';
 import Structure from './Structure';
 import './Substitute.css';

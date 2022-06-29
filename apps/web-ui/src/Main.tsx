@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GameMoment, Pitches } from '@wiffleball/state-machine';
+import { GameMoment, Pitches, getPossiblePitches } from '@wiffleball/state-machine';
 import Scoreboard from './Scoreboard/Scoreboard';
-import Feed from './Feed/Feed';
+// import Feed from './Feed/Feed';
 import Pitch from './Pitch/Pitch';
 import './Main.css';
 
@@ -43,14 +43,17 @@ interface Props {
 
 const Main: React.FC<Props> = ({ game, selectingPitch, handlePitch }) => {
     return (
-        <motion.div
-            variants={animations}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-        >
-            <Scoreboard game={game} />
-            {/* <Feed game={game} /> */}
+        <>
+            <motion.div
+                variants={animations}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="main"
+            >
+                <Scoreboard game={game} />
+                {/* <Feed game={game} /> */}
+            </motion.div>
             <AnimatePresence>
                 {selectingPitch && (
                     <motion.div
@@ -61,11 +64,11 @@ const Main: React.FC<Props> = ({ game, selectingPitch, handlePitch }) => {
                         animate="show"
                         exit="hidden"
                     >
-                        <Pitch onPitch={handlePitch} />
+                        <Pitch onPitch={handlePitch} possiblePitches={getPossiblePitches(game)}/>
                     </motion.div>
                 )}
             </AnimatePresence>
-        </motion.div>
+        </>
     );
 };
 

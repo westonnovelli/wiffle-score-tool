@@ -118,14 +118,14 @@ const PITCH_LIST: PitchList = [
         gridArea: 'T',
         type: 'inplayboth',
         label: 'Fly out',
-        subtext: 'runner tagged',
+        subtext: 'tagged',
     },
     {
         pitch: Pitches.INPLAY_OUTFIELD_OUT_TAG_FAIL,
         gridArea: 'O',
         type: 'inplayboth',
         label: 'Fly out',
-        subtext: 'runner thrown out',
+        subtext: 'thrown out',
     },
     {
         pitch: Pitches.INPLAY_INFIELD_SINGLE,
@@ -164,9 +164,6 @@ const PITCH_LIST: PitchList = [
     }
 ];
 
-// @ts-expect-error
-window.pitchlayout = 'layout2';
-
 const variants = {
     hidden: { y: 1000 },
     show: { y: 0 }
@@ -174,12 +171,7 @@ const variants = {
 
 const PitchSelector: React.FC<Props> = ({ onPitch, possiblePitches = [] }) => {
     return (
-        <div
-            className={'pitch pitch-menu ' +
-                // @ts-expect-error
-                `${window.pitchlayout}`
-            }
-        >
+        <div className="pitch pitch-menu layout">
             {PITCH_LIST.map(({ pitch, gridArea, type, label, subtext, style }) =>
                 <motion.div
                     key={pitch}
@@ -191,7 +183,7 @@ const PitchSelector: React.FC<Props> = ({ onPitch, possiblePitches = [] }) => {
                     <button
                         className={`pitch-btn ${type}`}
                         onClick={() => onPitch(pitch)}
-                        disabled={possiblePitches.includes(pitch)}
+                        disabled={!possiblePitches.includes(pitch)}
                         style={style}
                     >
                         {label}

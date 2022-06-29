@@ -22,4 +22,4 @@ export { handlePitch, hydrateGame } from './engine';
 export { getOffense, getDefense, EMPTY_BASES } from './gameReducer';
 export { default as manualEdit } from './manualEdit';
 export { getPitcher, getInfield, getOutfield, getBench, pitcherSwap, fielderSwap, fielderRotate } from './commonEdits';
-
+export { default as getPossiblePitches } from './possiblePitches';

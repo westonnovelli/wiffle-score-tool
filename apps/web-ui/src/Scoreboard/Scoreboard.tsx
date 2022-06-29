@@ -6,6 +6,7 @@ import {
     getPitcher,
     InningHalf
 } from '@wiffleball/state-machine';
+import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 import './Scoreboard.css';
 
@@ -139,6 +140,28 @@ const BasesRender = React.memo(({ first, second, third }: BasesProps) => (
     </div>
 ));
 
+interface AnimatedNumberProps {
+    children: React.ReactNode;
+}
+
+const AnimatedNumber: React.FC<AnimatedNumberProps> = ({ children }) => {
+    return (
+        <motion.span
+            key={children?.toString()}
+            exit={{ y: 50, opacity: 0, position: "absolute" }}
+            initial={{ y: -50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{
+                ease: "easeOut",
+                delay: .35,
+                duration: .5,
+            }}
+            className="number"
+        >
+            {children}
+        </motion.span>);
+};
+
 interface CountProps {
     inningHalf: InningHalf;
     inningNumber: number;
@@ -154,13 +177,45 @@ const Count = React.memo(({
     strikes,
     outs
 }: CountProps) => (
-    /* TODO animate count ticks, etc */
-    <div className="count">
-        <div><span>{inningHalf === InningHalf.TOP ? '▲' : '▼'}</span>{inningNumber}</div>
-        <div>{balls} - {strikes}</div>
-        <div>{outs} {outs === 1 ? 'out' : 'outs'}</div>
-    </div>
+    <AnimatePresence>
+        <div className="count">
+            <div>
+                <span className="icon">{inningHalf === InningHalf.TOP ? '▲' : '▼'}</span>
+                <AnimatedNumber>{inningNumber}</AnimatedNumber>
+            </div>
+            <div>
+                <AnimatedNumber>{balls}</AnimatedNumber>
+                {' - '}
+                <AnimatedNumber>{strikes}</AnimatedNumber>
+            </div>
+            <div><AnimatedNumber>{outs}</AnimatedNumber> {outs === 1 ? 'out' : 'outs'}</div>
+        </div>
+    </AnimatePresence>
 ));
+
+interface AnimatedNameProps {
+    children: React.ReactNode;
+}
+
+const AnimatedName: React.FC<AnimatedNameProps> = ({ children }) => {
+    return (
+        <motion.span
+            key={children?.toString()}
+            exit={{ x: -100, opacity: 0, position: "absolute" }}
+            initial={{ x: 100 }}
+            animate={{
+                x: 0,
+                transition: {
+                    ease: "easeOut",
+                    delay: .35,
+                    duration: 1,
+                }
+            }}
+            className="name"
+        >
+            {children}
+        </motion.span>);
+};
 
 interface PlayersProps {
     batter: string;
@@ -169,14 +224,16 @@ interface PlayersProps {
 }
 
 const Players = React.memo(({ batter, pitcher, inningHalf }: PlayersProps) => (
-    <div className="players">
-        <div className={`batter ${inningHalf === InningHalf.TOP ? 'away' : 'home'}`}>
-            <span>AB:</span> {batter}
+    <AnimatePresence>
+        <div className="players">
+            <div className={`batter ${inningHalf === InningHalf.TOP ? 'away' : 'home'}`}>
+                <span>AB:</span> <AnimatedName>{batter}</AnimatedName>
+            </div>
+            <div className={`pitcher ${inningHalf === InningHalf.BOTTOM ? 'away' : 'home'}`}>
+                <span>P:</span> <AnimatedName>{pitcher}</AnimatedName>
+            </div>
         </div>
-        <div className={`pitcher ${inningHalf === InningHalf.BOTTOM ? 'away' : 'home'}`}>
-            <span>P:</span> {pitcher}
-        </div>
-    </div>
+    </AnimatePresence>
 ));
 
 export default Scoreboard;

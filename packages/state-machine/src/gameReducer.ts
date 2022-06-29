@@ -96,7 +96,7 @@ export const advanceRunners = (bases: GameMoment['bases'], basesToAdvance: 0 | 1
 // }
 
 // runner furthest along the bases, that is forced to advance
-const forcedRunner = (bases: GameMoment['bases']): Bases | undefined => {
+export const forcedRunner = (bases: GameMoment['bases']): Bases | undefined => {
     if (bases[Bases.THIRD] > 0 && bases[Bases.SECOND] > 0 && bases[Bases.FIRST] > 0) return Bases.THIRD;
     if (bases[Bases.SECOND] > 0 && bases[Bases.FIRST] > 0) return Bases.SECOND;
     if (bases[Bases.FIRST] > 0) return Bases.FIRST;

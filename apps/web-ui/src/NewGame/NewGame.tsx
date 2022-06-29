@@ -57,8 +57,8 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ label, lineup, setLineup }) =
     return (
         <div className="teambuilder">
             <h2>{label}</h2>
-            {lineup.map(({ name, position }) => (
-                <div key={name} className={`player ${label === 'Home team' ? 'home' : 'away'}`}>
+            {lineup.map(({ name, position }, i) => (
+                <div key={`${name}-${i}`} className={`player ${label === 'Home team' ? 'home' : 'away'}`}>
                     <div className="name">{name}</div>
                     <div className="position">{allPositions.find(({ value }) => value === position)?.label}</div>
                 </div>
@@ -159,7 +159,7 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
             />
             <TeamBuilder label="Home team" lineup={homeTeamLineup} setLineup={setHomeTeamLineup} />
             <TeamBuilder label="Away team" lineup={awayTeamLineup} setLineup={setAwayTeamLineup} />
-            <button onClick={prepStart}>Start game</button>
+            <button className="start" onClick={prepStart}>Start game</button>
         </div>
     );
 };

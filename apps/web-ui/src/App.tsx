@@ -75,10 +75,12 @@ function App() {
       <Routes key={location.pathname} location={location}>
         <Route path="/" element={
           <div className="App">
-            <Outlet />
-            <Nav
-              onSelectPitch={() => void setSelectingPitch(prev => !prev)}
-            />
+            <div className="content"><Outlet /></div>
+            <div className="nav-container">
+              <Nav
+                onSelectPitch={() => void setSelectingPitch(prev => !prev)}
+              />
+            </div>
           </div>
         }>
           <Route index element={

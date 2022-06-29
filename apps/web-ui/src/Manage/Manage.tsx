@@ -1,25 +1,24 @@
-import { GameMoment, Pitches } from "@wiffleball/state-machine";
+import { GameMoment } from "@wiffleball/state-machine";
 import React from "react";
 import './Manage.css';
-import { Outlet, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Structure from "./Structure";
 
 interface Props {
     game: GameMoment;
 }
 
-// TODO manage game menu
 const Manage: React.FC<Props> = ({ game }) => {
     // TODO abstract friendly pitch names
 
     const navigate = useNavigate();
-    const handleUndoPitch = () => {
-        console.log('undo pitch not implemented');
-        // TODO undo pitch logic
-        // opt 1. hydrate new game with pitch[0..-1]
-        // opt 2. hold prev game state in and swap
-        navigate('/');
-    };
+    // const handleUndoPitch = () => {
+    //     console.log('undo pitch not implemented');
+    //     // TODO undo pitch logic
+    //     // opt 1. hydrate new game with pitch[0..-1]
+    //     // opt 2. hold prev game state in and swap
+    //     navigate('/');
+    // };
 
     const handleManual = () => {
         navigate('manual');
@@ -29,11 +28,11 @@ const Manage: React.FC<Props> = ({ game }) => {
         navigate('substitute');
     };
 
-    const handleFielderChange = () => {
-        console.log('fielder change not implemented');
-        // TODO fielder change
-        navigate('substitute');
-    };
+    // const handleFielderChange = () => {
+    //     console.log('fielder change not implemented');
+    //     // TODO fielder change
+    //     navigate('substitute');
+    // };
 
     const handleNew = () => {
         navigate('/new');

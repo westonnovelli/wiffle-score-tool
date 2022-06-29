@@ -3,7 +3,6 @@ import {
     InningHalf,
     OptionalRules,
     EMPTY_BASES,
-    getOffense,
     type GameMoment,
     type DeepPartial,
     type GameConfig,
