@@ -17,7 +17,9 @@ const Scoreboard: React.FC<Props> = ({ game }) => {
     // todo animate enter/exit of each section
     const offenseRoster = getOffense(game).roster;
     const defenseRoster = getDefense(game).roster;
-    const pitcher = defenseRoster[getPitcher(getDefense(game))].name;
+    const pitcher = defenseRoster[getPitcher(getDefense(game))]?.name ?? `cannot find pitcher`;
+    const batter = offenseRoster[game.atBat]?.name ?? `cannot find batter ${game.atBat}`;
+
     return (
         <div className="scoreboard">
             <BoxScore
@@ -38,7 +40,7 @@ const Scoreboard: React.FC<Props> = ({ game }) => {
                 strikes={game.count.strikes}
                 outs={game.outs}
             />
-            <Players batter={offenseRoster[game.atBat].name} pitcher={pitcher} />
+            <Players batter={batter} pitcher={pitcher} inningHalf={game.inning.half} />
         </div >
     );
 };
@@ -163,12 +165,17 @@ const Count = React.memo(({
 interface PlayersProps {
     batter: string;
     pitcher: string;
+    inningHalf: InningHalf;
 }
 
-const Players = React.memo(({ batter, pitcher }: PlayersProps) => (
+const Players = React.memo(({ batter, pitcher, inningHalf }: PlayersProps) => (
     <div className="players">
-        <div><span>batting:</span> {batter}</div>
-        <div><span>pitching:</span> {pitcher} </div>
+        <div className={`batter ${inningHalf === InningHalf.TOP ? 'away' : 'home'}`}>
+            <span>AB:</span> {batter}
+        </div>
+        <div className={`pitcher ${inningHalf === InningHalf.BOTTOM ? 'away' : 'home'}`}>
+            <span>P:</span> {pitcher}
+        </div>
     </div>
 ));
 

@@ -13,7 +13,6 @@ import './App.css';
 
 import {
   defaultGame,
-  getDefense,
   Pitches,
   handlePitch as processPitch,
   manualEdit,
@@ -63,8 +62,10 @@ function App() {
       },
       homeTeam,
       awayTeam,
-      atBat: awayTeam.lineup[0]
+      atBat: awayTeam.lineup[0],
+      nextHalfAtBat: homeTeam.lineup[0],
     };
+    console.log(newGame);
     setGame(newGame);
     navigate('/');
   }

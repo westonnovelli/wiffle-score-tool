@@ -2,7 +2,7 @@
   "name": "@wiffleball/web-ui",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://TODO.novelli.dev",
+  "homepage": "https://cpwiffleball.novelli.dev",
   "dependencies": {
     "@wiffleball/state-machine": "*",
     "framer-motion": "^6.3.15",
