@@ -23,3 +23,12 @@ export { getOffense, getDefense, EMPTY_BASES } from './gameReducer';
 export { default as manualEdit } from './manualEdit';
 export { getPitcher, getInfield, getOutfield, getBench, pitcherSwap, fielderSwap, fielderRotate } from './commonEdits';
 export { default as getPossiblePitches } from './possiblePitches';
+export {
+    battingAverage,
+    extraBaseHit,
+    groundOutToAirOutRatio,
+    onBasePercentage,
+    onBasePlusSlugging,
+    sluggingPercentage,
+    totalBases,
+} from './statAggregations';

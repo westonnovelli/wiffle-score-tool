@@ -54,13 +54,37 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({ label, lineup, setLineup }) =
             && pendingPosition === Position.Pitcher
         );
 
+    const move = (index: number, amt: number) => {
+        if (index === 0 && amt < 0) return;
+        if (index === lineup.length - 1 && amt > 0) return;
+        if (amt === 0 || amt > 1 || amt < -1) return;
+        if (index > lineup.length - 1 || index < 0) return;
+
+        const atIndex = lineup[index];
+        setLineup(prev => {
+            const next = [...prev];
+            next[index] = next[index + amt];
+            next[index + amt] = atIndex;
+            return next;
+        });
+    };
+
+    const remove = (index: number) => {
+        setLineup(prev => {
+            return [...prev.slice(0, index), ...prev.slice(index + 1)];
+        });
+    };
+
     return (
         <div className="teambuilder">
             <h2>{label}</h2>
             {lineup.map(({ name, position }, i) => (
                 <div key={`${name}-${i}`} className={`player ${label === 'Home team' ? 'home' : 'away'}`}>
+                    <button className="moveup" onClick={() => move(i, -1)} disabled={i === 0}>▲</button>
                     <div className="name">{name}</div>
                     <div className="position">{allPositions.find(({ value }) => value === position)?.label}</div>
+                    <button className="movedown" onClick={() => move(i, 1)} disabled={i === lineup.length - 1}>▼</button>
+                    <button className="remove" onClick={() => remove(i)}>X</button>
                 </div>
             ))}
             <input type="text" value={pendingName} onChange={(e) => void setPendingName(e.target.value)} />

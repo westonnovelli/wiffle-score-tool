@@ -1,0 +1,39 @@
+.stats {
+    color: var(--color-text);
+    padding: 8px;
+}
+
+.stats h1 {
+    font-weight: 400;
+    text-align: center;
+}
+
+.stats h2 {
+    font-weight: 400;
+}
+
+.stats .team {
+    display: flex;
+    flex-direction: column;
+    place-content: center left;
+}
+
+.stats .team table {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+.stats .team table td,
+.stats .team table th {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: center;
+}
+
+.stats .team.hometeam table thead tr td {
+    background: var(--color-primary-dark);
+}
+
+.stats .team.awayteam table thead tr td {
+    background: var(--color-secondary);
+}
