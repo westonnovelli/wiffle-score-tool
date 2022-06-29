@@ -11,10 +11,10 @@ const getPosition = (team: Team, pos: Position): string[] => {
     }, []);
 };
 
-export const getPitcher = (team: Team) => getPosition(team, Position.Pitcher)[0];
-export const getInfield = (team: Team) => getPosition(team, Position.Infield);
-export const getOutfield = (team: Team) => getPosition(team, Position.Outfield);
-export const getBench = (team: Team) => getPosition(team, Position.Bench);
+export const getPitcher = (team: Team): string => getPosition(team, Position.Pitcher)[0];
+export const getInfield = (team: Team): string[] => getPosition(team, Position.Infield);
+export const getOutfield = (team: Team): string[] => getPosition(team, Position.Outfield);
+export const getBench = (team: Team): string[] => getPosition(team, Position.Bench);
 
 export const pitcherSwap = (game: GameMoment, newPitcher: string): GameMoment => {
     return fielderSwap(game, newPitcher, getPitcher(getDefense(game)));

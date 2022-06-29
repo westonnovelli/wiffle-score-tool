@@ -11,6 +11,8 @@ import {
 import React from "react";
 import Structure from "./Structure";
 import './Manual.css';
+import RulesControl from "../components/RulesControl";
+import GameConfigControl from "../components/GameConfigControl";
 // import { useNavigate } from "react-router-dom";
 
 interface Props {
@@ -19,7 +21,7 @@ interface Props {
 }
 
 const rulesThatDontMatch = (variant: GameConfig['rules'], control: GameConfig['rules']) => {
-    return Object.keys(OptionalRules).filter((key) => 
+    return Object.keys(OptionalRules).filter((key) =>
         // @ts-expect-error
         variant[key] !== control[key]
     );
@@ -28,7 +30,7 @@ const rulesThatDontMatch = (variant: GameConfig['rules'], control: GameConfig['r
 const Manual: React.FC<Props> = ({ game, handleEdit }) => {
     const awayBatter = game.inning.half === InningHalf.TOP ? game.atBat : game.nextHalfAtBat;
     const homeBatter = game.inning.half === InningHalf.BOTTOM ? game.atBat : game.nextHalfAtBat;
-        
+
     const [inningNumber, setInningNumber] = React.useState(game.inning.number);
     const [inningHalf, setInningHalf] = React.useState<InningHalf>(game.inning.half);
 
@@ -56,7 +58,7 @@ const Manual: React.FC<Props> = ({ game, handleEdit }) => {
 
     const submitEdit = () => {
         const edit: DeepPartial<GameMoment> = {};
-        
+
         const inning: Partial<GameMoment['inning']> = {};
         if (inningNumber !== game.inning.number) {
             inning.number = inningNumber;
@@ -136,7 +138,7 @@ const Manual: React.FC<Props> = ({ game, handleEdit }) => {
         if (Object.keys(config).length > 0) {
             edit.configuration = config;
         }
-        
+
         console.log(edit);
         handleEdit(edit);
     };
@@ -265,116 +267,25 @@ const Manual: React.FC<Props> = ({ game, handleEdit }) => {
                     ))}
                 </select>
             </div>
-            <fieldset className="config">
-                <legend>Game Configuration</legend>
-                <div>
-                    <input
-                        type="number"
-                        value={maxStrikes}
-                        onChange={(e) => setMaxStrikes(parseInt(e.target.value))}
-                        name="maxStrikes"
-                        min={0}
-                        max={10}
-                    />
-                    <label htmlFor="maxStrikes">max strikes</label>
-                </div>
-                <div>
-                    <input
-                        type="number"
-                        value={maxBalls}
-                        onChange={(e) => setMaxBalls(parseInt(e.target.value))}
-                        name="maxBalls"
-                        min={0}
-                        max={10}
-                    />
-                    <label htmlFor="maxBalls">max balls</label>
-                </div>
-                <div>
-                    <input
-                        type="number"
-                        value={maxOuts}
-                        onChange={(e) => setMaxOuts(parseInt(e.target.value))}
-                        name="maxOuts"
-                        min={0}
-                        max={10}
-                    />
-                    <label htmlFor="maxOuts">max outs</label>
-                </div>
-                <div>
-                    <input
-                        type="number"
-                        value={maxRuns}
-                        onChange={(e) => setMaxRuns(parseInt(e.target.value))}
-                        name="maxRuns"
-                        min={-1}
-                        max={100}
-                    />
-                    <label htmlFor="maxRuns">max runs</label>
-                </div>
-                <div>
-                    <input
-                        type="number"
-                        value={maxInnings}
-                        onChange={(e) => setMaxInnings(parseInt(e.target.value))}
-                        name="maxInnings"
-                        min={0}
-                        max={20}
-                    />
-                    <label htmlFor="maxInnings">max innings</label>
-                </div>
-                <div>
-                    <input
-                        type="number"
-                        value={maxFielders}
-                        onChange={(e) => setMaxFielders(parseInt(e.target.value))}
-                        name="maxFielders"
-                        min={0}
-                        max={100}
-                    />
-                    <label htmlFor="maxFielders">max fielders</label>
-                </div>
-                <div>
-                    <input
-                        type="checkbox"
-                        name="allowExtras"
-                        value="allowExtras"
-                        defaultChecked={allowExtras}
-                        onChange={() => void setAllowExtras(prev => !prev)}
-                    />
-                    <label htmlFor="allowExtras">allow extra innings</label>
-                </div>
-                <div>
-                    <input
-                        type="checkbox"
-                        name="recordingStats"
-                        value="recordingStats"
-                        defaultChecked={recordingStats}
-                        onChange={() => void setRecordingStats(prev => !prev)}
-                    />
-                    <label htmlFor="recordingStats">recording stats</label>
-                </div>
-            </fieldset>
-            <fieldset className="rules">
-                <legend>Game Rules</legend>
-                {Object.keys(rules).map((key) => {
-                    // @ts-expect-error
-                    const display = OptionalRules[key];
-                    // @ts-expect-error
-                    const value = rules[key];
-                    return (
-                        <div key={key}>
-                            <input
-                                type="checkbox"
-                                name={key}
-                                value={display}
-                                defaultChecked={value}
-                                onChange={() => void setRules(prev => ({ ...prev, [key]: !value }))}
-                            />
-                            <label>{display}</label>
-                        </div>
-                    );
-                })}
-            </fieldset>
+            <GameConfigControl
+                maxBalls={maxBalls}
+                setMaxBalls={setMaxBalls}
+                maxStrikes={maxStrikes}
+                setMaxStrikes={setMaxStrikes}
+                maxOuts={maxOuts}
+                setMaxOuts={setMaxOuts}
+                maxRuns={maxRuns}
+                setMaxRuns={setMaxRuns}
+                maxFielders={maxFielders}
+                setMaxFielders={setMaxFielders}
+                maxInnings={maxInnings}
+                setMaxInnings={setMaxInnings}
+                allowExtras={allowExtras}
+                setAllowExtras={setAllowExtras}
+                recordingStats={recordingStats}
+                setRecordingStats={setRecordingStats}
+            />
+            <RulesControl rules={rules} setRules={setRules} />
             <button onClick={submitEdit}>Submit changes</button>
         </Structure>
     );

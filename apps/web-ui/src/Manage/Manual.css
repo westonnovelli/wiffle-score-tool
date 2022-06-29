@@ -44,12 +44,6 @@
     margin-right: 4px;
 }
 
-.manual .config {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-}
-
 .manual button {
     height: 30px;
 }

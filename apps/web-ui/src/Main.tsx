@@ -50,7 +50,7 @@ const Main: React.FC<Props> = ({ game, selectingPitch, handlePitch }) => {
             exit="exit"
         >
             <Scoreboard game={game} />
-            <Feed game={game} />
+            {/* <Feed game={game} /> */}
             <AnimatePresence>
                 {selectingPitch && (
                     <motion.div

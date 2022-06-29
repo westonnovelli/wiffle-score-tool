@@ -1,0 +1,84 @@
+.substitute {
+    color: var(--color-text);
+}
+
+.substitute h1 {
+    color: var(--color-text);
+    text-align: center;
+    font-weight: 400;
+}
+
+.substitute ul {
+    list-style: none;
+    padding: 16px;
+    margin: 0;
+}
+
+.substitute ul li {
+    padding: 16px;
+    margin-bottom: 8px;
+    box-shadow: 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12), 0 5px 5px -3px rgba(0,0,0,0.20);
+    font-size: 24px;
+    background-color: var(--color-primary-light);
+    color: var(--color-text);
+    border-radius: 4px;
+}
+
+.substitute ul li[role="button"] {
+    cursor: pointer;
+}
+
+.substitute div.prompt {
+    padding: 4px 16px;
+    margin-bottom: 8px;
+}
+
+.substitute div.prompt label {
+    margin-right: 8px;
+}
+
+.substitute div.prompt span {
+    padding: 4px 8px;
+    background: var(--color-disabled);
+    color: var(--color-text-dark);
+    border-radius: 19px;
+}
+
+.substitute div.summary {
+    padding: 4px 16px;
+}
+
+.substitute div.summary > div {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.substitute div.summary div.player {
+    margin-right: 8px;
+    padding: 4px 8px;
+    background: var(--color-secondary);
+    border-radius: 19px;
+    box-shadow: 0 3px 4px 0 rgba(0,0,0,0.14), 0 3px 3px -2px rgba(0,0,0,0.12), 0 1px 8px 0 rgba(0,0,0,0.20);
+}
+.substitute div.summary div.position {
+    margin-left: 8px;
+    padding: 4px 8px;
+    background: var(--color-quadinary);
+    color: var(--color-text-dark);
+    border-radius: 19px;
+    box-shadow: 0 3px 4px 0 rgba(0,0,0,0.14), 0 3px 3px -2px rgba(0,0,0,0.12), 0 1px 8px 0 rgba(0,0,0,0.20);
+}
+
+
+.substitute .submit {
+    margin-top: 32px;
+    width: 100%;
+    display: flex;
+    place-content: center;
+}
+
+.substitute button {
+    height: 32px;
+    width: 50vw;
+}
