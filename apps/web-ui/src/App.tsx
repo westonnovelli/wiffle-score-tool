@@ -30,10 +30,25 @@ import NewGame from './NewGame/NewGame';
 import Main from './Main';
 import Manual from './Manage/Manual';
 import Substitute from './Manage/Substitute';
+import useHistory from './useHistory';
 
 
 function App() {
-  const [game, setGame] = React.useState(defaultGame());
+  // const [game, setGame] = React.useState(defaultGame());
+  const {
+    state: {
+      past,
+      present: game,
+      future,
+    },
+    set: setGame,
+    canUndo,
+    undo,
+    canRedo,
+    redo,
+    clear
+  } = useHistory<GameMoment>(defaultGame());
+
   const [selectingPitch, setSelectingPitch] = React.useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -54,7 +69,7 @@ function App() {
   }
 
   const handleStart = (config: GameConfig, homeTeam: Team, awayTeam: Team) => {
-    const newGame = {
+    const newGame: GameMoment = {
       ...defaultGame(),
       configuration: {
         ...defaultConfiguration(),
@@ -65,8 +80,9 @@ function App() {
       atBat: awayTeam.lineup[0],
       nextHalfAtBat: homeTeam.lineup[0],
     };
+
     console.log(newGame);
-    setGame(newGame);
+    clear(newGame);
     navigate('/');
   }
 
@@ -87,12 +103,22 @@ function App() {
             <Main game={game} selectingPitch={selectingPitch} handlePitch={handlePitch} />
           } />
           <Route path="manage">
-            <Route index element={<Manage game={game} />} />
+            <Route index element={
+              <Manage
+                game={game}
+                last={past[past.length - 1]}
+                next={future[0]}
+                undo={undo}
+                redo={redo}
+                canUndo={canUndo}
+                canRedo={canRedo}
+              />}
+            />
             <Route path="manual" element={<Manual game={game} handleEdit={handleEdit} />} />
             <Route path="substitute" element={<Substitute game={game} handleEdit={handleSubstitute} />} />
           </Route>
           <Route path="stats" element={<Stats game={game} />} />
-          <Route path="new" element={<NewGame handleStart={handleStart}/>} />
+          <Route path="new" element={<NewGame handleStart={handleStart} />} />
         </Route>
       </Routes>
     </AnimatePresence>

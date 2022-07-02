@@ -1,4 +1,4 @@
-import { GameMoment } from "@wiffleball/state-machine";
+import { GameMoment, Pitches } from "@wiffleball/state-machine";
 import React from "react";
 import './Manage.css';
 import { useNavigate } from "react-router-dom";
@@ -6,33 +6,33 @@ import Structure from "./Structure";
 
 interface Props {
     game: GameMoment;
+    last: GameMoment;
+    next: GameMoment;
+    undo: () => void;
+    redo: () => void;
+    canUndo: boolean;
+    canRedo: boolean;
 }
 
-const Manage: React.FC<Props> = ({ game }) => {
+const Manage: React.FC<Props> = ({
+    game,
+    // last,
+    next,
+    undo,
+    redo,
+    canUndo,
+    canRedo
+}) => {
     // TODO abstract friendly pitch names
-
     const navigate = useNavigate();
-    // const handleUndoPitch = () => {
-    //     console.log('undo pitch not implemented');
-    //     // TODO undo pitch logic
-    //     // opt 1. hydrate new game with pitch[0..-1]
-    //     // opt 2. hold prev game state in and swap
-    //     navigate('/');
-    // };
 
     const handleManual = () => {
         navigate('manual');
     };
 
-    const handlePitchingChange = () => {
+    const handleSubstitute = () => {
         navigate('substitute');
     };
-
-    // const handleFielderChange = () => {
-    //     console.log('fielder change not implemented');
-    //     // TODO fielder change
-    //     navigate('substitute');
-    // };
 
     const handleNew = () => {
         navigate('/new');
@@ -41,11 +41,16 @@ const Manage: React.FC<Props> = ({ game }) => {
     return (
         <Structure className="manage" title={<h1>Manage game</h1>}>
             <ul>
-                {/* <li role="button" onClick={handleUndoPitch}>
+                {/* TODO figure out better undo/redo UI */}
+                {canUndo && <li role="button" onClick={undo}>
                     Undo last pitch
-                    {game.pitches.length > 0 && <span>{' '}({Pitches[game.pitches[game.pitches.length - 1]]})</span>}
-                </li> */}
-                <li role="button" onClick={handlePitchingChange}>Substitution (defense) ᐳ</li>
+                    <span>{' '}({Pitches[game.pitches[game.pitches.length - 1]]})</span>
+                </li>}
+                {canRedo && <li role="button" onClick={redo}>
+                    Redo last undo
+                    <span>{' '}({Pitches[next.pitches[next.pitches.length - 1]]})</span>
+                </li>}
+                <li role="button" onClick={handleSubstitute}>Substitution (defense) ᐳ</li>
                 {/* <li role="button" onClick={handleFielderChange}>Home Team ᐳ</li> */}
                 {/* <li role="button" onClick={handleFielderChange}>Away Team ᐳ</li> */}
                 <li role="button" onClick={handleManual}>Manually adjust game state ᐳ</li>
