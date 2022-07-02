@@ -12,6 +12,8 @@ import Structure from "./Structure";
 import './Manual.css';
 import RulesControl from "../components/RulesControl";
 import GameConfigControl from "../components/GameConfigControl";
+import BoxScore from "../components/BoxScore";
+import NumberInput from "../components/NumberInput";
 // import { useNavigate } from "react-router-dom";
 
 interface Props {
@@ -25,6 +27,10 @@ const rulesThatDontMatch = (variant: GameConfig['rules'], control: GameConfig['r
         variant[key] !== control[key]
     );
 }
+
+const boxScoresDontMatch = (variant: GameMoment['boxScore'], control: GameMoment['boxScore']) => {
+    return variant.length >= control.length || control.some(({homeTeam, awayTeam}, i) => variant[i]?.homeTeam !== homeTeam && variant[i]?.awayTeam !== awayTeam);
+};
 
 const Manual: React.FC<Props> = ({ game, handleEdit }) => {
     const awayBatter = game.inning.half === InningHalf.TOP ? game.atBat : game.nextHalfAtBat;
@@ -55,6 +61,8 @@ const Manual: React.FC<Props> = ({ game, handleEdit }) => {
     const [allowExtras, setAllowExtras] = React.useState(game.configuration.allowExtras);
     const [recordingStats, setRecordingStats] = React.useState(game.configuration.recordingStats);
 
+    const [boxScore, setBoxScore] = React.useState(game.boxScore);
+
     const submitEdit = () => {
         const edit: DeepPartial<GameMoment> = {};
 
@@ -70,6 +78,10 @@ const Manual: React.FC<Props> = ({ game, handleEdit }) => {
         if (Object.keys(inning).length > 0) {
             edit.inning = inning;
             edit.bases = EMPTY_BASES;
+        }
+
+        if (boxScoresDontMatch(boxScore, game.boxScore)) {
+            edit.boxScore = boxScore;
         }
 
         if (outs !== game.outs) {
@@ -160,8 +172,7 @@ const Manual: React.FC<Props> = ({ game, handleEdit }) => {
         >
             <fieldset className="inning">
                 <legend>Inning</legend>
-                <input
-                    type="number"
+                <NumberInput
                     name="inningNumber"
                     value={inningNumber}
                     onChange={(e) => setInningNumber(parseInt(e.target.value))}
@@ -189,12 +200,17 @@ const Manual: React.FC<Props> = ({ game, handleEdit }) => {
                     <label htmlFor="inningBottom">Bottom</label>
                 </div>
             </fieldset>
-            {/* <div>score</div> input type=number in each cell (only allow current/past innings) */}
+            <BoxScore
+                maxInnings={game.configuration.maxInnings}
+                inningNumber={game.inning.number}
+                inningHalf={game.inning.half}
+                boxScore={boxScore}
+                setBoxScore={setBoxScore}
+            />
             <fieldset className="count">
                 <legend>Count</legend>
                 <label htmlFor="countBalls">Balls</label>
-                <input
-                    type="number"
+                <NumberInput
                     name="countBalls"
                     value={balls}
                     onChange={(e) => void setBalls(parseInt(e.target.value))}
@@ -202,8 +218,7 @@ const Manual: React.FC<Props> = ({ game, handleEdit }) => {
                     min={0}
                 />
                 <label htmlFor="countStrikes">Strikes</label>
-                <input
-                    type="number"
+                <NumberInput
                     name="countStrikes"
                     value={strikes}
                     onChange={(e) => void setStrikes(parseInt(e.target.value))}
@@ -211,8 +226,7 @@ const Manual: React.FC<Props> = ({ game, handleEdit }) => {
                     min={0}
                 />
                 <label htmlFor="outs">Outs</label>
-                <input
-                    type="number"
+                <NumberInput
                     name="outs"
                     value={outs}
                     onChange={(e) => void setOuts(parseInt(e.target.value))}

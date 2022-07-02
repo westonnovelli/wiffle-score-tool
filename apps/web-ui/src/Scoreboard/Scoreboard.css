@@ -4,68 +4,7 @@
     padding-top: 32px;
 }
 
-/* boxscore */
-.scoreboard .boxScore {
-    display: flex;
-    justify-content: center;
-    background-color: var(--color-primary);
-    padding: 0 32px;
-}
-
-.scoreboard .boxScore table {
-    border: 1px solid black;
-    border-collapse: collapse;
-}
-
-.scoreboard .boxScore table thead tr td {
-    background: var(--color-disabled);
-    color: var(--color-text-dark);
-    font-weight: 700;
-}
-
-.scoreboard .boxScore table td,
-.scoreboard .boxScore table th {
-    border: 1px solid black;
-    padding: 8px;
-    text-align: center;
-}
-
-.scoreboard .boxScore table tr.awayScore td.active,
-.scoreboard .boxScore table tr.homeScore td.active {
-    background: var(--color-quadinary);
-    color: var(--color-text-dark);
-}
-
-.scoreboard .boxScore table tr.awayScore {
-    background: var(--color-secondary);
-}
-
-.scoreboard .boxScore table tr.homeScore {
-    background: var(--color-primary);
-}
-
-.scoreboard .boxScore table tr.awayScore th,
-.scoreboard .boxScore table tr.awayScore td {
-    background: var(--color-secondary-dark);
-    color: var(--color-text);
-}
-
-.scoreboard .boxScore table tr.homeScore th,
-.scoreboard .boxScore table tr.homeScore td {
-    background: var(--color-primary-dark);
-    color: var(--color-text);
-}
-
-.scoreboard .boxScore table tr th.runs,
-.scoreboard .boxScore table thead tr td.runs {
-    background: var(--color-tertiary);
-    color: var(--color-text);
-}
-
-
-
 /* bases */
-
 .scoreboard .bases {
     position: relative;
     margin: 0 auto;

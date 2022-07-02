@@ -8,6 +8,7 @@ import {
 } from '@wiffleball/state-machine';
 import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
+import BoxScore from '../components/BoxScore';
 import './Scoreboard.css';
 
 interface Props {
@@ -45,83 +46,6 @@ const Scoreboard: React.FC<Props> = ({ game }) => {
         </div >
     );
 };
-
-type BoxScoreProps = {
-    maxInnings: number;
-    inningNumber: number;
-    inningHalf: InningHalf;
-    boxScore: GameMoment['boxScore'];
-};
-
-const BoxScore = ({ inningNumber, inningHalf, maxInnings, boxScore }: BoxScoreProps) => {
-    const [awayScore, homeScore] = boxScore.reduce((total, inning) => {
-        total[0] += inning.awayTeam;
-        total[1] += inning.homeTeam;
-        return total;
-    }, [0, 0]);
-
-    const inningsToShow = Math.max(boxScore.length, maxInnings);
-    const inningsDiff = inningsToShow - boxScore.length;
-    // TODO animate box score
-    return (
-        <div className="boxScore">
-            <table>
-                <thead>
-                    <tr>
-                        <td></td>
-                        {Array.from(Array(inningsToShow)).map((_, i) => (
-                            <td key={i}>{i + 1}</td>
-                        ))}
-                        <td className="runs">R</td>
-                        <td>H</td>
-                        <td>E</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr className="awayScore">
-                        <th>AWAY</th>
-                        {boxScore.map(({ awayTeam }, i) => {
-                            return (
-                                <td
-                                    key={i}
-                                    className={`${inningNumber === i + 1 && inningHalf === InningHalf.TOP
-                                        ? 'active' : ''
-                                        }`}
-                                >{awayTeam}</td>
-                            );
-                        })}
-                        {Array.from(Array(inningsDiff)).map((_, i) => (
-                            <td key={i}></td>
-                        ))}
-                        <th className="runs">{awayScore}</th>
-                        <td>0</td>
-                        <td>0</td>
-                    </tr>
-                    <tr className="homeScore">
-                        <th>HOME</th>
-                        {boxScore.map(({ homeTeam }, i) => {
-                            return (
-                                <td
-                                    key={i}
-                                    className={`${inningNumber === i + 1 && inningHalf === InningHalf.BOTTOM
-                                        ? 'active' : ''
-                                        }`}
-                                >{homeTeam}</td>
-                            );
-                        })}
-                        {Array.from(Array(inningsDiff)).map((_, i) => (
-                            <td key={i}></td>
-                        ))}
-                        <th className="runs">{homeScore}</th>
-                        <td>0</td>
-                        <td>0</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    );
-};
-
 interface BasesProps {
     first: number;
     second: number;
