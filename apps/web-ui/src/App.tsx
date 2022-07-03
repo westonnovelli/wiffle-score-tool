@@ -8,7 +8,7 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
-import './colors.css';
+import './standards.css';
 import './App.css';
 
 import {
@@ -31,10 +31,9 @@ import Main from './Main';
 import Manual from './Manage/Manual';
 import Substitute from './Manage/Substitute';
 import useHistory from './useHistory';
-
+import Roster from './Manage/Roster';
 
 function App() {
-  // const [game, setGame] = React.useState(defaultGame());
   const {
     state: {
       past,
@@ -61,12 +60,16 @@ function App() {
   const handleEdit = (edit: DeepPartial<GameMoment>) => {
     setGame(manualEdit(game, edit));
     navigate('/');
-  }
+  };
+
+  const handleTeamEdit = (edit: DeepPartial<Team>, teamKey: 'homeTeam' | 'awayTeam') => {
+    handleEdit({ [teamKey]: edit });
+  };
 
   const handleSubstitute = (rotation: string[]) => {
     setGame(fielderRotate(game, ...rotation));
     navigate('/');
-  }
+  };
 
   const handleStart = (config: GameConfig, homeTeam: Team, awayTeam: Team) => {
     const newGame: GameMoment = {
@@ -116,6 +119,24 @@ function App() {
             />
             <Route path="manual" element={<Manual game={game} handleEdit={handleEdit} />} />
             <Route path="substitute" element={<Substitute game={game} handleEdit={handleSubstitute} />} />
+            <Route path="roster">
+              <Route path="home" element={
+                <Roster
+                  whichTeam="home"
+                  teamName="Home team"
+                  team={game.homeTeam}
+                  handleEdit={(e) => handleTeamEdit(e, 'homeTeam')}
+                />}
+              />
+              <Route path="away" element={
+                <Roster
+                  whichTeam="away"
+                  teamName="Away team"
+                  team={game.awayTeam}
+                  handleEdit={(e) => handleTeamEdit(e, 'awayTeam')}
+                />}
+              />
+            </Route>
           </Route>
           <Route path="stats" element={<Stats game={game} />} />
           <Route path="new" element={<NewGame handleStart={handleStart} />} />

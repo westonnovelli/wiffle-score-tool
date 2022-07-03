@@ -38,6 +38,10 @@ const Manage: React.FC<Props> = ({
         navigate('/new');
     };
 
+    const handleRoster = (team: 'home' | 'away') => {
+        navigate(`roster/${team}`);
+    }
+
     return (
         <Structure className="manage" title={<h1>Manage game</h1>}>
             <ul>
@@ -51,8 +55,8 @@ const Manage: React.FC<Props> = ({
                     <span>{' '}({Pitches[next.pitches[next.pitches.length - 1]]})</span>
                 </li>}
                 <li role="button" onClick={handleSubstitute}>Substitution (defense) ᐳ</li>
-                {/* <li role="button" onClick={handleFielderChange}>Home Team ᐳ</li> */}
-                {/* <li role="button" onClick={handleFielderChange}>Away Team ᐳ</li> */}
+                <li role="button" onClick={() => handleRoster('home')}>Home Team ᐳ</li>
+                <li role="button" onClick={() => handleRoster('away')}>Away Team ᐳ</li>
                 <li role="button" onClick={handleManual}>Manually adjust game state ᐳ</li>
                 {/* <li role="button" onClick={handleFielderChange}>Fielders change ᐳ</li> */}
                 <li role="button" onClick={handleNew}>New Game (abandon this game)</li>

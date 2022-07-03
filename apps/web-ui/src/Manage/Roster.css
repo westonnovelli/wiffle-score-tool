@@ -1,0 +1,52 @@
+.manage-roster {
+    color: var(--color-text);
+}
+
+.manage-roster h1 {
+    text-align: center;
+    font-weight: 400;
+    margin: 0;
+    padding: 32px 0;
+    grid-area: header;
+}
+
+.manage-roster.home h1 {
+    background: var(--color-primary-dark);
+}
+
+.manage-roster.away h1 {
+    background: var(--color-secondary);
+}
+
+.manage-roster li::marker,
+.manage-roster li {
+    box-shadow: var(--elevation-1);
+    width: calc(100% - 16px);
+    margin-bottom: 8px;
+}
+
+.manage-roster .row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    height: 2em;
+    padding: 0 8px;
+    background: var(--color-primary-light);
+}
+
+.manage-roster .row .name {
+    width: 33%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.manage-roster .row .position {
+    text-align: center;
+}
+
+.manage-roster .row .pa-stat {
+    justify-self: flex-end;
+    text-align: right;
+    flex: 1;
+}

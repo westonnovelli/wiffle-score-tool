@@ -17,7 +17,7 @@
 .substitute ul li {
     padding: 16px;
     margin-bottom: 8px;
-    box-shadow: 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12), 0 5px 5px -3px rgba(0,0,0,0.20);
+    box-shadow: var(--elevation-2);
     font-size: 24px;
     background-color: var(--color-primary-light);
     color: var(--color-text);
@@ -59,7 +59,7 @@
     padding: 4px 8px;
     background: var(--color-secondary);
     border-radius: 19px;
-    box-shadow: 0 3px 4px 0 rgba(0,0,0,0.14), 0 3px 3px -2px rgba(0,0,0,0.12), 0 1px 8px 0 rgba(0,0,0,0.20);
+    box-shadow: var(--elevation-1);
 }
 .substitute div.summary div.position {
     margin-left: 8px;
@@ -67,7 +67,7 @@
     background: var(--color-quadinary);
     color: var(--color-text-dark);
     border-radius: 19px;
-    box-shadow: 0 3px 4px 0 rgba(0,0,0,0.14), 0 3px 3px -2px rgba(0,0,0,0.12), 0 1px 8px 0 rgba(0,0,0,0.20);
+    box-shadow: var(--elevation-1);
 }
 
 
