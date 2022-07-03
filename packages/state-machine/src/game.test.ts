@@ -18,15 +18,57 @@ test('1st batter: Lead off walk', () => {
     const atBat: atBat = [
         {
             pitch: Pitches.BALL,
-            expected: { count: { balls: 1 }, pitches: [Pitches.BALL] }
+            expected: {
+                count: { balls: 1 },
+                homeTeam: {
+                    roster: {
+                        '4': {
+                            defenseStats: {
+                                pitching: {
+                                    balls: 1
+                                }
+                            }
+                        }
+                    }
+                },
+                pitches: [Pitches.BALL]
+            }
         },
         {
             pitch: Pitches.BALL,
-            expected: { count: { balls: 2 }, pitches: [Pitches.BALL, Pitches.BALL] }
+            expected: {
+                count: { balls: 2 },
+                homeTeam: {
+                    roster: {
+                        '4': {
+                            defenseStats: {
+                                pitching: {
+                                    balls: 2
+                                }
+                            }
+                        }
+                    }
+                },
+                pitches: [Pitches.BALL, Pitches.BALL]
+            }
         },
         {
             pitch: Pitches.BALL,
-            expected: { count: { balls: 3 }, pitches: [Pitches.BALL, Pitches.BALL, Pitches.BALL] }
+            expected: {
+                count: { balls: 3 },
+                homeTeam: {
+                    roster: {
+                        '4': {
+                            defenseStats: {
+                                pitching: {
+                                    balls: 3
+                                }
+                            }
+                        }
+                    }
+                },
+                pitches: [Pitches.BALL, Pitches.BALL, Pitches.BALL]
+            }
         },
         {
             pitch: Pitches.BALL,
@@ -48,6 +90,18 @@ test('1st batter: Lead off walk', () => {
                         }
                     }
                 },
+                homeTeam: {
+                    roster: {
+                        '4': {
+                            defenseStats: {
+                                pitching: {
+                                    balls: 4,
+                                    walks: 1,
+                                }
+                            }
+                        }
+                    }
+                },
                 pitches: [Pitches.BALL, Pitches.BALL, Pitches.BALL, Pitches.BALL]
             }
         },
@@ -64,15 +118,62 @@ test('2nd batter: single on 1,2 count', () => {
     const atBat: atBat = [
         {
             pitch: Pitches.BALL,
-            expected: { count: { balls: 1 }, bases: { [Bases.FIRST]: 1, }, pitches: [...initial.pitches, Pitches.BALL] }
+            expected: {
+                count: { balls: 1 },
+                bases: { [Bases.FIRST]: 1, },
+                homeTeam: {
+                    roster: {
+                        '4': {
+                            defenseStats: {
+                                pitching: {
+                                    balls: 5,
+                                }
+                            }
+                        }
+                    }
+                },
+                pitches: [...initial.pitches, Pitches.BALL]
+            }
         },
         {
             pitch: Pitches.STRIKE_FOUL,
-            expected: { count: { balls: 1, strikes: 1 }, bases: { [Bases.FIRST]: 1, }, pitches: [...initial.pitches, Pitches.BALL, Pitches.STRIKE_FOUL] }
+            expected: {
+                count: { balls: 1, strikes: 1 },
+                bases: { [Bases.FIRST]: 1, },
+                homeTeam: {
+                    roster: {
+                        '4': {
+                            defenseStats: {
+                                pitching: {
+                                    balls: 5,
+                                    strikes: 1,
+                                }
+                            }
+                        }
+                    }
+                },
+                pitches: [...initial.pitches, Pitches.BALL, Pitches.STRIKE_FOUL]
+            }
         },
         {
             pitch: Pitches.STRIKE_SWINGING,
-            expected: { count: { balls: 1, strikes: 2 }, bases: { [Bases.FIRST]: 1, }, pitches: [...initial.pitches, Pitches.BALL, Pitches.STRIKE_FOUL, Pitches.STRIKE_SWINGING] }
+            expected: {
+                count: { balls: 1, strikes: 2 },
+                bases: { [Bases.FIRST]: 1, },
+                homeTeam: {
+                    roster: {
+                        '4': {
+                            defenseStats: {
+                                pitching: {
+                                    balls: 5,
+                                    strikes: 2,
+                                }
+                            }
+                        }
+                    }
+                },
+                pitches: [...initial.pitches, Pitches.BALL, Pitches.STRIKE_FOUL, Pitches.STRIKE_SWINGING]
+            }
         },
         {
             pitch: Pitches.INPLAY_OUTFIELD_SINGLE,
@@ -95,6 +196,19 @@ test('2nd batter: single on 1,2 count', () => {
                         },
                     }
                 },
+                homeTeam: {
+                    roster: {
+                        '4': {
+                            defenseStats: {
+                                pitching: {
+                                    balls: 5,
+                                    strikes: 2,
+                                    singles: 1,
+                                }
+                            }
+                        }
+                    }
+                },
                 pitches: [...initial.pitches, Pitches.BALL, Pitches.STRIKE_FOUL, Pitches.STRIKE_SWINGING, Pitches.INPLAY_OUTFIELD_SINGLE]
             }
         },
@@ -106,7 +220,7 @@ test('2nd batter: single on 1,2 count', () => {
     });
 });
 
-test('3rd batter: groud out on first pitch', () => {
+test('3rd batter: ground out on first pitch', () => {
     const initial = { ...game };
     const atBat: atBat = [
         {
@@ -131,6 +245,17 @@ test('3rd batter: groud out on first pitch', () => {
                         }
                     }
                 },
+                homeTeam: {
+                    roster: {
+                        '4': {
+                            defenseStats: {
+                                pitching: {
+                                    groundOuts: 1,
+                                }
+                            }
+                        }
+                    }
+                },
                 pitches: [...initial.pitches, Pitches.INPLAY_INFIELD_GRD_OUT]
             }
         },
@@ -147,11 +272,42 @@ test('4th batter: strikeout looking on 2,0 count', () => {
     const atBat: atBat = [
         {
             pitch: Pitches.BALL,
-            expected: { count: { balls: 1 }, outs: 1, bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1, }, pitches: [...initial.pitches, Pitches.BALL] }
+            expected: {
+                count: { balls: 1 },
+                outs: 1,
+                bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1, },
+                homeTeam: {
+                    roster: {
+                        '4': {
+                            defenseStats: {
+                                pitching: {
+                                    balls: 6,
+                                }
+                            }
+                        }
+                    }
+                },
+                pitches: [...initial.pitches, Pitches.BALL] }
         },
         {
             pitch: Pitches.BALL,
-            expected: { count: { balls: 2 }, outs: 1, bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1, }, pitches: [...initial.pitches, Pitches.BALL, Pitches.BALL] }
+            expected: {
+                count: { balls: 2 },
+                outs: 1,
+                bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1, },
+                homeTeam: {
+                    roster: {
+                        '4': {
+                            defenseStats: {
+                                pitching: {
+                                    balls: 7,
+                                }
+                            }
+                        }
+                    }
+                },
+                pitches: [...initial.pitches, Pitches.BALL, Pitches.BALL]
+            }
         },
         {
             pitch: Pitches.STRIKE_LOOKING,
@@ -175,6 +331,19 @@ test('4th batter: strikeout looking on 2,0 count', () => {
                         }
                     }
                 },
+                homeTeam: {
+                    roster: {
+                        '4': {
+                            defenseStats: {
+                                pitching: {
+                                    balls: 7,
+                                    strikes: 3,
+                                    strikeoutsLooking: 1,
+                                }
+                            }
+                        }
+                    }
+                },
                 pitches: [...initial.pitches, Pitches.BALL, Pitches.BALL, Pitches.STRIKE_LOOKING]
             }
         },
@@ -186,23 +355,70 @@ test('4th batter: strikeout looking on 2,0 count', () => {
     });
 });
 
-test('5th batter: foul, foul, foul, infield error', () => {
+test('5th batter: foul, foul, foul, infield single', () => {
     const initial = { ...game };
     const atBat: atBat = [
         {
             pitch: Pitches.STRIKE_FOUL,
-            expected: { count: { strikes: 1 }, outs: 2, bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1, }, pitches: [...initial.pitches, Pitches.STRIKE_FOUL] }
+            expected: {
+                count: { strikes: 1 },
+                outs: 2,
+                bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1, },
+                homeTeam: {
+                    roster: {
+                        '4': {
+                            defenseStats: {
+                                pitching: {
+                                    strikes: 4,
+                                }
+                            }
+                        }
+                    }
+                },
+                pitches: [...initial.pitches, Pitches.STRIKE_FOUL] }
         },
         {
             pitch: Pitches.STRIKE_FOUL,
-            expected: { count: { strikes: 2 }, outs: 2, bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1, }, pitches: [...initial.pitches, Pitches.STRIKE_FOUL, Pitches.STRIKE_FOUL] }
+            expected: {
+                count: { strikes: 2 },
+                outs: 2,
+                bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1, },
+                homeTeam: {
+                    roster: {
+                        '4': {
+                            defenseStats: {
+                                pitching: {
+                                    strikes: 5,
+                                }
+                            }
+                        }
+                    }
+                },
+                pitches: [...initial.pitches, Pitches.STRIKE_FOUL, Pitches.STRIKE_FOUL]
+            }
         },
         {
             pitch: Pitches.STRIKE_FOUL,
-            expected: { count: { strikes: 2 }, outs: 2, bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1, }, pitches: [...initial.pitches, Pitches.STRIKE_FOUL, Pitches.STRIKE_FOUL, Pitches.STRIKE_FOUL] }
+            expected: {
+                count: { strikes: 2 },
+                outs: 2,
+                bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1, },
+                homeTeam: {
+                    roster: {
+                        '4': {
+                            defenseStats: {
+                                pitching: {
+                                    strikes: 6,
+                                }
+                            }
+                        }
+                    }
+                },
+                pitches: [...initial.pitches, Pitches.STRIKE_FOUL, Pitches.STRIKE_FOUL, Pitches.STRIKE_FOUL]
+            }
         },
         {
-            pitch: Pitches.INPLAY_INFIELD_ERROR,
+            pitch: Pitches.INPLAY_INFIELD_SINGLE,
             expected: {
                 outs: 2,
                 bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1, [Bases.THIRD]: 1, },
@@ -224,7 +440,19 @@ test('5th batter: foul, foul, foul, infield error', () => {
                         }
                     }
                 },
-                pitches: [...initial.pitches, Pitches.STRIKE_FOUL, Pitches.STRIKE_FOUL, Pitches.STRIKE_FOUL, Pitches.INPLAY_INFIELD_ERROR]
+                homeTeam: {
+                    roster: {
+                        '4': {
+                            defenseStats: {
+                                pitching: {
+                                    strikes: 6,
+                                    singles: 2,
+                                }
+                            }
+                        }
+                    }
+                },
+                pitches: [...initial.pitches, Pitches.STRIKE_FOUL, Pitches.STRIKE_FOUL, Pitches.STRIKE_FOUL, Pitches.INPLAY_INFIELD_SINGLE]
             }
         },
     ];
@@ -265,6 +493,18 @@ test('6th batter: grand slam! first pitch', () => {
                         }
                     }
                 },
+                homeTeam: {
+                    roster: {
+                        '4': {
+                            defenseStats: {
+                                pitching: {
+                                    homeruns: 1,
+                                    runsAllowed: 4,
+                                }
+                            }
+                        }
+                    }
+                },
                 pitches: [...initial.pitches, Pitches.INPLAY_HOMERUN]
             }
         },
@@ -281,8 +521,23 @@ test('7th batter: fly out on 1,0, ends the inning', () => {
     const atBat: atBat = [
         {
             pitch: Pitches.BALL,
-            expected: { count: { balls: 1 }, outs: 2, boxScore: [{ homeTeam: 0, awayTeam: 4 }], pitches: [...initial.pitches, Pitches.BALL] }
-
+            expected: {
+                count: { balls: 1 },
+                outs: 2,
+                boxScore: [{ homeTeam: 0, awayTeam: 4 }],
+                homeTeam: {
+                    roster: {
+                        '4': {
+                            defenseStats: {
+                                pitching: {
+                                    balls: 8,
+                                }
+                            }
+                        }
+                    }
+                },
+                pitches: [...initial.pitches, Pitches.BALL]
+            }
         },
         {
             pitch: Pitches.INPLAY_OUTFIELD_OUT,
@@ -300,6 +555,18 @@ test('7th batter: fly out on 1,0, ends the inning', () => {
                                 flyOuts: 1,
                             }
                         },
+                    }
+                },
+                homeTeam: {
+                    roster: {
+                        '4': {
+                            defenseStats: {
+                                pitching: {
+                                    balls: 8,
+                                    flyOuts: 1,
+                                }
+                            }
+                        }
                     }
                 },
                 // TODO this probably needs to have a plate appearance for the homeTeam at the end of this
@@ -340,6 +607,17 @@ test('next inning - batter 1: triple, first pitch', () => {
                         }
                     }
                 },
+                awayTeam: {
+                    roster: {
+                        '0': {
+                            defenseStats: {
+                                pitching: {
+                                    triples: 1,
+                                }
+                            }
+                        }
+                    }
+                },
                 pitches: [...initial.pitches, Pitches.INPLAY_TRIPLE]
             }
         },
@@ -373,6 +651,18 @@ test('batter 2: sac fly, runner tags', () => {
                         '6': {
                             offenseStats: {
                                 plateAppearance: 1,
+                            }
+                        }
+                    }
+                },
+                awayTeam: {
+                    roster: {
+                        '0': {
+                            defenseStats: {
+                                pitching: {
+                                    flyOuts: 1,
+                                    runsAllowed: 1,
+                                }
                             }
                         }
                     }

@@ -18,7 +18,6 @@ export enum Pitches {
     INPLAY_INFIELD_AIR_OUT_INFIELD_FLY,
     INPLAY_INFIELD_OUT_DP_SUCCESS,
     INPLAY_INFIELD_OUT_DP_FAIL,
-    INPLAY_INFIELD_ERROR,
     INPLAY_OUTFIELD_OUT,
     INPLAY_OUTFIELD_OUT_TAG_SUCCESS,
     INPLAY_OUTFIELD_OUT_TAG_FAIL,
@@ -40,6 +39,9 @@ export enum StatEvent {
     WALK_OFF = 'WO',
     STRIKEOUT_SWINGING = "K",
     STRIKE_LOOKING = "_K",
+    RUNS_SCORED = "R",
+    LEAD_CHANGE = "LC",
+    LEAD_LOST = "LL",
 }
 
 export enum InningHalf {
@@ -100,32 +102,37 @@ export interface DefenseStats {
 }
 
 export interface PitchingStats {
-    pitchCount: number;
     battersFaced: number;
-    blownSave: number;
-    completeGame: number;
-    _earnableRuns: number; // for tracking which baserunners are earnable by this pitcher
-    earnedRun: number;
-    gamesFinished: number;
-    gamesStarted: number;
-    holds: number;
-    _holdable: number;
-    inheritedRunners: number;
-    loss: number;
-    _losing: number;
-    saveOpportunities: number;
-    strikeoutsSwinging: number;
-    strikeoutsLooking: number;
-    unearnedRuns: number;
+    balls: number;
+    strikes: number;
     wildPitches: number;
     walks: number;
-    inningsPitched: number;
+    strikeoutsSwinging: number;
+    strikeoutsLooking: number;
     groundOuts: number;
     doublePlays: number;
     flyOuts: number;
-    _potentialWin: number;
-    balls: number;
-    strikes: number;
+    singles: number;
+    doubles: number;
+    triples: number;
+    homeruns: number;
+    runsAllowed: number;
+    // blownSaves: number;
+    // completeGames: number;
+    // _earnable1B: number; // for tracking which baserunners are earnable by this pitcher
+    // _earnable2B: number;
+    // _earnable3B: number;
+    // earnedRuns: number;
+    // gamesFinished: number;
+    // gamesStarted: number;
+    // holds: number;
+    // _holdable: number; // https://www.mlb.com/glossary/standard-stats/hold
+    // inheritedRunners: number;
+    // losses: number;
+    // _losing: number; // https://www.mlb.com/glossary/standard-stats/loss
+    // saveOpportunities: number;
+    // unearnedRuns: number;
+    // _potentialWin: number; // https://www.mlb.com/glossary/standard-stats/win
 }
 
 export interface FieldingStats {

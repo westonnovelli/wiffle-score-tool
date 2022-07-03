@@ -188,7 +188,7 @@ describe('[6.01]', () => {
 });
 
 describe('[6.02]', () => {
-    test('1.000: an infield error behaves as a single', () => {
+    test.skip('1.000: an infield error behaves as a single', () => {
         const initial: GameMoment = noStatsGame();
         const thrown: Pitches = Pitches.INPLAY_INFIELD_ERROR;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 1 }, atBat: '1' };
@@ -196,7 +196,7 @@ describe('[6.02]', () => {
         expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
     });
 
-    test('1.100: an infield error advances all runners 1 base', () => {
+    test.skip('1.100: an infield error advances all runners 1 base', () => {
         const initial: GameMoment = mergeDeepRight(noStatsGame(), { bases: { [Bases.FIRST]: 1 } });
         const thrown: Pitches = Pitches.INPLAY_INFIELD_ERROR;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1 }, atBat: '1' };
@@ -204,7 +204,7 @@ describe('[6.02]', () => {
         expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
     });
 
-    test('1.020: an infield error advances all runners 1 base', () => {
+    test.skip('1.020: an infield error advances all runners 1 base', () => {
         const initial: GameMoment = mergeDeepRight(noStatsGame(), { bases: { [Bases.SECOND]: 1 } });
         const thrown: Pitches = Pitches.INPLAY_INFIELD_ERROR;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 0, [Bases.THIRD]: 1, }, atBat: '1' };
@@ -212,7 +212,7 @@ describe('[6.02]', () => {
         expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
     });
 
-    test('1.003: an infield error advances all runners 1 base', () => {
+    test.skip('1.003: an infield error advances all runners 1 base', () => {
         const initial: GameMoment = mergeDeepRight(noStatsGame(), { bases: { [Bases.THIRD]: 1 } });
         const thrown: Pitches = Pitches.INPLAY_INFIELD_ERROR;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 1, [Bases.THIRD]: 0, }, boxScore: [{ homeTeam: 0, awayTeam: 1 }], atBat: '1' };
@@ -220,7 +220,7 @@ describe('[6.02]', () => {
         expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
     });
 
-    test('1.120: an infield error advances all runners 1 base', () => {
+    test.skip('1.120: an infield error advances all runners 1 base', () => {
         const initial: GameMoment = mergeDeepRight(noStatsGame(), { bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1 } });
         const thrown: Pitches = Pitches.INPLAY_INFIELD_ERROR;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.THIRD]: 1, }, atBat: '1' };
@@ -228,7 +228,7 @@ describe('[6.02]', () => {
         expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
     });
 
-    test('1.103: an infield error advances all runners 1 base', () => {
+    test.skip('1.103: an infield error advances all runners 1 base', () => {
         const initial: GameMoment = mergeDeepRight(noStatsGame(), { bases: { [Bases.FIRST]: 1, [Bases.THIRD]: 1 } });
         const thrown: Pitches = Pitches.INPLAY_INFIELD_ERROR;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.SECOND]: 1, [Bases.THIRD]: 0, }, boxScore: [{ homeTeam: 0, awayTeam: 1 }], atBat: '1' };
@@ -236,7 +236,7 @@ describe('[6.02]', () => {
         expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
     });
 
-    test('1.023: an infield error advances all runners 1 base', () => {
+    test.skip('1.023: an infield error advances all runners 1 base', () => {
         const initial: GameMoment = mergeDeepRight(noStatsGame(), { bases: { [Bases.SECOND]: 1, [Bases.THIRD]: 1 } });
         const thrown: Pitches = Pitches.INPLAY_INFIELD_ERROR;
         const diff: DeepPartial<GameMoment> = { bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 0, }, boxScore: [{ homeTeam: 0, awayTeam: 1 }], atBat: '1' };
@@ -244,7 +244,7 @@ describe('[6.02]', () => {
         expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
     });
 
-    test('1.123: an infield error advances all runners 1 base', () => {
+    test.skip('1.123: an infield error advances all runners 1 base', () => {
         const initial: GameMoment = mergeDeepRight(noStatsGame(), { bases: { [Bases.FIRST]: 1, [Bases.SECOND]: 1, [Bases.THIRD]: 1 } });
         const thrown: Pitches = Pitches.INPLAY_INFIELD_ERROR;
         const diff: DeepPartial<GameMoment> = { boxScore: [{ homeTeam: 0, awayTeam: 1 }], atBat: '1' };
@@ -871,7 +871,7 @@ describe('[count resets at new batter]', () => {
         expect(pitch(initial, thrown).count).toEqual(mergeDeepRight(initial, diff).count);
     });
 
-    test('E: an infield error resets the count', () => {
+    test.skip('E: an infield error resets the count', () => {
         const initial: GameMoment = mergeDeepRight(noStatsGame(), { count: { balls: 1, strikes: 1 } });
         const thrown: Pitches = Pitches.INPLAY_INFIELD_ERROR;
         const diff: DeepPartial<GameMoment> = { count: { balls: 0, strikes: 0 } };

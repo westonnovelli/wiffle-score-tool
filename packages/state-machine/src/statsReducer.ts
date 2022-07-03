@@ -12,7 +12,6 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
 
     const batter = playerAtBat.id;
 
-    // pitches received are before state has changed, stat events are when the event is calculated
     switch (pitch) {
         case StatEvent.PLATE_APPEARANCE:
             return {
@@ -148,7 +147,6 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
                 }
             };
         }
-        case Pitches.INPLAY_INFIELD_ERROR:
         case Pitches.INPLAY_INFIELD_SINGLE:
         case Pitches.INPLAY_OUTFIELD_SINGLE:
             return {
@@ -235,7 +233,30 @@ export function pitchingStats(team: Team, game: GameMoment, pitch: Pitches | Sta
                         .done(),
                 },
             };
-        // case StatEvent.RBI:
+        // case StatEvent.LEAD_LOST:
+        // case StatEvent.LEAD_CHANGE:
+        //     return {
+        //         ...team,
+        //         roster: {
+        //             ...team.roster,
+        //             [pitcher]: record(team.roster[pitcher])
+        //                 .pitching('blownSaves', -team.roster[pitcher].defenseStats.pitching.saveOpportunities)
+        //                 .pitching('_potentialWin', -1)
+        //                 .pitching('_holdable', -1)
+        //                 .done(),
+        //         },
+        //     };
+        // case StatEvent.RUNS_SCORED: // is there anything to do here?
+        case StatEvent.RBI:
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [pitcher]: record(team.roster[pitcher])
+                        .pitching('runsAllowed', game.bases[Bases.HOME])
+                        .done(),
+                },
+            };
         // case StatEvent.INNING_END:
         case Pitches.BALL:
             return {
@@ -258,6 +279,7 @@ export function pitchingStats(team: Team, game: GameMoment, pitch: Pitches | Sta
                         .done(),
                 },
             };
+        case Pitches.STRIKE_FOUL:
         case Pitches.STRIKE_SWINGING: {
             return {
                 ...team,
@@ -327,12 +349,47 @@ export function pitchingStats(team: Team, game: GameMoment, pitch: Pitches | Sta
                         .done(),
                 },
             };
-        // case Pitches.INPLAY_INFIELD_ERROR:
-        // case Pitches.INPLAY_INFIELD_SINGLE:
-        // case Pitches.INPLAY_OUTFIELD_SINGLE:
-        // case Pitches.INPLAY_DOUBLE:
-        // case Pitches.INPLAY_TRIPLE:
-        // case Pitches.INPLAY_HOMERUN:
+        case Pitches.INPLAY_INFIELD_SINGLE:
+        case Pitches.INPLAY_OUTFIELD_SINGLE:
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [pitcher]: record(team.roster[pitcher])
+                        .pitching('singles', 1)
+                        .done(),
+                },
+            };
+        case Pitches.INPLAY_DOUBLE:
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [pitcher]: record(team.roster[pitcher])
+                        .pitching('doubles', 1)
+                        .done(),
+                },
+            };
+        case Pitches.INPLAY_TRIPLE:
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [pitcher]: record(team.roster[pitcher])
+                        .pitching('triples', 1)
+                        .done(),
+                },
+            };
+        case Pitches.INPLAY_HOMERUN:
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [pitcher]: record(team.roster[pitcher])
+                        .pitching('homeruns', 1)
+                        .done(),
+                },
+            };
         // case StatEvent.WALK_OFF:
         default:
             return team;
@@ -360,7 +417,6 @@ export function fieldingStats(team: Team, game: GameMoment, pitch: Pitches | Sta
         case Pitches.INPLAY_OUTFIELD_OUT_TAG_FAIL:
         case Pitches.INPLAY_INFIELD_AIR_OUT:
         case Pitches.INPLAY_OUTFIELD_OUT_TAG_SUCCESS:
-        case Pitches.INPLAY_INFIELD_ERROR:
         case Pitches.INPLAY_INFIELD_SINGLE:
         case Pitches.INPLAY_OUTFIELD_SINGLE:
         case Pitches.INPLAY_DOUBLE:

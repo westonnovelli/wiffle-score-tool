@@ -26,7 +26,7 @@ export const record = (player: Player): StatBuilder => {
                 ...internalPlayer,
                 offenseStats: {
                     ...internalPlayer.offenseStats,
-                    [stat]: internalPlayer.offenseStats[stat] + amt
+                    [stat]: Math.max(internalPlayer.offenseStats[stat] + amt, 0),
                 },
             };
             return builder;
@@ -83,7 +83,7 @@ export const record = (player: Player): StatBuilder => {
                     ...internalPlayer.defenseStats,
                     pitching: {
                         ...internalPlayer.defenseStats.pitching,
-                        [stat]: internalPlayer.defenseStats.pitching[stat] + amt
+                        [stat]: Math.max(internalPlayer.defenseStats.pitching[stat] + amt, 0),
                     },
                 }
             };
@@ -96,7 +96,7 @@ export const record = (player: Player): StatBuilder => {
                     ...internalPlayer.defenseStats,
                     fielding: {
                         ...internalPlayer.defenseStats.fielding,
-                        [stat]: internalPlayer.defenseStats.fielding[stat] + amt,
+                        [stat]: Math.max(internalPlayer.defenseStats.fielding[stat] + amt, 0),
                     },
                 }
             };

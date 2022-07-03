@@ -49,7 +49,7 @@ export const totalBases = ({ offenseStats }: Player): number => {
 
 // https://www.mlb.com/glossary/standard-stats/number-of-pitches
 export const pitchCount = ({ defenseStats }: Player): number => {
-    return 0;
+    return 0; // TODO
 };
 
 // https://www.mlb.com/glossary/standard-stats/appearance
@@ -94,11 +94,19 @@ export const wins = ({ defenseStats }: Player): number => {
 
 // https://www.mlb.com/glossary/standard-stats/winning-percentage
 export const winningPercentage = ({ defenseStats }: Player): number => {
-    return 0.0;
+    return 0.0; // TODO 
 };
-
 
 // https://www.mlb.com/glossary/standard-stats/fielding-percentage
 export const fieldingPercentage = ({ defenseStats }: Player): number => {
     return 0.0;
+};
+
+export const outs = ({ defenseStats }: Player): number => {
+    const { strikeoutsLooking, strikeoutsSwinging, groundOuts, flyOuts} = defenseStats.pitching;
+    return strikeoutsLooking + strikeoutsSwinging + groundOuts + flyOuts;
+};
+
+export const inningsPitched = (player: Player): number => {
+    return outs(player) / 3.0;
 };

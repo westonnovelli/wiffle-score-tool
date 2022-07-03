@@ -294,7 +294,7 @@ describe('[offenseStats]', () => {
             expect(offenseStats(initial, game, thrown)).toEqual(mergeDeepRight(initial, diff));
         });
 
-        test('an infield error (a single) updates for the batter (AB, H, 1B)', () => {
+        test.skip('an infield error (a single) updates for the batter (AB, H, 1B)', () => {
             const game: GameMoment = defaultGame();
             const initial: Team = game.awayTeam;
             const thrown: Pitches = Pitches.INPLAY_INFIELD_ERROR;

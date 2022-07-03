@@ -114,13 +114,13 @@ const strike = (state: GameMoment): ChainingReducer => {
 };
 
 const foulBall = (state: GameMoment): GameMoment => {
-    return {
+    return countReducer({
         ...state,
         count: {
             ...state.count,
             strikes: Math.min(state.count.strikes + 1, state.configuration.maxStrikes - 1),
         }
-    };
+    }).next;
 }
 
 const out = (state: GameMoment): ChainingReducer => {
@@ -143,7 +143,6 @@ const whoisNextBatter = (state: GameMoment, offense: boolean = true): string => 
     return currentBatterOrder >= 0 ? team.lineup[(currentBatterOrder + 1) % team.lineup.length] : team.lineup[0];
 };
 
-// future proofing for when GameMoment['pitches'] includes other types of events
 const lastPitch = (state: GameMoment): Pitches => {
     return findLast((candidate) => {
         return Object.values(Pitches).includes(candidate)
@@ -320,7 +319,6 @@ export function pitch(initial: GameMoment, pitch: Pitches): GameMoment {
                 : { next: inningContinues, proceed: checkForRuns };
             return proceed ? batterUp(next) : next;
         }
-        case Pitches.INPLAY_INFIELD_ERROR:
         case Pitches.INPLAY_INFIELD_SINGLE: {
             const { next, proceed } = basesReducer({
                 ...state,
@@ -428,8 +426,7 @@ function countReducer(intermediate: GameMoment): ChainingReducer {
     }
     // is strikeout
     if (intermediate.count.strikes >= intermediate.configuration.maxStrikes) {
-        const lastPitch = intermediate.pitches[intermediate.pitches.length - 1];
-        const event = (lastPitch === Pitches.STRIKE_LOOKING) ? StatEvent.STRIKE_LOOKING : StatEvent.STRIKEOUT_SWINGING;
+        const event = (lastPitch(intermediate) === Pitches.STRIKE_LOOKING) ? StatEvent.STRIKE_LOOKING : StatEvent.STRIKEOUT_SWINGING;
         const withStats = {
             ...intermediate,
             [getDefenseKey(intermediate)]: defenseStats(getDefense(intermediate), intermediate, event),
@@ -448,22 +445,65 @@ function basesReducer(intermediate: GameMoment): ChainingReducer {
         const withStats = {
             ...intermediate,
             [getOffenseKey(intermediate)]: offenseStats(getOffense(intermediate), intermediate, StatEvent.RBI),
+            [getDefenseKey(intermediate)]: defenseStats(getDefense(intermediate), intermediate, StatEvent.RBI),
         };
         const newScore = [...withStats.boxScore];
         newScore[withStats.inning.number - 1][getOffenseKey(withStats)] += withStats.bases[Bases.HOME];
+        
         return runsReducer(withStats);
     }
     return { next: intermediate, proceed: true };
+}
+
+function logLeadChange(intermediate: GameMoment): GameMoment {
+    const defenseKey = getDefenseKey(intermediate);
+    const defense = getDefense(intermediate);
+
+    const [
+        offenseScore,
+        defenseScore,
+        runsThisInning
+    ] = intermediate.inning.half === InningHalf.TOP
+        ? [awayScore(intermediate), homeScore(intermediate), intermediate.boxScore[intermediate.inning.number - 1].awayTeam]
+        : [homeScore(intermediate), awayScore(intermediate), intermediate.boxScore[intermediate.inning.number - 1].homeTeam];
+    const offenseScoreBeforeInning = offenseScore - runsThisInning;
+
+    if (offenseScoreBeforeInning >= defenseScore) return intermediate;
+
+    if (offenseScoreBeforeInning + runsThisInning === defenseScore) {
+        return {
+            ...intermediate,
+            [defenseKey]: defenseStats(defense, intermediate, StatEvent.LEAD_LOST),
+        };
+    }
+
+    if (offenseScoreBeforeInning + runsThisInning > defenseScore) {
+        return {
+            ...intermediate,
+            [defenseKey]: defenseStats(defense, intermediate, StatEvent.LEAD_CHANGE),
+        };
+    }
+
+    return intermediate;
+}
+
+function logRunStats(intermediate: GameMoment): GameMoment {
+    // TODO compute earned vs unearned runs
+    const next: GameMoment = {
+        ...intermediate,
+        [getDefenseKey(intermediate)]: defenseStats(getDefense(intermediate), intermediate, StatEvent.RUNS_SCORED),
+    };
+    return logLeadChange(next);
 }
 
 // runs can "overflow" and cascade into innings
 function runsReducer(intermediate: GameMoment): ChainingReducer {
     // assumes runs have already been tallied, need to adjust if rules indicate
     const runsThisInning = intermediate.boxScore[intermediate.inning.number - 1][getOffenseKey(intermediate)];
-    const shouldSetRunsToMax = !intermediate.configuration.rules[OptionalRules.AllowSinglePlayRunsToPassLimit];
-
+    
     // hit max runs
     if (runsThisInning >= intermediate.configuration.maxRuns && intermediate.configuration.maxRuns > 0) {
+        const shouldSetRunsToMax = !intermediate.configuration.rules[OptionalRules.AllowSinglePlayRunsToPassLimit];
         const newScore = shouldSetRunsToMax ? intermediate.configuration.maxRuns : runsThisInning;
         const newBoxes = [...intermediate.boxScore];
         newBoxes[intermediate.inning.number - 1][getOffenseKey(intermediate)] = newScore;
@@ -472,9 +512,10 @@ function runsReducer(intermediate: GameMoment): ChainingReducer {
             ...intermediate,
             boxScore: newBoxes,
         };
+        const withRunsStats: GameMoment = logRunStats(withRunsAdjusted);
         const needsBatterSwitch: GameMoment = {
-            ...withRunsAdjusted,
-            ...nextInning(withRunsAdjusted),
+            ...withRunsStats,
+            ...nextInning(withRunsStats),
         }
         return { next: batterUp(needsBatterSwitch, true), proceed: false };
     }
@@ -485,7 +526,7 @@ function runsReducer(intermediate: GameMoment): ChainingReducer {
         && intermediate.inning.half === InningHalf.BOTTOM
         && homeScore(intermediate) > awayScore(intermediate)
     ) {
-        const withStats = logStats(intermediate);
+        const withStats = logStats(logRunStats(intermediate));
         return {
             next: {
                 ...withStats,
@@ -496,7 +537,7 @@ function runsReducer(intermediate: GameMoment): ChainingReducer {
         };
     }
 
-    return { next: intermediate, proceed: true };
+    return { next: logRunStats(intermediate), proceed: true };
 }
 
 // outs can "overflow" and cascade into innings
