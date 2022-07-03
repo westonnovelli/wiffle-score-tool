@@ -1,4 +1,4 @@
-import React, { useReducer, useCallback } from "react";
+import React from "react";
 
 // copied from https://usehooks.com/useHistory/
 
@@ -75,7 +75,7 @@ interface HistoryResult<T> {
 
 // Hook
 const useHistory = <T>(initialPresent: T): HistoryResult<T> => {
-    const [state, dispatch] = useReducer<typeof reducer<T>, HistoryState<T>>(
+    const [state, dispatch] = React.useReducer<typeof reducer<T>, HistoryState<T>>(
         reducer,
         initialHistory(initialPresent),
         () => initialHistory(initialPresent)
@@ -84,25 +84,26 @@ const useHistory = <T>(initialPresent: T): HistoryResult<T> => {
     const canUndo = state?.past?.length !== 0;
     const canRedo = state?.future?.length !== 0;
 
-    const undo = useCallback(
+    const undo = React.useCallback(
         () => { if (canUndo) dispatch({ type: "UNDO" });
     }, [canUndo, dispatch]);
 
-    const redo = useCallback(
+    const redo = React.useCallback(
         () => { if (canRedo) dispatch({ type: "REDO" });
     }, [canRedo, dispatch]);
 
-    const set = useCallback(
+    const set = React.useCallback(
         (newPresent: T) => dispatch({ type: "SET", newPresent }),
         [dispatch]
     );
 
-    const clear = useCallback(
+    const clear = React.useCallback(
         (newInitial?: T) => {
             const newInitialValue = newInitial ? newInitial : initialPresent;
             dispatch({ type: "CLEAR", initialPresent: newInitialValue })
         }, [
         dispatch,
+        initialPresent,
     ]);
 
     return { state, set, undo, redo, clear, canUndo, canRedo };

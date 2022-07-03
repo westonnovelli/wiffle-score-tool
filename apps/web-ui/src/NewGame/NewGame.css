@@ -15,49 +15,10 @@
     margin-bottom: 8px;
 }
 
-.newgame .teambuilder h2 {
+.newgame h2 {
     margin-bottom: 4px;
 }
 
-.newgame .teambuilder .player {
-    display: flex;
-    align-items: center;
-    border-radius: 19px;
-    box-shadow: var(--elevation-1);
-    gap: 12px;
-    width: fit-content;
-    margin-bottom: 4px;
-}
-
-.newgame .teambuilder .player.home {
-    background: var(--color-primary-dark);
-    color: var(--color-text);
-}
-.newgame .teambuilder .player.away {
-    background: var(--color-secondary);
-    color: var(--color-text);
-}
-
-
-.newgame .teambuilder .player button {
-    border-radius: 50%;
-    aspect-ratio: 1;
-    border: none;
-    margin: 4px;
-    display: flex;
-    place-items: center;
-}
-
-.newgame .teambuilder .player .name {
-    padding: 4px 8px;
-}
-
-.newgame .teambuilder .player .position {
-    padding: 4px 8px;
-    background: var(--color-quadinary);
-    color: var(--color-text-dark);
-    border-radius: 19px;
-}
 
 .newgame button.start {
     height: 40px;
