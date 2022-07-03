@@ -1,20 +1,7 @@
-import { getDefense, getDefenseKey } from "./gameReducer";
+import { GameMoment, Team } from "../types";
+import { getDefense, getDefenseKey } from "../teams/getTeams";
+import { getPitcher } from "../defense/getPosition";
 import manualEdit from "./manualEdit";
-import { GameMoment, Position, Team } from "./types";
-
-const getPosition = (team: Team, pos: Position): string[] => {
-    return Object.entries(team.defense).reduce<string[]>((acc, [id, position]) => {
-        if (position === pos) {
-            acc.push(id);
-        }
-        return acc;
-    }, []);
-};
-
-export const getPitcher = (team: Team): string => getPosition(team, Position.Pitcher)[0];
-export const getInfield = (team: Team): string[] => getPosition(team, Position.Infield);
-export const getOutfield = (team: Team): string[] => getPosition(team, Position.Outfield);
-export const getBench = (team: Team): string[] => getPosition(team, Position.Bench);
 
 export const pitcherSwap = (game: GameMoment, newPitcher: string): GameMoment => {
     return fielderSwap(game, newPitcher, getPitcher(getDefense(game)));
@@ -45,4 +32,4 @@ export const fielderRotate = (game: GameMoment, ...fielders: string[]): GameMome
             defense: newDefense,
         }
     });
-}
+};

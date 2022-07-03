@@ -1,7 +1,7 @@
 import mergeDeepRight from "ramda/src/mergeDeepRight.js";
-import { defaultGame, defaultTeam } from "./factory";
+import { defaultGame } from "../factory";
+import { Bases, DeepPartial, GameMoment, Pitches, StatEvent, Team } from "../types";
 import { offenseStats } from "./statsReducer";
-import { Bases, DeepPartial, GameMoment, Pitches, StatEvent, Team } from "./types";
 
 describe('[offenseStats]', () => {
     describe('events', () => {
@@ -295,22 +295,22 @@ describe('[offenseStats]', () => {
         });
 
         test.skip('an infield error (a single) updates for the batter (AB, H, 1B)', () => {
-            const game: GameMoment = defaultGame();
-            const initial: Team = game.awayTeam;
-            const thrown: Pitches = Pitches.INPLAY_INFIELD_ERROR;
-            const diff: DeepPartial<Team> = {
-                roster: {
-                    '0': {
-                        offenseStats: {
-                            atbats: 1,
-                            hits: 1,
-                            singles: 1,
-                        }
-                    }
-                }
-            };
+            // const game: GameMoment = defaultGame();
+            // const initial: Team = game.awayTeam;
+            // const thrown: Pitches = Pitches.INPLAY_INFIELD_ERROR;
+            // const diff: DeepPartial<Team> = {
+            //     roster: {
+            //         '0': {
+            //             offenseStats: {
+            //                 atbats: 1,
+            //                 hits: 1,
+            //                 singles: 1,
+            //             }
+            //         }
+            //     }
+            // };
 
-            expect(offenseStats(initial, game, thrown)).toEqual(mergeDeepRight(initial, diff));
+            // expect(offenseStats(initial, game, thrown)).toEqual(mergeDeepRight(initial, diff));
         });
 
         test('an infield single updates for the batter (AB, H, 1B)', () => {

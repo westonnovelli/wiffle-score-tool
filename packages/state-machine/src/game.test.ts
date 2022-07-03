@@ -1,11 +1,11 @@
 import mergeDeepRight from 'ramda/src/mergeDeepRight.js';
 
 import { GameMoment, DeepPartial, Pitches, InningHalf, Bases } from './types';
-import { handlePitch, hydrateGame } from './engine';
-import { defaultGame } from './factory';
-import { EMPTY_BASES } from './gameReducer';
+import hydrateGame from './history/hydrate';
+import { defaultGame, EMPTY_BASES } from './factory';
+import { pitch as handlePitch } from './gameReducer';
 import { deserializeGame, serializeGame } from './io';
-import manualEdit from './manualEdit';
+import manualEdit from './edits/manualEdit';
 
 type atBat = {
     pitch: Pitches,

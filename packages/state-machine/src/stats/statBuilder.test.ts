@@ -1,7 +1,7 @@
 import mergeDeepRight from 'ramda/src/mergeDeepRight.js';
-import { defaultPlayer } from './factory';
-import { record } from './StatBuilder';
-import { DeepPartial, Player } from './types';
+import { defaultPlayer } from '../factory';
+import { record } from './statBuilder';
+import { DeepPartial, Player } from '../types';
 
 describe('basics', () => {
     test('statsBuilder returns the same player when not edited', () => {

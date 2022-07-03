@@ -3,7 +3,7 @@ import {
     Bases,
     InningHalf,
     OptionalRules,
-    Position,
+    Score,
     type GameConfig,
     type GameMoment,
     type Player,
@@ -153,3 +153,20 @@ export const defaultRules = (): Record<OptionalRules, boolean> => {
 };
 
 export const noStatsGame = () => mergeDeepRight(defaultGame(), { configuration: { recordingStats: false } });
+
+export const NEW_COUNT: GameMoment['count'] = {
+    balls: 0,
+    strikes: 0,
+};
+
+export const EMPTY_BASES: GameMoment['bases'] = {
+    [Bases.FIRST]: 0,
+    [Bases.SECOND]: 0,
+    [Bases.THIRD]: 0,
+    [Bases.HOME]: 0,
+};
+
+export const EMPTY_BOX: Score = {
+    awayTeam: 0,
+    homeTeam: 0,
+};

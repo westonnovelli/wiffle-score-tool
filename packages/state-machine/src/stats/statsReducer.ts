@@ -1,8 +1,7 @@
-import { getPitcher } from './commonEdits';
-import { runnersOn, } from './gameReducer';
-import { record } from './StatBuilder';
-import { Bases, GameMoment, StatEvent, Team } from './types';
-import { Pitches, OptionalRules } from './types';
+import { Bases, GameMoment, StatEvent, Team, Pitches, OptionalRules } from '../types';
+import { getPitcher } from '../defense/getPosition';
+import { runnersOn } from '../bases/runnersOn';
+import { record } from './statBuilder';
 
 export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | StatEvent): Team {
     if (!game.configuration.recordingStats) return team;

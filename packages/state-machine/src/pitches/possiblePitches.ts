@@ -1,5 +1,5 @@
-import { forcedRunner } from "./gameReducer";
-import { Bases, GameMoment, OptionalRules, Pitches } from "./types";
+import { Bases, GameMoment, OptionalRules, Pitches } from "../types";
+import { forcedRunner } from "../bases/leadRunner";
 
 const getPossiblePitches = (game: GameMoment): Pitches[] => {
     const values = Object.values(Pitches);

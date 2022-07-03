@@ -17,12 +17,14 @@ export {
     type Team,
     type DeepPartial,
 } from './types';
-export { defaultRules, defaultGame, defaultConfiguration, defaultPlayer, defaultTeam } from './factory';
-export { handlePitch, hydrateGame } from './engine';
-export { getOffense, getDefense, EMPTY_BASES } from './gameReducer';
-export { default as manualEdit } from './manualEdit';
-export { getPitcher, getInfield, getOutfield, getBench, pitcherSwap, fielderSwap, fielderRotate } from './commonEdits';
-export { default as getPossiblePitches } from './possiblePitches';
+export { defaultRules, defaultGame, defaultConfiguration, defaultPlayer, defaultTeam, EMPTY_BASES } from './factory';
+export { default as hydrateGame } from './history/hydrate';
+export { getOffense, getDefense } from './teams/getTeams';
+export { pitch as handlePitch } from './gameReducer';
+export { default as manualEdit } from './edits/manualEdit';
+export { getPitcher, getInfield, getOutfield, getBench } from './defense/getPosition';
+export { pitcherSwap, fielderSwap, fielderRotate } from './edits/commonEdits';
+export { default as getPossiblePitches } from './pitches/possiblePitches';
 export {
     battingAverage,
     extraBaseHit,
@@ -31,4 +33,4 @@ export {
     onBasePlusSlugging,
     sluggingPercentage,
     totalBases,
-} from './statAggregations';
+} from './stats/statAggregations';

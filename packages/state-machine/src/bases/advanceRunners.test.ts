@@ -1,5 +1,6 @@
-import { advanceRunners, EMPTY_BASES } from "./gameReducer";
-import { Bases } from "./types";
+import { EMPTY_BASES } from "../factory";
+import { Bases } from "../types";
+import advanceRunners from "./advanceRunners";
 
 const {
     FIRST,

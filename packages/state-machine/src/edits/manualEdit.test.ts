@@ -1,7 +1,7 @@
 import { mergeDeepRight } from 'ramda';
-import { defaultGame, defaultPlayer } from './factory';
+import { defaultGame, defaultPlayer } from '../factory';
 import manualEdit from './manualEdit';
-import { Bases, InningHalf, OptionalRules, Position } from './types';
+import { Bases, InningHalf, OptionalRules, Position } from '../types';
 
 test('manual edits work for empty edit', () => {
     const initial = defaultGame();

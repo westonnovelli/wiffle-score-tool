@@ -1,107 +1,16 @@
-import findLast from 'ramda/src/findLast.js';
 import mergeDeepRight from 'ramda/src/mergeDeepRight.js';
-import { log } from './pitchLog';
-import { defenseStats, offenseStats } from './statsReducer';
-import { Bases, GameMoment, InningHalf, OptionalRules, Score, StatEvent, Team } from './types';
-import { Pitches } from './types';
-
-const NEW_COUNT: GameMoment['count'] = {
-    balls: 0,
-    strikes: 0,
-};
-
-export const EMPTY_BASES: GameMoment['bases'] = {
-    [Bases.FIRST]: 0,
-    [Bases.SECOND]: 0,
-    [Bases.THIRD]: 0,
-    [Bases.HOME]: 0,
-};
-
-export const EMPTY_BOX: Score = {
-    awayTeam: 0,
-    homeTeam: 0,
-};
-
-const nextInning = (state: GameMoment): Pick<GameMoment, 'inning' | 'outs' | 'count' | 'bases' | 'boxScore'> => {
-    const currentInning = state.inning;
-    const boxScore = [...state.boxScore];
-    if (currentInning.half === InningHalf.BOTTOM) {
-        boxScore.push(EMPTY_BOX);
-    }
-    return {
-        inning: {
-            number: currentInning.half === InningHalf.BOTTOM ? currentInning.number + 1 : currentInning.number,
-            half: currentInning.half === InningHalf.BOTTOM ? InningHalf.TOP : InningHalf.BOTTOM,
-        },
-        outs: 0,
-        count: NEW_COUNT,
-        bases: EMPTY_BASES,
-        boxScore,
-    };
-};
-
-// moves runners on base forward `basesToAdvance` number of bases
-// advancing runners 4 assumes the batter moves (unique rule)
-// if the runners are advancing 1 base, unforced runners might not move (ex: walk with runner on 3rd does not score the run)
-// if runners are advancing more than 1 base, unforced runners advance the same as forced runners
-// TODO: consider changing the implementation of the comment above
-export const advanceRunners = (bases: GameMoment['bases'], basesToAdvance: 0 | 1 | 2 | 3 | 4, advanceUnforced: boolean = true): GameMoment['bases'] => {
-    const leadForced = forcedRunner(bases);
-    switch (basesToAdvance) {
-        case 1: {
-            return {
-                [Bases.FIRST]: 0,
-                [Bases.SECOND]: (advanceUnforced || leadForced === Bases.FIRST) ? bases[Bases.FIRST] : bases[Bases.SECOND],
-                [Bases.THIRD]: (advanceUnforced || leadForced === Bases.SECOND) ? bases[Bases.SECOND] : bases[Bases.THIRD],
-                [Bases.HOME]: (advanceUnforced || leadForced === Bases.THIRD) ? bases[Bases.HOME] + bases[Bases.THIRD] : bases[Bases.HOME],
-            };
-        }
-        case 2: {
-            return {
-                [Bases.HOME]: bases[Bases.HOME] + bases[Bases.THIRD] + bases[Bases.SECOND],
-                [Bases.THIRD]: bases[Bases.FIRST],
-                [Bases.SECOND]: 0,
-                [Bases.FIRST]: 0,
-            };
-        }
-        case 3: {
-            return {
-                [Bases.HOME]:
-                    bases[Bases.HOME] + bases[Bases.THIRD] + bases[Bases.SECOND] + bases[Bases.FIRST],
-                [Bases.THIRD]: 0,
-                [Bases.SECOND]: 0,
-                [Bases.FIRST]: 0,
-            };
-        }
-        case 4: {
-            return {
-                [Bases.HOME]:
-                    bases[Bases.HOME] + bases[Bases.THIRD] + bases[Bases.SECOND] + bases[Bases.FIRST] + 1,
-                [Bases.THIRD]: 0,
-                [Bases.SECOND]: 0,
-                [Bases.FIRST]: 0,
-            };
-        }
-        default:
-            return { ...bases };
-    }
-};
-
-// runner furthest along the bases
-// const leadRunner = (bases: GameMoment['bases']): Bases | undefined => {
-//     if (bases[Bases.THIRD] > 0) return Bases.THIRD;
-//     if (bases[Bases.SECOND] > 0) return Bases.SECOND;
-//     if (bases[Bases.FIRST] > 0) return Bases.FIRST;
-//     return undefined;
-// }
-
-// runner furthest along the bases, that is forced to advance
-export const forcedRunner = (bases: GameMoment['bases']): Bases | undefined => {
-    if (bases[Bases.THIRD] > 0 && bases[Bases.SECOND] > 0 && bases[Bases.FIRST] > 0) return Bases.THIRD;
-    if (bases[Bases.SECOND] > 0 && bases[Bases.FIRST] > 0) return Bases.SECOND;
-    if (bases[Bases.FIRST] > 0) return Bases.FIRST;
-    return undefined;
-}
+import advanceRunners from './bases/advanceRunners';
+import { forcedRunner } from './bases/leadRunner';
+import batterUp from './batters/batterUp';
+import { NEW_COUNT } from './factory';
+import nextInning from './inning/nextInning';
+import lastPitch from './history/lastPitch';
+import logPitch from './pitches/logPitch';
+import { awayScore, homeScore } from './score/score';
+import logStats from './stats/logStats';
+import { defenseStats, offenseStats } from './stats/statsReducer';
+import { getDefense, getDefenseKey, getOffense, getOffenseKey } from './teams/getTeams';
+import { Bases, GameMoment, InningHalf, OptionalRules, StatEvent, Pitches } from './types';
 
 const strike = (state: GameMoment): ChainingReducer => {
     return countReducer({
@@ -131,64 +40,9 @@ const out = (state: GameMoment): ChainingReducer => {
     });
 }
 
-export const runnersOn = (state: GameMoment): number => {
-    const { [Bases.FIRST]: first, [Bases.SECOND]: second, [Bases.THIRD]: third } = state.bases;
-    return first + second + third;
-};
-
-// returns the next batter in the lineup for the offense, or the "next due up" for the defense
-const whoisNextBatter = (state: GameMoment, offense: boolean = true): string => {
-    const team = offense ? getOffense(state) : getDefense(state);
-    const currentBatterOrder = team.lineup.indexOf(state.atBat);
-    return currentBatterOrder >= 0 ? team.lineup[(currentBatterOrder + 1) % team.lineup.length] : team.lineup[0];
-};
-
-const lastPitch = (state: GameMoment): Pitches => {
-    return findLast((candidate) => {
-        return Object.values(Pitches).includes(candidate)
-    }, state.pitches) ?? -1;
-};
-
-// log stats from last pitch, assumes pitch last pitch is in log
-const logStats = (state: GameMoment, inningChange: boolean = false): GameMoment => {
-    const offenseStatsTeam = inningChange ? getDefenseKey(state) : getOffenseKey(state);
-    const defenseStatsTeam = inningChange ? getOffenseKey(state) : getDefenseKey(state);
-    const thrown = lastPitch(state);
-    return {
-        ...state,
-        [offenseStatsTeam]: offenseStats(state[offenseStatsTeam], state, thrown),
-        [defenseStatsTeam]: defenseStats(state[defenseStatsTeam], state, thrown),
-    };
-}
-
-const batterUp = (state: GameMoment, inningChange: boolean = false): GameMoment => {
-    // if inningChange, assumes inning half has switched, but batters have not
-    const onDeck = inningChange ? state.nextHalfAtBat : whoisNextBatter(state);
-    const onDeckNextInning = inningChange ? whoisNextBatter(state, false) : state.nextHalfAtBat;
-
-    const next: GameMoment = mergeDeepRight({
-        ...logStats(state, inningChange),
-        // also switch batters
-        atBat: onDeck,
-        nextHalfAtBat: onDeckNextInning,
-    }, {
-        // and clear the play's runs scored
-        bases: {
-            [Bases.HOME]: 0,
-        },
-    });
-
-    // update new batter with plate appearance stat
-    const offenseStatsTeam = inningChange ? getDefenseKey(state) : getOffenseKey(state);
-    return {
-        ...next,
-        [offenseStatsTeam]: offenseStats(next[offenseStatsTeam], next, StatEvent.PLATE_APPEARANCE),
-    };
-};
-
 // state transitions, this is just a reducer
 export function pitch(initial: GameMoment, pitch: Pitches): GameMoment {
-    const state = log(initial, pitch);
+    const state = logPitch(initial, pitch);
     switch (pitch) {
         case Pitches.BALL:
             return countReducer({
@@ -381,22 +235,6 @@ export function pitch(initial: GameMoment, pitch: Pitches): GameMoment {
     }
 }
 
-export const getOffense = (game: GameMoment): Team => {
-    return game.inning.half === InningHalf.TOP ? game.awayTeam : game.homeTeam;
-};
-
-export const getOffenseKey = (game: GameMoment): keyof Pick<GameMoment, 'awayTeam' | 'homeTeam'> => {
-    return game.inning.half === InningHalf.TOP ? 'awayTeam' : 'homeTeam';
-};
-
-export const getDefense = (game: GameMoment): Team => {
-    return game.inning.half === InningHalf.TOP ? game.homeTeam : game.awayTeam;
-};
-
-export const getDefenseKey = (game: GameMoment): keyof Pick<GameMoment, 'awayTeam' | 'homeTeam'> => {
-    return game.inning.half === InningHalf.TOP ? 'homeTeam' : 'awayTeam';
-};
-
 // **********************
 //   SECONDARY REDUCERS
 // **********************
@@ -455,45 +293,43 @@ function basesReducer(intermediate: GameMoment): ChainingReducer {
     return { next: intermediate, proceed: true };
 }
 
-function logLeadChange(intermediate: GameMoment): GameMoment {
-    const defenseKey = getDefenseKey(intermediate);
-    const defense = getDefense(intermediate);
+// function logLeadChange(intermediate: GameMoment): GameMoment {
+//     const defenseKey = getDefenseKey(intermediate);
+//     const defense = getDefense(intermediate);
 
-    const [
-        offenseScore,
-        defenseScore,
-        runsThisInning
-    ] = intermediate.inning.half === InningHalf.TOP
-        ? [awayScore(intermediate), homeScore(intermediate), intermediate.boxScore[intermediate.inning.number - 1].awayTeam]
-        : [homeScore(intermediate), awayScore(intermediate), intermediate.boxScore[intermediate.inning.number - 1].homeTeam];
-    const offenseScoreBeforeInning = offenseScore - runsThisInning;
+    // const runsThisInning = intermediate.inning.half === InningHalf.TOP
+    //     ? intermediate.boxScore[intermediate.inning.number - 1].awayTeam
+    //     : intermediate.boxScore[intermediate.inning.number - 1].homeTeam;
+    // const defenseScore = defenseScore(intermediate);
+//     const offenseScoreBeforeInning = offenseScore(intermediate) - runsThisInning;
 
-    if (offenseScoreBeforeInning >= defenseScore) return intermediate;
+//     if (offenseScoreBeforeInning >= defenseScore) return intermediate;
 
-    if (offenseScoreBeforeInning + runsThisInning === defenseScore) {
-        return {
-            ...intermediate,
-            [defenseKey]: defenseStats(defense, intermediate, StatEvent.LEAD_LOST),
-        };
-    }
+//     if (offenseScoreBeforeInning + runsThisInning === defenseScore) {
+//         return {
+//             ...intermediate,
+//             [defenseKey]: defenseStats(defense, intermediate, StatEvent.LEAD_LOST),
+//         };
+//     }
 
-    if (offenseScoreBeforeInning + runsThisInning > defenseScore) {
-        return {
-            ...intermediate,
-            [defenseKey]: defenseStats(defense, intermediate, StatEvent.LEAD_CHANGE),
-        };
-    }
+//     if (offenseScoreBeforeInning + runsThisInning > defenseScore) {
+//         return {
+//             ...intermediate,
+//             [defenseKey]: defenseStats(defense, intermediate, StatEvent.LEAD_CHANGE),
+//         };
+//     }
 
-    return intermediate;
-}
+//     return intermediate;
+// }
 
 function logRunStats(intermediate: GameMoment): GameMoment {
-    // TODO compute earned vs unearned runs
-    const next: GameMoment = {
-        ...intermediate,
-        [getDefenseKey(intermediate)]: defenseStats(getDefense(intermediate), intermediate, StatEvent.RUNS_SCORED),
-    };
-    return logLeadChange(next);
+    // // TODO compute earned vs unearned runs
+    // const next: GameMoment = {
+    //     ...intermediate,
+    //     [getDefenseKey(intermediate)]: defenseStats(getDefense(intermediate), intermediate, StatEvent.RUNS_SCORED),
+    // };
+    // return logLeadChange(next);
+    return intermediate;
 }
 
 // runs can "overflow" and cascade into innings
@@ -557,14 +393,6 @@ function outsReducer(intermediate: GameMoment): ChainingReducer {
     }
     return { next: intermediate, proceed: true };
 }
-
-const homeScore = (state: GameMoment): number => {
-    return state.boxScore.reduce((total, inning) => total + inning.homeTeam, 0);
-};
-
-const awayScore = (state: GameMoment): number => {
-    return state.boxScore.reduce((total, inning) => total + inning.awayTeam, 0);
-};
 
 const undoInningChange = (intermediate: GameMoment): GameMoment => {
     return {

@@ -1,7 +1,7 @@
 import { mergeDeepRight } from "ramda";
-import { fielderRotate, fielderSwap, pitcherSwap, pitchingChange } from "./commonEdits";
-import { defaultGame } from "./factory";
-import { DeepPartial, GameMoment, Position } from "./types";
+import { fielderRotate, fielderSwap, pitcherSwap } from "./commonEdits";
+import { defaultGame } from "../factory";
+import { DeepPartial, GameMoment, Position } from "../types";
 
 describe('[swap]', () => {
     test('bench:pitching', () => {

@@ -1,6 +1,6 @@
 import mergeDeepRight from "ramda/src/mergeDeepRight.js";
 import omit from "ramda/src/omit.js";
-import { BattingOrder, DeepPartial, GameMoment, Score } from "./types";
+import { BattingOrder, DeepPartial, GameMoment, Score } from "../types";
 
 type LooseBoxScore = ({ homeTeam?: number | undefined, awayTeam?: number | undefined } | undefined)[] | undefined;
 const isValidBoxScore = (candidate: LooseBoxScore): candidate is Score[] => {

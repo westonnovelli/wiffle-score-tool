@@ -1,13 +1,9 @@
-import { GameMoment, Pitches } from "./types";
-import { pitch } from "./gameReducer";
-import manualEdit from "./manualEdit";
+import { GameMoment } from "../types";
+import { pitch } from "../gameReducer";
+import manualEdit from "../edits/manualEdit";
 
-export const handlePitch = (game: GameMoment, thrownPitch: Pitches): GameMoment => {
-    return pitch(game, thrownPitch);
-};
-
-export const hydrateGame = (gameStub: GameMoment): GameMoment => {
-    const pitchLog = [...gameStub.pitches];
+const hydrateGame = (gameStub: GameMoment, pitchIndex?: number): GameMoment => {
+    const pitchLog = [...gameStub.pitches].slice(0, pitchIndex);
     const editLog = [...gameStub.manualEdits];
     const stubbier: GameMoment = { ...gameStub, pitches: [], manualEdits: [] };
     let editCursor = 0;
@@ -20,3 +16,5 @@ export const hydrateGame = (gameStub: GameMoment): GameMoment => {
         return pitch(game, thrown);
     }, stubbier);
 };
+
+export default hydrateGame;

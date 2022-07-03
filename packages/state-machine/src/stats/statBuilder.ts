@@ -1,4 +1,4 @@
-import { Player, OffenseStats, PitchingStats, FieldingStats } from './types';
+import { Player, OffenseStats, PitchingStats, FieldingStats } from '../types';
 
 interface StatBuilder {
     player: Player;

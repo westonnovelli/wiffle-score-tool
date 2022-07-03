@@ -1,6 +1,6 @@
 import mergeDeepRight from "ramda/src/mergeDeepRight.js";
-import { defaultGame } from "./factory";
-import { Bases, OptionalRules, Pitches } from "./types";
+import { defaultGame } from "../factory";
+import { Bases, OptionalRules, Pitches } from "../types";
 import getPossiblePitches from "./possiblePitches";
 
 test('Strike (Looking) requires the rule to be enabled', () => {
