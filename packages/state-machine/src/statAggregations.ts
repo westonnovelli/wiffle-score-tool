@@ -83,8 +83,11 @@ export const shutouts = ({ defenseStats }: Player): number => {
 };
 
 // https://www.mlb.com/glossary/standard-stats/walks-and-hits-per-inning-pitched
-export const walksAndHitsPerInningPitched = ({ defenseStats }: Player): number => {
-    return 0.0;
+export const walksAndHitsPerInningPitched = (player: Player): number => {
+    const innings = inningsPitched(player);
+    if (!innings) return 0.0;
+    const { walks } = player.defenseStats.pitching;
+    return (walks + hits(player)) / innings;
 };
 
 // https://www.mlb.com/glossary/standard-stats/win
@@ -94,7 +97,7 @@ export const wins = ({ defenseStats }: Player): number => {
 
 // https://www.mlb.com/glossary/standard-stats/winning-percentage
 export const winningPercentage = ({ defenseStats }: Player): number => {
-    return 0.0; // TODO 
+    return 0.0;
 };
 
 // https://www.mlb.com/glossary/standard-stats/fielding-percentage
@@ -103,8 +106,13 @@ export const fieldingPercentage = ({ defenseStats }: Player): number => {
 };
 
 export const outs = ({ defenseStats }: Player): number => {
-    const { strikeoutsLooking, strikeoutsSwinging, groundOuts, flyOuts} = defenseStats.pitching;
+    const { strikeoutsLooking, strikeoutsSwinging, groundOuts, flyOuts } = defenseStats.pitching;
     return strikeoutsLooking + strikeoutsSwinging + groundOuts + flyOuts;
+};
+
+export const hits = ({ defenseStats }: Player): number => {
+    const { singles, doubles, triples, homeruns } = defenseStats.pitching;
+    return singles + doubles + triples + homeruns;
 };
 
 export const inningsPitched = (player: Player): number => {
