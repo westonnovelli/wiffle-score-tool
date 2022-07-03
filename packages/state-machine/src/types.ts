@@ -38,6 +38,8 @@ export enum StatEvent {
     INNING_END = 'INNING',
     WALK = 'W',
     WALK_OFF = 'WO',
+    STRIKEOUT_SWINGING = "K",
+    STRIKE_LOOKING = "_K",
 }
 
 export enum InningHalf {
@@ -93,17 +95,47 @@ export interface OffenseStats {
 }
 
 export interface DefenseStats {
+    pitching: PitchingStats;
+    fielding: FieldingStats;
+}
+
+export interface PitchingStats {
+    pitchCount: number;
+    battersFaced: number;
+    blownSave: number;
+    completeGame: number;
+    _earnableRuns: number; // for tracking which baserunners are earnable by this pitcher
+    earnedRun: number;
+    gamesFinished: number;
+    gamesStarted: number;
+    holds: number;
+    _holdable: number;
+    inheritedRunners: number;
+    loss: number;
+    _losing: number;
+    saveOpportunities: number;
     strikeoutsSwinging: number;
     strikeoutsLooking: number;
+    unearnedRuns: number;
+    wildPitches: number;
     walks: number;
-    saves: number;
-    earnedRuns: number;
     inningsPitched: number;
-    infieldErrors: number;
     groundOuts: number;
+    doublePlays: number;
     flyOuts: number;
+    _potentialWin: number;
+    balls: number;
+    strikes: number;
+}
+
+export interface FieldingStats {
+    putouts: number;
+    infieldErrors: number;
+    inningsPlayed: number;
     DPA: number;
     DPSuccess: number;
+    tagThrowAttempts: number;
+    tagThrowSuccess: number;
 }
 
 export interface Player {

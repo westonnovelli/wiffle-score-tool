@@ -415,6 +415,7 @@ function countReducer(intermediate: GameMoment): ChainingReducer {
         const withStats = {
             ...intermediate,
             [getOffenseKey(intermediate)]: offenseStats(getOffense(intermediate), intermediate, StatEvent.WALK),
+            [getDefenseKey(intermediate)]: defenseStats(getDefense(intermediate), intermediate, StatEvent.WALK),
         };
         const { next, proceed } = basesReducer(mergeDeepRight(withStats, {
             count: NEW_COUNT,
@@ -427,7 +428,13 @@ function countReducer(intermediate: GameMoment): ChainingReducer {
     }
     // is strikeout
     if (intermediate.count.strikes >= intermediate.configuration.maxStrikes) {
-        const { next, proceed } = outsReducer(mergeDeepRight(intermediate, { outs: intermediate.outs + 1, count: NEW_COUNT }));
+        const lastPitch = intermediate.pitches[intermediate.pitches.length - 1];
+        const event = (lastPitch === Pitches.STRIKE_LOOKING) ? StatEvent.STRIKE_LOOKING : StatEvent.STRIKEOUT_SWINGING;
+        const withStats = {
+            ...intermediate,
+            [getDefenseKey(intermediate)]: defenseStats(getDefense(intermediate), intermediate, event),
+        }
+        const { next, proceed } = outsReducer(mergeDeepRight(withStats, { outs: withStats.outs + 1, count: NEW_COUNT }));
         return { next: proceed ? batterUp(next) : next, proceed };
     }
     // count continues

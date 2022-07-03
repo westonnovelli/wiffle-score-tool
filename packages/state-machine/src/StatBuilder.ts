@@ -1,4 +1,4 @@
-import { Player, OffenseStats } from './types';
+import { Player, OffenseStats, PitchingStats, FieldingStats } from './types';
 
 interface StatBuilder {
     player: Player;
@@ -12,6 +12,8 @@ interface StatBuilder {
     double: (rbi?: number) => StatBuilder;
     triple: (rbi?: number) => StatBuilder;
     homerun: (rbi?: number) => StatBuilder;
+    pitching: (stat: keyof PitchingStats, amt: number) => StatBuilder;
+    fielding: (stat: keyof FieldingStats, amt: number) => StatBuilder;
     done: () => Player;
 }
 
@@ -74,6 +76,33 @@ export const record = (player: Player): StatBuilder => {
                 .offense('hits', 1)
                 .offense('runs', 1);
         },
+        pitching: (stat: keyof PitchingStats, amt: number) => {
+            internalPlayer = {
+                ...internalPlayer,
+                defenseStats: {
+                    ...internalPlayer.defenseStats,
+                    pitching: {
+                        ...internalPlayer.defenseStats.pitching,
+                        [stat]: internalPlayer.defenseStats.pitching[stat] + amt
+                    },
+                }
+            };
+            return builder;
+        },
+        fielding: (stat: keyof FieldingStats, amt: number) => {
+            internalPlayer = {
+                ...internalPlayer,
+                defenseStats: {
+                    ...internalPlayer.defenseStats,
+                    fielding: {
+                        ...internalPlayer.defenseStats.fielding,
+                        [stat]: internalPlayer.defenseStats.fielding[stat] + amt,
+                    },
+                }
+            };
+            return builder;
+        },
+
         done: () => internalPlayer,
     };
     return builder;

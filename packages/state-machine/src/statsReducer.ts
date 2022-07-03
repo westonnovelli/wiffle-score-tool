@@ -1,3 +1,4 @@
+import { getPitcher } from './commonEdits';
 import { runnersOn, } from './gameReducer';
 import { record } from './StatBuilder';
 import { Bases, GameMoment, StatEvent, Team } from './types';
@@ -5,12 +6,13 @@ import { Pitches, OptionalRules } from './types';
 
 export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | StatEvent): Team {
     if (!game.configuration.recordingStats) return team;
-    
+
     const playerAtBat = team.roster[game.atBat];
     if (!playerAtBat) return team;
-    
+
     const batter = playerAtBat.id;
 
+    // pitches received are before state has changed, stat events are when the event is calculated
     switch (pitch) {
         case StatEvent.PLATE_APPEARANCE:
             return {
@@ -207,7 +209,169 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
     }
 };
 
-export function defenseStats(team: Team, game: GameMoment, pitch: Pitches): Team {
-    // TODO defense stats
-    return team;
+export function pitchingStats(team: Team, game: GameMoment, pitch: Pitches | StatEvent): Team {
+    if (!game.configuration.recordingStats) return team;
+    
+    const pitcher = getPitcher(team);
+    
+    switch (pitch) {
+        case StatEvent.PLATE_APPEARANCE:
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [pitcher]: record(team.roster[pitcher])
+                        .pitching('battersFaced', 1)
+                        .done(),
+                },
+            };
+        case StatEvent.WALK:
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [pitcher]: record(team.roster[pitcher])
+                        .pitching('walks', 1)
+                        .done(),
+                },
+            };
+        // case StatEvent.RBI:
+        // case StatEvent.INNING_END:
+        case Pitches.BALL:
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [pitcher]: record(team.roster[pitcher])
+                        .pitching('balls', 1)
+                        .done(),
+                },
+            };
+        case Pitches.BALL_WILD:
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [pitcher]: record(team.roster[pitcher])
+                        .pitching('balls', 1)
+                        .pitching('wildPitches', 1)
+                        .done(),
+                },
+            };
+        case Pitches.STRIKE_SWINGING: {
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [pitcher]: record(team.roster[pitcher])
+                        .pitching('strikes', 1)
+                        .done(),
+                },
+            };
+        }
+        case Pitches.STRIKE_FOUL_ZONE:
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [pitcher]: record(team.roster[pitcher])
+                        .pitching('strikes', 1)
+                        .pitching('strikeoutsSwinging', 1)
+                        .done(),
+                },
+            };
+        case Pitches.STRIKE_LOOKING:
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [pitcher]: record(team.roster[pitcher])
+                        .pitching('strikes', 1)
+                        .pitching('strikeoutsLooking', 1)
+                        .done(),
+                },
+            };
+        case Pitches.INPLAY_INFIELD_OUT_DP_FAIL:
+        case Pitches.INPLAY_INFIELD_GRD_OUT:
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [pitcher]: record(team.roster[pitcher])
+                        .pitching('groundOuts', 1)
+                        .done(),
+                },
+            };
+        case Pitches.INPLAY_INFIELD_OUT_DP_SUCCESS:
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [pitcher]: record(team.roster[pitcher])
+                        .pitching('doublePlays', 1)
+                        .pitching('groundOuts', 1)
+                        .done(),
+                },
+            };
+        case Pitches.STRIKE_FOUL_CAUGHT:
+        case Pitches.INPLAY_INFIELD_AIR_OUT:
+        case Pitches.INPLAY_OUTFIELD_OUT:
+        case Pitches.INPLAY_OUTFIELD_OUT_TAG_FAIL:
+        case Pitches.INPLAY_OUTFIELD_OUT_TAG_SUCCESS:
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [pitcher]: record(team.roster[pitcher])
+                        .pitching('flyOuts', 1)
+                        .done(),
+                },
+            };
+        // case Pitches.INPLAY_INFIELD_ERROR:
+        // case Pitches.INPLAY_INFIELD_SINGLE:
+        // case Pitches.INPLAY_OUTFIELD_SINGLE:
+        // case Pitches.INPLAY_DOUBLE:
+        // case Pitches.INPLAY_TRIPLE:
+        // case Pitches.INPLAY_HOMERUN:
+        // case StatEvent.WALK_OFF:
+        default:
+            return team;
+    }
+};
+
+export function fieldingStats(team: Team, game: GameMoment, pitch: Pitches | StatEvent): Team {
+    if (!game.configuration.recordingStats) return team;
+    
+    switch (pitch) {
+        case StatEvent.PLATE_APPEARANCE:
+        case StatEvent.WALK:
+        case StatEvent.RBI:
+        case StatEvent.INNING_END:
+        case Pitches.BALL:
+        case Pitches.BALL_WILD:
+        case Pitches.STRIKE_SWINGING:
+        case Pitches.STRIKE_FOUL_ZONE:
+        case Pitches.STRIKE_LOOKING:
+        case Pitches.INPLAY_INFIELD_GRD_OUT:
+        case Pitches.INPLAY_INFIELD_OUT_DP_SUCCESS:
+        case Pitches.INPLAY_INFIELD_OUT_DP_FAIL:
+        case Pitches.STRIKE_FOUL_CAUGHT:
+        case Pitches.INPLAY_OUTFIELD_OUT:
+        case Pitches.INPLAY_OUTFIELD_OUT_TAG_FAIL:
+        case Pitches.INPLAY_INFIELD_AIR_OUT:
+        case Pitches.INPLAY_OUTFIELD_OUT_TAG_SUCCESS:
+        case Pitches.INPLAY_INFIELD_ERROR:
+        case Pitches.INPLAY_INFIELD_SINGLE:
+        case Pitches.INPLAY_OUTFIELD_SINGLE:
+        case Pitches.INPLAY_DOUBLE:
+        case Pitches.INPLAY_TRIPLE:
+        case Pitches.INPLAY_HOMERUN:
+        case StatEvent.WALK_OFF:
+        default:
+            return team;
+    }
+};
+
+export function defenseStats(team: Team, game: GameMoment, pitch: Pitches | StatEvent): Team {
+    return fieldingStats(pitchingStats(team, game, pitch), game, pitch);
 };

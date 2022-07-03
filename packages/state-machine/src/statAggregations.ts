@@ -46,3 +46,59 @@ export const totalBases = ({ offenseStats }: Player): number => {
     const { singles, doubles, triples, homeruns } = offenseStats;
     return singles + (2 * doubles) + (3 * triples) + (4 * homeruns);
 };
+
+// https://www.mlb.com/glossary/standard-stats/number-of-pitches
+export const pitchCount = ({ defenseStats }: Player): number => {
+    return 0;
+};
+
+// https://www.mlb.com/glossary/standard-stats/appearance
+export const appearances = ({ defenseStats }: Player): number => {
+    return 0;
+};
+
+// https://www.mlb.com/glossary/standard-stats/earned-run-average
+export const earnedRunAverages = ({ defenseStats }: Player): number => {
+    return 0.0;
+};
+
+// https://www.mlb.com/glossary/standard-stats/relief-win
+export const reliefWins = ({ defenseStats }: Player): number => {
+    return 0;
+};
+
+// https://www.mlb.com/glossary/standard-stats/save
+export const saves = ({ defenseStats }: Player): number => {
+    return 0;
+};
+
+// https://www.mlb.com/glossary/standard-stats/save-percentage
+export const savePercentage = ({ defenseStats }: Player): number => {
+    return 0.0;
+};
+
+// https://www.mlb.com/glossary/standard-stats/shutout
+export const shutouts = ({ defenseStats }: Player): number => {
+    return 0;
+};
+
+// https://www.mlb.com/glossary/standard-stats/walks-and-hits-per-inning-pitched
+export const walksAndHitsPerInningPitched = ({ defenseStats }: Player): number => {
+    return 0.0;
+};
+
+// https://www.mlb.com/glossary/standard-stats/win
+export const wins = ({ defenseStats }: Player): number => {
+    return 0;
+};
+
+// https://www.mlb.com/glossary/standard-stats/winning-percentage
+export const winningPercentage = ({ defenseStats }: Player): number => {
+    return 0.0;
+};
+
+
+// https://www.mlb.com/glossary/standard-stats/fielding-percentage
+export const fieldingPercentage = ({ defenseStats }: Player): number => {
+    return 0.0;
+};
