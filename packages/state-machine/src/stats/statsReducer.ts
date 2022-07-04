@@ -1,9 +1,9 @@
-import { Bases, GameMoment, StatEvent, Team, Pitches, OptionalRules } from '../types';
+import { Bases, GameMoment, GameEvent, Team, Pitches, OptionalRules } from '../types';
 import { getPitcher } from '../defense/getPosition';
 import { runnersOn } from '../bases/runnersOn';
 import { record } from './statBuilder';
 
-export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | StatEvent): Team {
+export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | GameEvent): Team {
     if (!game.configuration.recordingStats) return team;
 
     const playerAtBat = team.roster[game.atBat];
@@ -12,7 +12,7 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
     const batter = playerAtBat.id;
 
     switch (pitch) {
-        case StatEvent.PLATE_APPEARANCE:
+        case GameEvent.PLATE_APPEARANCE:
             return {
                 ...team,
                 roster: {
@@ -22,7 +22,7 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
                         .done(),
                 }
             };
-        case StatEvent.WALK:
+        case GameEvent.WALK:
             return {
                 ...team,
                 roster: {
@@ -32,7 +32,7 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
                         .done(),
                 }
             };
-        case StatEvent.RBI:
+        case GameEvent.RBI:
             return {
                 ...team,
                 roster: {
@@ -42,7 +42,7 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
                         .done(),
                 }
             };
-        case StatEvent.INNING_END:
+        case GameEvent.INNING_END:
             return {
                 ...team,
                 roster: {
@@ -190,7 +190,7 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
                 }
             };
         }
-        case StatEvent.WALK_OFF: {
+        case GameEvent.WALK_OFF: {
             return {
                 ...team,
                 roster: {
@@ -206,13 +206,13 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Stat
     }
 };
 
-export function pitchingStats(team: Team, game: GameMoment, pitch: Pitches | StatEvent): Team {
+export function pitchingStats(team: Team, game: GameMoment, pitch: Pitches | GameEvent): Team {
     if (!game.configuration.recordingStats) return team;
-    
+
     const pitcher = getPitcher(team);
-    
+
     switch (pitch) {
-        case StatEvent.PLATE_APPEARANCE:
+        case GameEvent.PLATE_APPEARANCE:
             return {
                 ...team,
                 roster: {
@@ -222,7 +222,7 @@ export function pitchingStats(team: Team, game: GameMoment, pitch: Pitches | Sta
                         .done(),
                 },
             };
-        case StatEvent.WALK:
+        case GameEvent.WALK:
             return {
                 ...team,
                 roster: {
@@ -232,8 +232,28 @@ export function pitchingStats(team: Team, game: GameMoment, pitch: Pitches | Sta
                         .done(),
                 },
             };
-        // case StatEvent.LEAD_LOST:
-        // case StatEvent.LEAD_CHANGE:
+        case GameEvent.STRIKEOUT_SWINGING:
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [pitcher]: record(team.roster[pitcher])
+                        .pitching('strikeoutsSwinging', 1)
+                        .done(),
+                },
+            };
+        case GameEvent.STRIKEOUT_LOOKING:
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [pitcher]: record(team.roster[pitcher])
+                        .pitching('strikeoutsLooking', 1)
+                        .done(),
+                },
+            };
+        // case GameEvent.LEAD_LOST:
+        // case GameEvent.LEAD_CHANGE:
         //     return {
         //         ...team,
         //         roster: {
@@ -245,8 +265,8 @@ export function pitchingStats(team: Team, game: GameMoment, pitch: Pitches | Sta
         //                 .done(),
         //         },
         //     };
-        // case StatEvent.RUNS_SCORED: // is there anything to do here?
-        case StatEvent.RBI:
+        // case GameEvent.RUNS_SCORED: // is there anything to do here?
+        case GameEvent.RBI:
             return {
                 ...team,
                 roster: {
@@ -256,7 +276,7 @@ export function pitchingStats(team: Team, game: GameMoment, pitch: Pitches | Sta
                         .done(),
                 },
             };
-        // case StatEvent.INNING_END:
+        // case GameEvent.INNING_END:
         case Pitches.BALL:
             return {
                 ...team,
@@ -389,20 +409,20 @@ export function pitchingStats(team: Team, game: GameMoment, pitch: Pitches | Sta
                         .done(),
                 },
             };
-        // case StatEvent.WALK_OFF:
+        // case GameEvent.WALK_OFF:
         default:
             return team;
     }
 };
 
-export function fieldingStats(team: Team, game: GameMoment, pitch: Pitches | StatEvent): Team {
+export function fieldingStats(team: Team, game: GameMoment, pitch: Pitches | GameEvent): Team {
     if (!game.configuration.recordingStats) return team;
-    
+
     switch (pitch) {
-        case StatEvent.PLATE_APPEARANCE:
-        case StatEvent.WALK:
-        case StatEvent.RBI:
-        case StatEvent.INNING_END:
+        case GameEvent.PLATE_APPEARANCE:
+        case GameEvent.WALK:
+        case GameEvent.RBI:
+        case GameEvent.INNING_END:
         case Pitches.BALL:
         case Pitches.BALL_WILD:
         case Pitches.STRIKE_SWINGING:
@@ -421,12 +441,12 @@ export function fieldingStats(team: Team, game: GameMoment, pitch: Pitches | Sta
         case Pitches.INPLAY_DOUBLE:
         case Pitches.INPLAY_TRIPLE:
         case Pitches.INPLAY_HOMERUN:
-        case StatEvent.WALK_OFF:
+        case GameEvent.WALK_OFF:
         default:
             return team;
     }
 };
 
-export function defenseStats(team: Team, game: GameMoment, pitch: Pitches | StatEvent): Team {
+export function defenseStats(team: Team, game: GameMoment, pitch: Pitches | GameEvent): Team {
     return fieldingStats(pitchingStats(team, game, pitch), game, pitch);
 };

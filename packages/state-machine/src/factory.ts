@@ -25,7 +25,7 @@ export const defaultTeam = (
     ];
 
     return names.reduce<Team>((acc, player, index) => {
-        const newPlayer = defaultPlayer(player, alignment === 'away' && index === 0);
+        const newPlayer = defaultPlayer(player);
         acc.roster[newPlayer.id] = newPlayer;
         acc.lineup.push(newPlayer.id);
         acc.defense[newPlayer.id] = index; // enum hack of Position
@@ -68,14 +68,14 @@ export const defaultGame = (awayTeam: Team = defaultTeam('away', 'away'), homeTe
     }
 };
 
-export const defaultPlayer = (name: string = 'mockPlayer', leadOff: boolean = false): Player => {
+export const defaultPlayer = (name: string = 'mockPlayer'): Player => {
     const id = `${pid}`;
     pid += 1;
     return {
         id,
         name,
         offenseStats: {
-            plateAppearance: leadOff ? 1 : 0,
+            plateAppearance: 0,
             atbats: 0,
             hits: 0,
             strikeoutsSwinging: 0,

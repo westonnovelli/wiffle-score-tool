@@ -31,14 +31,16 @@ export enum Pitches {
     INTERFERENCE, // or otherwise screwed up play, that you want to log (just skip it if its not important)
 }
 
-export enum StatEvent {
+export enum GameEvent {
+    START = 'START',
+    END = 'END',
     PLATE_APPEARANCE = 'PA',
     RBI = 'RBI',
     INNING_END = 'INNING',
     WALK = 'W',
     WALK_OFF = 'WO',
     STRIKEOUT_SWINGING = "K",
-    STRIKE_LOOKING = "_K",
+    STRIKEOUT_LOOKING = "_K",
     RUNS_SCORED = "R",
     LEAD_CHANGE = "LC",
     LEAD_LOST = "LL",

@@ -15,3 +15,7 @@ export const getDefense = (game: GameMoment): Team => {
 export const getDefenseKey = (game: GameMoment): keyof Pick<GameMoment, 'awayTeam' | 'homeTeam'> => {
     return game.inning.half === InningHalf.TOP ? 'homeTeam' : 'awayTeam';
 };
+
+export const getOtherTeamKey = (key: 'homeTeam' | 'awayTeam'): 'homeTeam' | 'awayTeam' => {
+    return key === 'homeTeam' ? 'awayTeam' : 'homeTeam';
+};

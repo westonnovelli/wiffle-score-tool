@@ -1,8 +1,8 @@
 import mergeDeepRight from "ramda/src/mergeDeepRight.js";
-import { Bases, GameMoment, StatEvent } from "../types";
-import { getDefense, getDefenseKey, getOffense, getOffenseKey } from "../teams/getTeams";
+import { Bases, GameMoment, GameEvent } from "../types";
+import { getDefense, getDefenseKey, getOffense, getOffenseKey, getOtherTeamKey } from "../teams/getTeams";
 import logStats from "../stats/logStats";
-import { offenseStats } from "../stats/statsReducer";
+import { defenseStats, offenseStats } from "../stats/statsReducer";
 
 // returns the next batter in the lineup for the offense, or the "next due up" for the defense
 const whoisNextBatter = (state: GameMoment, offense: boolean = true): string => {
@@ -29,10 +29,10 @@ const batterUp = (state: GameMoment, inningChange: boolean = false): GameMoment 
     });
 
     // update new batter with plate appearance stat
-    const offenseStatsTeam = inningChange ? getDefenseKey(state) : getOffenseKey(state);
     return {
         ...next,
-        [offenseStatsTeam]: offenseStats(next[offenseStatsTeam], next, StatEvent.PLATE_APPEARANCE),
+        [getOffenseKey(state)]: offenseStats(next[getOffenseKey(state)], next, GameEvent.PLATE_APPEARANCE),
+        [getDefenseKey(state)]: defenseStats(next[getDefenseKey(state)], next, GameEvent.PLATE_APPEARANCE),
     };
 };
 
