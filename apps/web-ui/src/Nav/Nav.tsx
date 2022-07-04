@@ -20,7 +20,7 @@ const Nav: React.FC<Props> = ({ onSelectPitch }) => {
             {isManaging && <button className="nav-btn" onClick={() => navigate(-1)}>ᐸ Back</button>}
             <button className="nav-btn pitch" onClick={onSelectPitch} disabled={!isHome}>Pitch</button>
             {!isStats && <Link className={`nav-btn${!isHome ? ' disabled' : ''}`} to="stats">Stats</Link>}
-            {isStats && <button className="nav-btn" onClick={() => navigate(-1)}>Back ᐳ</button>}
+            {isStats && <button className="nav-btn" onClick={() => navigate('')}>Back ᐳ</button>}
         </nav>
     );
 };

@@ -100,13 +100,13 @@ const PITCH_LIST: PitchList = [
         label: 'FC',
         subtext: '(DP fail)',
     },
-    {
-        pitch: Pitches.INPLAY_INFIELD_ERROR,
-        gridArea: 'E',
-        type: 'inplay',
-        label: 'Error',
-        subtext: 'single',
-    },
+    // {
+    //     pitch: Pitches.INPLAY_INFIELD_ERROR,
+    //     gridArea: 'E',
+    //     type: 'inplay',
+    //     label: 'Error',
+    //     subtext: 'single',
+    // },
     {
         pitch: Pitches.INPLAY_OUTFIELD_OUT,
         gridArea: 'Y',

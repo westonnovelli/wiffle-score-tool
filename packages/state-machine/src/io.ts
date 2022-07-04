@@ -3,6 +3,7 @@ import mergeDeepRight from 'ramda/src/mergeDeepRight.js';
 import pick from 'ramda/src/pick.js';
 import { defaultConfiguration, defaultGame, defaultRules } from './factory';
 import { GameConfig, GameMoment } from "./types";
+import { start } from './gameReducer';
 
 export const serializeGame = (game: GameMoment): string => {
     const standardConfig = defaultConfiguration();
@@ -42,7 +43,7 @@ export const deserializeGame = (serialized: string): GameMoment => {
         'homeTeam',
         'awayTeam',
     ], parsed);
-    const merged: GameMoment = mergeDeepRight(defaultGame(), toBeMerged);
+    const merged: GameMoment = mergeDeepRight(start(defaultGame()), toBeMerged);
     return {
         ...merged,
         pitches: parsed?.pitches ?? [],

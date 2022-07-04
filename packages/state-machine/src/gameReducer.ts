@@ -10,7 +10,7 @@ import { awayScore, homeScore } from './score/score';
 import logStats from './stats/logStats';
 import { defenseStats, offenseStats } from './stats/statsReducer';
 import { getDefense, getDefenseKey, getOffense, getOffenseKey } from './teams/getTeams';
-import { Bases, GameMoment, InningHalf, OptionalRules, StatEvent, Pitches } from './types';
+import { Bases, GameMoment, InningHalf, OptionalRules, GameEvent, Pitches } from './types';
 
 const strike = (state: GameMoment): ChainingReducer => {
     return countReducer({
@@ -39,6 +39,16 @@ const out = (state: GameMoment): ChainingReducer => {
         count: NEW_COUNT,
     });
 }
+
+export function start(initial: GameMoment): GameMoment {
+    return batterUp({
+        ...initial,
+        atBat: initial.awayTeam.lineup[initial.awayTeam.lineup.length - 1],
+        nextHalfAtBat: initial.homeTeam.lineup[0],
+        [getOffenseKey(initial)]: offenseStats(getOffense(initial), initial, GameEvent.START),
+        [getDefenseKey(initial)]: defenseStats(getDefense(initial), initial, GameEvent.START),
+    });
+};
 
 // state transitions, this is just a reducer
 export function pitch(initial: GameMoment, pitch: Pitches): GameMoment {
@@ -250,8 +260,8 @@ function countReducer(intermediate: GameMoment): ChainingReducer {
     if (intermediate.count.balls >= intermediate.configuration.maxBalls) {
         const withStats = {
             ...intermediate,
-            [getOffenseKey(intermediate)]: offenseStats(getOffense(intermediate), intermediate, StatEvent.WALK),
-            [getDefenseKey(intermediate)]: defenseStats(getDefense(intermediate), intermediate, StatEvent.WALK),
+            [getOffenseKey(intermediate)]: offenseStats(getOffense(intermediate), intermediate, GameEvent.WALK),
+            [getDefenseKey(intermediate)]: defenseStats(getDefense(intermediate), intermediate, GameEvent.WALK),
         };
         const { next, proceed } = basesReducer(mergeDeepRight(withStats, {
             count: NEW_COUNT,
@@ -264,7 +274,7 @@ function countReducer(intermediate: GameMoment): ChainingReducer {
     }
     // is strikeout
     if (intermediate.count.strikes >= intermediate.configuration.maxStrikes) {
-        const event = (lastPitch(intermediate) === Pitches.STRIKE_LOOKING) ? StatEvent.STRIKE_LOOKING : StatEvent.STRIKEOUT_SWINGING;
+        const event = (lastPitch(intermediate) === Pitches.STRIKE_LOOKING) ? GameEvent.STRIKE_LOOKING : GameEvent.STRIKEOUT_SWINGING;
         const withStats = {
             ...intermediate,
             [getDefenseKey(intermediate)]: defenseStats(getDefense(intermediate), intermediate, event),
@@ -282,8 +292,8 @@ function basesReducer(intermediate: GameMoment): ChainingReducer {
     if (intermediate.bases[Bases.HOME] > 0) {
         const withStats = {
             ...intermediate,
-            [getOffenseKey(intermediate)]: offenseStats(getOffense(intermediate), intermediate, StatEvent.RBI),
-            [getDefenseKey(intermediate)]: defenseStats(getDefense(intermediate), intermediate, StatEvent.RBI),
+            [getOffenseKey(intermediate)]: offenseStats(getOffense(intermediate), intermediate, GameEvent.RBI),
+            [getDefenseKey(intermediate)]: defenseStats(getDefense(intermediate), intermediate, GameEvent.RBI),
         };
         const newScore = [...withStats.boxScore];
         newScore[withStats.inning.number - 1][getOffenseKey(withStats)] += withStats.bases[Bases.HOME];
@@ -308,14 +318,14 @@ function basesReducer(intermediate: GameMoment): ChainingReducer {
 //     if (offenseScoreBeforeInning + runsThisInning === defenseScore) {
 //         return {
 //             ...intermediate,
-//             [defenseKey]: defenseStats(defense, intermediate, StatEvent.LEAD_LOST),
+//             [defenseKey]: defenseStats(defense, intermediate, GameEvent.LEAD_LOST),
 //         };
 //     }
 
 //     if (offenseScoreBeforeInning + runsThisInning > defenseScore) {
 //         return {
 //             ...intermediate,
-//             [defenseKey]: defenseStats(defense, intermediate, StatEvent.LEAD_CHANGE),
+//             [defenseKey]: defenseStats(defense, intermediate, GameEvent.LEAD_CHANGE),
 //         };
 //     }
 
@@ -326,7 +336,7 @@ function logRunStats(intermediate: GameMoment): GameMoment {
     // // TODO compute earned vs unearned runs
     // const next: GameMoment = {
     //     ...intermediate,
-    //     [getDefenseKey(intermediate)]: defenseStats(getDefense(intermediate), intermediate, StatEvent.RUNS_SCORED),
+    //     [getDefenseKey(intermediate)]: defenseStats(getDefense(intermediate), intermediate, GameEvent.RUNS_SCORED),
     // };
     // return logLeadChange(next);
     return intermediate;
@@ -366,7 +376,7 @@ function runsReducer(intermediate: GameMoment): ChainingReducer {
         return {
             next: {
                 ...withStats,
-                [getOffenseKey(intermediate)]: offenseStats(getOffense(intermediate), intermediate, StatEvent.WALK_OFF),
+                [getOffenseKey(intermediate)]: offenseStats(getOffense(intermediate), intermediate, GameEvent.WALK_OFF),
                 gameOver: true,
             },
             proceed: false,
@@ -382,7 +392,7 @@ function outsReducer(intermediate: GameMoment): ChainingReducer {
         // end of inning, signal for LOB stats
         const withStats: GameMoment = {
             ...intermediate,
-            [getOffenseKey(intermediate)]: offenseStats(getOffense(intermediate), intermediate, StatEvent.INNING_END),
+            [getOffenseKey(intermediate)]: offenseStats(getOffense(intermediate), intermediate, GameEvent.INNING_END),
         };
         const needsBatterSwitch: GameMoment = {
             ...withStats,

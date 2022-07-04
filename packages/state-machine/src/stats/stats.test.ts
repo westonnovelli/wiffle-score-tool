@@ -1,14 +1,15 @@
 import mergeDeepRight from "ramda/src/mergeDeepRight.js";
 import { defaultGame } from "../factory";
-import { Bases, DeepPartial, GameMoment, Pitches, StatEvent, Team } from "../types";
+import { start } from "../gameReducer";
+import { Bases, DeepPartial, GameMoment, Pitches, GameEvent, Team } from "../types";
 import { offenseStats } from "./statsReducer";
 
 describe('[offenseStats]', () => {
     describe('events', () => {
         test('a plate appearance updates the stat for the batter', () => {
-            const game: GameMoment = defaultGame();
+            const game: GameMoment = start(defaultGame());
             const initial: Team = game.awayTeam;
-            const event: StatEvent = StatEvent.PLATE_APPEARANCE;
+            const event: GameEvent = GameEvent.PLATE_APPEARANCE;
             const diff: DeepPartial<Team> = {
                 roster: {
                     '0': {
@@ -25,7 +26,7 @@ describe('[offenseStats]', () => {
         test('a walk updates the stat for the batter', () => {
             const game: GameMoment = defaultGame();
             const initial: Team = game.awayTeam;
-            const event: StatEvent = StatEvent.WALK;
+            const event: GameEvent = GameEvent.WALK;
             const diff: DeepPartial<Team> = {
                 roster: {
                     '0': {
@@ -42,7 +43,7 @@ describe('[offenseStats]', () => {
         test('an RBI updates the stat for the batter with the number of runs (currently at the plate)', () => {
             const game: GameMoment = defaultGame();
             const initial: Team = game.awayTeam;
-            const event: StatEvent = StatEvent.RBI;
+            const event: GameEvent = GameEvent.RBI;
             const diff: DeepPartial<Team> = {
                 roster: {
                     '0': {
@@ -60,7 +61,7 @@ describe('[offenseStats]', () => {
         test('an inningEnd updates the LOB stat for the batter with the number of runners on)', () => {
             const game: GameMoment = defaultGame();
             const initial: Team = game.awayTeam;
-            const event: StatEvent = StatEvent.INNING_END;
+            const event: GameEvent = GameEvent.INNING_END;
             const diff: DeepPartial<Team> = {
                 roster: {
                     '0': {
@@ -82,7 +83,7 @@ describe('[offenseStats]', () => {
         test('a walk off updates the stat for the batter', () => {
             const game: GameMoment = defaultGame();
             const initial: Team = game.awayTeam;
-            const event: StatEvent = StatEvent.WALK_OFF;
+            const event: GameEvent = GameEvent.WALK_OFF;
             const diff: DeepPartial<Team> = {
                 roster: {
                     '0': {

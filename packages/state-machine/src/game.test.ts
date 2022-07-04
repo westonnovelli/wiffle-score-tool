@@ -3,7 +3,7 @@ import mergeDeepRight from 'ramda/src/mergeDeepRight.js';
 import { GameMoment, DeepPartial, Pitches, InningHalf, Bases } from './types';
 import hydrateGame from './history/hydrate';
 import { defaultGame, EMPTY_BASES } from './factory';
-import { pitch as handlePitch } from './gameReducer';
+import { pitch as handlePitch, start } from './gameReducer';
 import { deserializeGame, serializeGame } from './io';
 import manualEdit from './edits/manualEdit';
 
@@ -12,7 +12,7 @@ type atBat = {
     expected: DeepPartial<GameMoment>
 }[];
 
-let game: GameMoment = defaultGame();
+let game: GameMoment = start(defaultGame());
 
 test('1st batter: Lead off walk', () => {
     const atBat: atBat = [
@@ -25,7 +25,7 @@ test('1st batter: Lead off walk', () => {
                         '4': {
                             defenseStats: {
                                 pitching: {
-                                    balls: 1
+                                    balls: 1,
                                 }
                             }
                         }
@@ -43,7 +43,8 @@ test('1st batter: Lead off walk', () => {
                         '4': {
                             defenseStats: {
                                 pitching: {
-                                    balls: 2
+                                    balls: 2,
+                                    battersFaced: 1,
                                 }
                             }
                         }
@@ -61,7 +62,8 @@ test('1st batter: Lead off walk', () => {
                         '4': {
                             defenseStats: {
                                 pitching: {
-                                    balls: 3
+                                    balls: 3,
+                                    battersFaced: 1,
                                 }
                             }
                         }
@@ -97,6 +99,7 @@ test('1st batter: Lead off walk', () => {
                                 pitching: {
                                     balls: 4,
                                     walks: 1,
+                                    battersFaced: 2,
                                 }
                             }
                         }
@@ -109,7 +112,7 @@ test('1st batter: Lead off walk', () => {
 
     atBat.forEach(({ pitch, expected }) => {
         game = handlePitch(game, pitch);
-        expect(game).toEqual(mergeDeepRight(defaultGame(), expected));
+        expect(game).toEqual(mergeDeepRight(start(defaultGame()), expected));
     });
 });
 
@@ -147,6 +150,7 @@ test('2nd batter: single on 1,2 count', () => {
                                 pitching: {
                                     balls: 5,
                                     strikes: 1,
+                                    battersFaced: 2,
                                 }
                             }
                         }
@@ -167,6 +171,7 @@ test('2nd batter: single on 1,2 count', () => {
                                 pitching: {
                                     balls: 5,
                                     strikes: 2,
+                                    battersFaced: 2,
                                 }
                             }
                         }
@@ -204,6 +209,7 @@ test('2nd batter: single on 1,2 count', () => {
                                     balls: 5,
                                     strikes: 2,
                                     singles: 1,
+                                    battersFaced: 3,
                                 }
                             }
                         }
@@ -251,6 +257,7 @@ test('3rd batter: ground out on first pitch', () => {
                             defenseStats: {
                                 pitching: {
                                     groundOuts: 1,
+                                    battersFaced: 4,
                                 }
                             }
                         }
@@ -301,6 +308,7 @@ test('4th batter: strikeout looking on 2,0 count', () => {
                             defenseStats: {
                                 pitching: {
                                     balls: 7,
+                                    battersFaced: 4,
                                 }
                             }
                         }
@@ -339,6 +347,7 @@ test('4th batter: strikeout looking on 2,0 count', () => {
                                     balls: 7,
                                     strikes: 3,
                                     strikeoutsLooking: 1,
+                                    battersFaced: 5,
                                 }
                             }
                         }
@@ -389,6 +398,7 @@ test('5th batter: foul, foul, foul, infield single', () => {
                             defenseStats: {
                                 pitching: {
                                     strikes: 5,
+                                    battersFaced: 5,
                                 }
                             }
                         }
@@ -409,6 +419,7 @@ test('5th batter: foul, foul, foul, infield single', () => {
                             defenseStats: {
                                 pitching: {
                                     strikes: 6,
+                                    battersFaced: 5,
                                 }
                             }
                         }
@@ -447,6 +458,7 @@ test('5th batter: foul, foul, foul, infield single', () => {
                                 pitching: {
                                     strikes: 6,
                                     singles: 2,
+                                    battersFaced: 6,
                                 }
                             }
                         }
@@ -500,6 +512,7 @@ test('6th batter: grand slam! first pitch', () => {
                                 pitching: {
                                     homeruns: 1,
                                     runsAllowed: 4,
+                                    battersFaced: 7,
                                 }
                             }
                         }
@@ -549,6 +562,13 @@ test('7th batter: fly out on 1,0, ends the inning', () => {
                 nextHalfAtBat: '3',
                 awayTeam: {
                     roster: {
+                        '0': {
+                            defenseStats: {
+                                pitching: {
+                                    battersFaced: 1,
+                                }
+                            }
+                        },
                         '2': {
                             offenseStats: {
                                 atbats: 2,
@@ -560,16 +580,21 @@ test('7th batter: fly out on 1,0, ends the inning', () => {
                 homeTeam: {
                     roster: {
                         '4': {
+                            offenseStats: {
+                                plateAppearance: 1,
+                            },
                             defenseStats: {
                                 pitching: {
                                     balls: 8,
                                     flyOuts: 1,
+                                    battersFaced: 7,
                                 }
                             }
                         }
                     }
                 },
                 // TODO this probably needs to have a plate appearance for the homeTeam at the end of this
+                // and a batter faced for the next pitcher
                 pitches: [...initial.pitches, Pitches.BALL, Pitches.INPLAY_OUTFIELD_OUT]
             }
         },
@@ -613,6 +638,7 @@ test('next inning - batter 1: triple, first pitch', () => {
                             defenseStats: {
                                 pitching: {
                                     triples: 1,
+                                    battersFaced: 2,
                                 }
                             }
                         }
@@ -662,6 +688,7 @@ test('batter 2: sac fly, runner tags', () => {
                                 pitching: {
                                     flyOuts: 1,
                                     runsAllowed: 1,
+                                    battersFaced: 3,
                                 }
                             }
                         }

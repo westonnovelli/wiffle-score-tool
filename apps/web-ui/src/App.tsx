@@ -19,9 +19,10 @@ import {
   fielderRotate,
   type DeepPartial,
   type GameMoment,
-  GameConfig,
-  Team,
-  defaultConfiguration
+  type GameConfig,
+  type Team,
+  defaultConfiguration,
+  start,
 } from '@wiffleball/state-machine';
 import Nav from './Nav/Nav';
 import Manage from './Manage/Manage';
@@ -32,6 +33,8 @@ import Manual from './Manage/Manual';
 import Substitute from './Manage/Substitute';
 import useHistory from './useHistory';
 import Roster from './Manage/Roster';
+import PitchingStats from './Stats/PitchingStats';
+import BattingStats from './Stats/BattingStats';
 
 function App() {
   const {
@@ -85,7 +88,7 @@ function App() {
     };
 
     console.log(newGame);
-    clear(newGame);
+    clear(start(newGame));
     navigate('/');
   }
 
@@ -96,9 +99,7 @@ function App() {
           <div className="App">
             <div className="content"><Outlet /></div>
             <div className="nav-container">
-              <Nav
-                onSelectPitch={() => void setSelectingPitch(prev => !prev)}
-              />
+              <Nav onSelectPitch={() => void setSelectingPitch(prev => !prev)} />
             </div>
           </div>
         }>
@@ -138,7 +139,11 @@ function App() {
               />
             </Route>
           </Route>
-          <Route path="stats" element={<Stats game={game} />} />
+          <Route path="stats" element={<Stats />}>
+              <Route path="batting" element={<BattingStats game={game}/>}/>
+              <Route path="pitching" element={<PitchingStats game={game}/>}/>
+              <Route path="fielding" element={<h2>Coming soon</h2>}/>
+          </Route>
           <Route path="new" element={<NewGame handleStart={handleStart} />} />
         </Route>
       </Routes>

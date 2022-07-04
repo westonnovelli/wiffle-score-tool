@@ -8,8 +8,23 @@
     text-align: center;
 }
 
+.stats nav {
+    display: flex;
+    gap: 16px;
+}
+
+.stats nav a {
+    text-decoration: none;
+    color: var(--color-text);
+}
+
+.stats nav a.active {
+    border-bottom: 2px solid var(--color-text);
+}
+
 .stats h2 {
     font-weight: 400;
+    margin-bottom: 8px;
 }
 
 .stats .team {

@@ -1,6 +1,6 @@
 export {
     Pitches,
-    StatEvent,
+    GameEvent,
     Bases,
     OptionalRules,
     Position,
@@ -20,7 +20,7 @@ export {
 export { defaultRules, defaultGame, defaultConfiguration, defaultPlayer, defaultTeam, EMPTY_BASES } from './factory';
 export { default as hydrateGame } from './history/hydrate';
 export { getOffense, getDefense } from './teams/getTeams';
-export { pitch as handlePitch } from './gameReducer';
+export { pitch as handlePitch, start } from './gameReducer';
 export { default as manualEdit } from './edits/manualEdit';
 export { getPitcher, getInfield, getOutfield, getBench } from './defense/getPosition';
 export { pitcherSwap, fielderSwap, fielderRotate } from './edits/commonEdits';
@@ -33,4 +33,9 @@ export {
     onBasePlusSlugging,
     sluggingPercentage,
     totalBases,
+    pitchCount,
+    walksAndHitsPerInningPitched,
+    outs,
+    hits,
+    inningsPitched,
 } from './stats/statAggregations';
