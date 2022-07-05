@@ -161,7 +161,14 @@ const PITCH_LIST: PitchList = [
         type: 'inplay',
         label: 'HR',
         style: { fontSize: '24px' },
-    }
+    },
+    {
+        pitch: Pitches.INTERFERENCE,
+        gridArea: '_ERROR_',
+        type: 'inplayboth',
+        label: 'I',
+        style: { fontSize: '24px' },
+    },
 ];
 
 const variants = {
@@ -185,6 +192,8 @@ const PitchSelector: React.FC<Props> = ({ onPitch, possiblePitches = [] }) => {
                         onClick={() => onPitch(pitch)}
                         disabled={!possiblePitches.includes(pitch)}
                         style={style}
+                        data-pitch={label}
+                        data-patchid={pitch}
                     >
                         {label}
                         {subtext && (<div>{subtext}</div>)}

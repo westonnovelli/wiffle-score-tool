@@ -9,7 +9,14 @@ export const getPosition = (team: Team, pos: Position): string[] => {
     }, []);
 };
 
-export const getPitcher = (team: Team): string => getPosition(team, Position.Pitcher)[0];
+export const getPitcher = (team: Team): string | undefined => {
+    const pitcher = getPosition(team, Position.Pitcher)[0];
+    if (!pitcher) {
+        console.warn('no pitcher found')
+    }
+    return pitcher;
+};
+    
 export const getInfield = (team: Team): string[] => getPosition(team, Position.Infield);
 export const getOutfield = (team: Team): string[] => getPosition(team, Position.Outfield);
 export const getBench = (team: Team): string[] => getPosition(team, Position.Bench);

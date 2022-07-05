@@ -34,6 +34,15 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
     const [awayNames, setAwayNames] = React.useState<Record<string, string>>({});
     const [awayPositions, setAwayPositions] = React.useState<Record<string, Position>>({});
 
+    const isValid = 
+           homeTeamLineup.length >= 1
+        && awayTeamLineup.length >= 1
+        && Object.values(homePositions).includes(Position.Pitcher)
+        && Object.values(awayPositions).includes(Position.Pitcher)
+        && maxStrikes >= 1 && maxBalls >= 0 && maxOuts >= 0 && maxInnings >= 1;
+
+    console.log({homePositions, awayPositions});
+
     const prepStart = () => {
         const config: GameConfig = {
             maxBalls,
@@ -120,7 +129,8 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
                 setPositions={setAwayPositions}
                 editing
             />
-            <button className="start" onClick={prepStart}>Start game</button>
+            {!isValid && <div className="validation">both teams need at least 1 pitcher</div>}
+            <button className="start" onClick={prepStart} disabled={!isValid}>Start game</button>
         </div>
     );
 };

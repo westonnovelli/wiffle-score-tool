@@ -52,7 +52,7 @@ const GameConfigControl: React.FC<Props> = ({
                     value={maxStrikes}
                     onChange={(e) => setMaxStrikes(parseInt(e.target.value))}
                     name="maxStrikes"
-                    min={0}
+                    min={1}
                     max={MAX_STRIKES}
                 />
                 <label htmlFor="maxStrikes">max strikes</label>
@@ -62,7 +62,7 @@ const GameConfigControl: React.FC<Props> = ({
                     value={maxBalls}
                     onChange={(e) => setMaxBalls(parseInt(e.target.value))}
                     name="maxBalls"
-                    min={0}
+                    min={1}
                     max={MAX_BALLS}
                 />
                 <label htmlFor="maxBalls">max balls</label>
@@ -70,9 +70,9 @@ const GameConfigControl: React.FC<Props> = ({
             <div>
                 <NumberInput
                     value={maxOuts}
-                    onChange={(e) => setMaxOuts(parseInt(e.target.value))}
+                    onChange={(e) => setMaxOuts(parseInt(e.target.value ?? 0))}
                     name="maxOuts"
-                    min={0}
+                    min={1}
                     max={MAX_OUTS}
                 />
                 <label htmlFor="maxOuts">max outs</label>
@@ -82,17 +82,17 @@ const GameConfigControl: React.FC<Props> = ({
                     value={maxRuns}
                     onChange={(e) => setMaxRuns(parseInt(e.target.value))}
                     name="maxRuns"
-                    min={-1}
+                    min={0}
                     max={MAX_RUNS}
                 />
-                <label htmlFor="maxRuns">max runs</label>
+                <label htmlFor="maxRuns">max runs (0 for no limit)</label>
             </div>
             <div>
                 <NumberInput
                     value={maxInnings}
                     onChange={(e) => setMaxInnings(parseInt(e.target.value))}
                     name="maxInnings"
-                    min={0}
+                    min={1}
                     max={MAX_INNINGS}
                 />
                 <label htmlFor="maxInnings">max innings</label>
@@ -102,7 +102,7 @@ const GameConfigControl: React.FC<Props> = ({
                     value={maxFielders}
                     onChange={(e) => setMaxFielders(parseInt(e.target.value))}
                     name="maxFielders"
-                    min={0}
+                    min={1}
                     max={MAX_FIELDERS}
                 />
                 <label htmlFor="maxFielders">max fielders</label>

@@ -450,9 +450,7 @@ describe('[7.00]', () => {
         const initial: GameMoment = mergeDeepRight(noStatsGame(), { bases: { [Bases.SECOND]: 1 } });
         const thrown: Pitches = Pitches.INPLAY_DOUBLE;
         const diff: DeepPartial<GameMoment> = {
-            bases: {
-                [Bases.SECOND]: 1
-            },
+            boxScore: [{ homeTeam: 0, awayTeam: 1 }],
             atBat: '1'
         };
 

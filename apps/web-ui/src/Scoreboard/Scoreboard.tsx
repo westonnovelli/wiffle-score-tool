@@ -19,8 +19,10 @@ const Scoreboard: React.FC<Props> = ({ game }) => {
     // todo animate enter/exit of each section
     const offenseRoster = getOffense(game).roster;
     const defenseRoster = getDefense(game).roster;
-    const pitcher = defenseRoster[getPitcher(getDefense(game))]?.name ?? `cannot find pitcher`;
-    const batter = offenseRoster[game.atBat]?.name ?? `cannot find batter ${game.atBat}`;
+    const pitcherId = getPitcher(getDefense(game)) ?? 'cannot find pitcher';
+    const pitcher = defenseRoster[pitcherId]?.name ?? pitcherId;
+    const atBatId = game.atBat ?? `cannot find batter ${game.atBat}`;
+    const batter = offenseRoster[atBatId]?.name ?? atBatId;
 
     return (
         <div className="scoreboard">

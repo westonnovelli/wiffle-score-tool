@@ -3,7 +3,9 @@ import {
     Bases,
     InningHalf,
     OptionalRules,
+    Position,
     Score,
+    TeamSeed,
     type GameConfig,
     type GameMoment,
     type Player,
@@ -28,9 +30,26 @@ export const defaultTeam = (
         const newPlayer = defaultPlayer(player);
         acc.roster[newPlayer.id] = newPlayer;
         acc.lineup.push(newPlayer.id);
+        acc.startingLineup.push(newPlayer.id);
         acc.defense[newPlayer.id] = index; // enum hack of Position
+        acc.startingDefense[newPlayer.id] = index; // also here
         return acc;
-    }, { roster: {}, lineup: [], defense: {} });
+    }, { roster: {}, lineup: [], defense: {}, startingLineup: [], startingDefense: {} });
+};
+
+export const newTeam = (
+    players: TeamSeed[]
+): Team | undefined => {
+    if (players.length === 0) return undefined;
+    return players.reduce<Team>((acc, player) => {
+        const newPlayer = defaultPlayer(player.name, player.id);
+        acc.roster[player.id] = newPlayer;
+        acc.lineup.push(newPlayer.id);
+        acc.startingLineup.push(newPlayer.id);
+        acc.defense[player.id] = player.position;
+        acc.startingDefense[player.id] = player.position;
+        return acc;
+    }, { roster: {}, lineup: [], defense: {}, startingLineup: [], startingDefense: {} });
 };
 
 export const defaultGame = (awayTeam: Team = defaultTeam('away', 'away'), homeTeam: Team = defaultTeam('home')): GameMoment => {
@@ -62,14 +81,14 @@ export const defaultGame = (awayTeam: Team = defaultTeam('away', 'away'), homeTe
         awayTeam,
         homeTeam,
         gameOver: false,
+        gameStarted: false,
         configuration: defaultConfiguration(),
         pitches: [],
         manualEdits: [],
     }
 };
 
-export const defaultPlayer = (name: string = 'mockPlayer'): Player => {
-    const id = `${pid}`;
+export const defaultPlayer = (name: string = 'mockPlayer', id: string = `${pid}`): Player => {
     pid += 1;
     return {
         id,

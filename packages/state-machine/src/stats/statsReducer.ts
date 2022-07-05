@@ -210,6 +210,7 @@ export function pitchingStats(team: Team, game: GameMoment, pitch: Pitches | Gam
     if (!game.configuration.recordingStats) return team;
 
     const pitcher = getPitcher(team);
+    if (!pitcher) return team;
 
     switch (pitch) {
         case GameEvent.PLATE_APPEARANCE:

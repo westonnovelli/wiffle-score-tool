@@ -17,8 +17,17 @@ export {
     type Team,
     type DeepPartial,
 } from './types';
-export { defaultRules, defaultGame, defaultConfiguration, defaultPlayer, defaultTeam, EMPTY_BASES } from './factory';
+export {
+    defaultRules,
+    defaultGame,
+    defaultConfiguration,
+    defaultPlayer,
+    defaultTeam,
+    newTeam,
+    EMPTY_BASES,
+} from './factory';
 export { default as hydrateGame } from './history/hydrate';
+export { serializeGame, deserializeGame } from './io';
 export { getOffense, getDefense } from './teams/getTeams';
 export { pitch as handlePitch, start } from './gameReducer';
 export { default as manualEdit } from './edits/manualEdit';

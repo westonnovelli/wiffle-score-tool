@@ -1,6 +1,6 @@
 import mergeDeepRight from 'ramda/src/mergeDeepRight.js';
 
-import { GameMoment, DeepPartial, Pitches, InningHalf, Bases } from './types';
+import { GameMoment, DeepPartial, Pitches, InningHalf, Bases, Position } from './types';
 import hydrateGame from './history/hydrate';
 import { defaultGame, EMPTY_BASES } from './factory';
 import { pitch as handlePitch, start } from './gameReducer';
@@ -664,6 +664,7 @@ test('batter 2: sac fly, runner tags', () => {
                 atBat: '6',
                 bases: { [Bases.THIRD]: 0 },
                 outs: 1,
+                boxScore: [{ awayTeam: 4, homeTeam: 1 }],
                 homeTeam: {
                     roster: {
                         '5': {
@@ -721,4 +722,37 @@ test('saving and loading the game results in the same state', () => {
     const initial = { ...game };
     const saved = serializeGame(game);
     expect(hydrateGame(deserializeGame(saved))).toEqual(initial);
+});
+
+test('saving and loading the game in the same state with multiple roster edits', () => {
+    const initial = manualEdit(game, {
+        homeTeam: {
+            roster: {
+                '4': {
+                    id: '4',
+                    name: 'billy',
+                }
+            }
+        }
+    });
+
+    const edit: DeepPartial<GameMoment> = {
+        awayTeam: {
+            defense: {
+                '0': Position.Bench,
+                '1': Position.Pitcher,
+                '3': Position.Infield,
+            }
+        }
+    };
+    const next = manualEdit(initial, edit);
+    const diff = {
+        ...edit,
+        pitches: [...initial.pitches, -1],
+        manualEdits: [...initial.manualEdits, edit],
+    };
+    expect(next).toEqual(mergeDeepRight(initial, diff));
+
+    const saved = serializeGame(next);
+    expect(hydrateGame(deserializeGame(saved))).toEqual(next);
 });

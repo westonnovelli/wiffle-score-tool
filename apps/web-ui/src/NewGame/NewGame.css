@@ -1,7 +1,6 @@
 .newgame {
     color: var(--color-text);
     padding: 16px;
-    height: 85vh;
     overflow: auto;
 }
 
@@ -19,9 +18,19 @@
     margin-bottom: 4px;
 }
 
+.newgame .validation {
+    margin-top: 16px;
+    color: var(--color-quadinary);
+    width: 100%;
+    text-align: center;
+}
 
 .newgame button.start {
     height: 40px;
     width: 80%;
     margin: 32px;
+}
+
+.newgame button.start:disabled {
+    margin-top: 0;
 }

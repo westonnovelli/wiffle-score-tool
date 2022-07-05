@@ -24,7 +24,7 @@ const PitchingTable: React.FC<PitchingTableProps> = ({ team, label, className })
         return acc;
     }, []);
     const activePitcher = getPitcher(team);
-    if (pitchers.length === 0) {
+    if (pitchers.length === 0 && activePitcher) {
         pitchers.push(team.roster[activePitcher]);
     }
 
@@ -37,8 +37,7 @@ const PitchingTable: React.FC<PitchingTableProps> = ({ team, label, className })
                         <td>Player</td>
                         <td>BF</td>
                         <td>PC</td>
-                        <td>B</td>
-                        <td>S</td>
+                        <td>K/B</td>
                         <td>H</td>
                         <td>K</td>
                         <td>ꓘ</td>
@@ -55,8 +54,7 @@ const PitchingTable: React.FC<PitchingTableProps> = ({ team, label, className })
                                 <th>{player.name}</th>
                                 <td>{player.defenseStats.pitching.battersFaced}</td>
                                 <td>{pitchCount(player)}</td>
-                                <td>{player.defenseStats.pitching.balls}</td>
-                                <td>{player.defenseStats.pitching.strikes}</td>
+                                <td>{player.defenseStats.pitching.strikes}/{player.defenseStats.pitching.balls}</td>
                                 <td>{hits(player)}</td>
                                 <td>{player.defenseStats.pitching.strikeoutsSwinging}</td>
                                 <td>{player.defenseStats.pitching.strikeoutsLooking}</td>

@@ -93,8 +93,21 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({
     };
 
     const remove = (index: number) => {
+        if (index > lineup.length -1) return;
+
+        const id = lineup[index];
         setLineup(prev => {
             return [...prev.slice(0, index), ...prev.slice(index + 1)];
+        });
+        setPositions(prev => {
+            const next = { ...prev };
+            delete next[id];
+            return next;
+        });
+        setNames(prev => {
+            const next = { ...prev };
+            delete next[id];
+            return next;
         });
     };
 

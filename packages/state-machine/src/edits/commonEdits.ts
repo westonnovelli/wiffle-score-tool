@@ -4,7 +4,9 @@ import { getPitcher } from "../defense/getPosition";
 import manualEdit from "./manualEdit";
 
 export const pitcherSwap = (game: GameMoment, newPitcher: string): GameMoment => {
-    return fielderSwap(game, newPitcher, getPitcher(getDefense(game)));
+    const pitcher = getPitcher(getDefense(game));
+    if (!pitcher) return game;
+    return fielderSwap(game, newPitcher, pitcher);
 };
 
 export const fielderSwap = (game: GameMoment, newFielder: string, oldFielder: string): GameMoment => {

@@ -43,6 +43,7 @@ const out = (state: GameMoment): ChainingReducer => {
 export function start(initial: GameMoment): GameMoment {
     return batterUp({
         ...initial,
+        gameStarted: true,
         atBat: initial.awayTeam.lineup[initial.awayTeam.lineup.length - 1],
         nextHalfAtBat: initial.homeTeam.lineup[0],
         [getOffenseKey(initial)]: offenseStats(getOffense(initial), initial, GameEvent.START),
@@ -139,7 +140,7 @@ export function pitch(initial: GameMoment, pitch: Pitches): GameMoment {
                 })
                 : { next: inningContinues, proceed: false };
             return proceed ? batterUp(next) : next;
-        }   
+        }
         case Pitches.STRIKE_FOUL:
             return foulBall(state);
         case Pitches.INPLAY_INFIELD_OUT_DP_SUCCESS: {
@@ -239,6 +240,8 @@ export function pitch(initial: GameMoment, pitch: Pitches): GameMoment {
             });
             return proceed ? batterUp(next) : next;
         }
+        case Pitches.INTERFERENCE:
+            throw new Error('interference');
         default:
             console.warn('PITCH NOT IMPLEMENTED', pitch);
             return state;
@@ -274,7 +277,7 @@ function countReducer(intermediate: GameMoment): ChainingReducer {
     }
     // is strikeout
     if (intermediate.count.strikes >= intermediate.configuration.maxStrikes) {
-        const event = (lastPitch(intermediate) === Pitches.STRIKE_LOOKING) ? GameEvent.STRIKE_LOOKING : GameEvent.STRIKEOUT_SWINGING;
+        const event = (lastPitch(intermediate) === Pitches.STRIKE_LOOKING) ? GameEvent.STRIKEOUT_LOOKING : GameEvent.STRIKEOUT_SWINGING;
         const withStats = {
             ...intermediate,
             [getDefenseKey(intermediate)]: defenseStats(getDefense(intermediate), intermediate, event),
@@ -295,10 +298,9 @@ function basesReducer(intermediate: GameMoment): ChainingReducer {
             [getOffenseKey(intermediate)]: offenseStats(getOffense(intermediate), intermediate, GameEvent.RBI),
             [getDefenseKey(intermediate)]: defenseStats(getDefense(intermediate), intermediate, GameEvent.RBI),
         };
-        const newScore = [...withStats.boxScore];
+        const newScore = withStats.boxScore.map((inning) => ({ ...inning }));
         newScore[withStats.inning.number - 1][getOffenseKey(withStats)] += withStats.bases[Bases.HOME];
-        
-        return runsReducer(withStats);
+        return runsReducer({ ...withStats, boxScore: newScore });
     }
     return { next: intermediate, proceed: true };
 }
@@ -307,10 +309,10 @@ function basesReducer(intermediate: GameMoment): ChainingReducer {
 //     const defenseKey = getDefenseKey(intermediate);
 //     const defense = getDefense(intermediate);
 
-    // const runsThisInning = intermediate.inning.half === InningHalf.TOP
-    //     ? intermediate.boxScore[intermediate.inning.number - 1].awayTeam
-    //     : intermediate.boxScore[intermediate.inning.number - 1].homeTeam;
-    // const defenseScore = defenseScore(intermediate);
+// const runsThisInning = intermediate.inning.half === InningHalf.TOP
+//     ? intermediate.boxScore[intermediate.inning.number - 1].awayTeam
+//     : intermediate.boxScore[intermediate.inning.number - 1].homeTeam;
+// const defenseScore = defenseScore(intermediate);
 //     const offenseScoreBeforeInning = offenseScore(intermediate) - runsThisInning;
 
 //     if (offenseScoreBeforeInning >= defenseScore) return intermediate;
@@ -346,7 +348,7 @@ function logRunStats(intermediate: GameMoment): GameMoment {
 function runsReducer(intermediate: GameMoment): ChainingReducer {
     // assumes runs have already been tallied, need to adjust if rules indicate
     const runsThisInning = intermediate.boxScore[intermediate.inning.number - 1][getOffenseKey(intermediate)];
-    
+
     // hit max runs
     if (runsThisInning >= intermediate.configuration.maxRuns && intermediate.configuration.maxRuns > 0) {
         const shouldSetRunsToMax = !intermediate.configuration.rules[OptionalRules.AllowSinglePlayRunsToPassLimit];

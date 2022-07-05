@@ -25,15 +25,21 @@ const manualEdit = (game: GameMoment, edit: DeepPartial<GameMoment>): GameMoment
         merged.boxScore = edit.boxScore;
     }
     if (edit.homeTeam) {
-        merged.homeTeam = mergeDeepRight(game.homeTeam, omit(['lineup'], edit.homeTeam));
+        merged.homeTeam = mergeDeepRight(game.homeTeam, omit(['lineup', 'startingLineup'], edit.homeTeam));
         if (isValidLineup(edit.homeTeam.lineup)) {
             merged.homeTeam.lineup = edit.homeTeam.lineup;
         }
+        if (isValidLineup(edit.homeTeam.startingLineup)) {
+            merged.homeTeam.startingLineup = edit.homeTeam.startingLineup;
+        }
     }
     if (edit.awayTeam) {
-        merged.awayTeam = mergeDeepRight(game.awayTeam, omit(['lineup'], edit.awayTeam));
+        merged.awayTeam = mergeDeepRight(game.awayTeam, omit(['lineup', 'startingLineup'], edit.awayTeam));
         if (isValidLineup(edit.awayTeam.lineup)) {
             merged.awayTeam.lineup = edit.awayTeam.lineup;
+        }
+        if (isValidLineup(edit.awayTeam.startingLineup)) {
+            merged.awayTeam.startingLineup = edit.awayTeam.startingLineup;
         }
     }
     return merged;

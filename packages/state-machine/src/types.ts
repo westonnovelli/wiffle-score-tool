@@ -165,6 +165,7 @@ export interface GameMoment {
     homeTeam: Team;
     awayTeam: Team;
     gameOver: boolean;
+    gameStarted: boolean;
     configuration: GameConfig;
     pitches: (Pitches | -1)[];
     manualEdits: DeepPartial<GameMoment>[]
@@ -205,4 +206,12 @@ export interface Team {
     roster: Record<string, Player>;
     lineup: BattingOrder;
     defense: Record<string, Position>;
+    startingDefense: Record<string, Position>;
+    startingLineup: BattingOrder;
 };
+
+export interface TeamSeed {
+    id: string;
+    name: string;
+    position: Position;
+}

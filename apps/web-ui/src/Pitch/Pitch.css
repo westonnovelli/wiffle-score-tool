@@ -6,7 +6,7 @@
 }
 
 .pitch-menu.layout {
-    grid-template-areas: ". . . ." "B S F K" "W G Z Q " "A I E L" "Y T O single" "D C . double" ". . H triple";
+    grid-template-areas: ". . . ." "B S F K" "W G Z Q " "A I E L" "Y T O single" "D C . double" "_ERROR_ . H triple";
     grid-template-rows: repeat(7, 1fr);
     grid-template-columns: repeat(4, 1fr);
 }
