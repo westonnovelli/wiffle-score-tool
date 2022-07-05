@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { AnimatePresence } from 'framer-motion';
+import { useLocalStorage } from 'usehooks-ts';
 import {
   Routes,
   Route,
@@ -39,10 +40,17 @@ import useHistory from './useHistory';
 import Roster from './Manage/Roster';
 import PitchingStats from './Stats/PitchingStats';
 import BattingStats from './Stats/BattingStats';
+import Stash from './Manage/Stash';
+import Load from './Manage/Load';
+import Share from './Manage/Share';
 
-const getGameSeed = (searchParams: URLSearchParams) => {
+const getGameSeed = (searchParams: URLSearchParams, lsGame: string | null) => {
   if (searchParams.get('game')) {
     const game = deserializeGame(searchParams.get('game') ?? '');
+    return hydrateGame(game);
+  }
+  if (lsGame) {
+    const game = deserializeGame(lsGame);
     return hydrateGame(game);
   }
   return defaultGame();
@@ -52,6 +60,7 @@ function App() {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [lsGame, setlsGame] = useLocalStorage<string | null>('wiffle-st.active-game', null);
 
   const [audit, setAudit] = React.useState<string[]>([]);
   const {
@@ -66,7 +75,17 @@ function App() {
     canRedo,
     redo,
     clear
-  } = useHistory<GameMoment>(getGameSeed(searchParams));
+  } = useHistory<GameMoment>(getGameSeed(searchParams, lsGame));
+
+  const setGameAndSyncLS = (newGame: GameMoment) => {
+    setGame(newGame);
+    setlsGame(serializeGame(newGame));
+  };
+
+  const clearGameAndSyncLS = (newGame: GameMoment) => {
+    clear(newGame);
+    setlsGame(serializeGame(newGame));
+  };
 
   const [selectingPitch, setSelectingPitch] = React.useState(false);
 
@@ -74,12 +93,12 @@ function App() {
     setAudit(prev => [...prev, `${pitch}`]);
     try {
       const nextGame = processPitch(game, pitch);
-      setGame(nextGame);
+      setGameAndSyncLS(nextGame);
     } catch (e) {
       console.log(e);
       let newSearchParams = new URLSearchParams(searchParams);
       newSearchParams.set('game', serializeGame(game));
-      newSearchParams.set('game', serializeGame(past[past.length - 1]));
+      newSearchParams.set('pitch', `${pitch}`);
       setSearchParams(newSearchParams);
     }
     setSelectingPitch(false);
@@ -87,7 +106,7 @@ function App() {
 
   const handleEdit = (edit: DeepPartial<GameMoment>) => {
     setAudit(prev => [...prev, `${edit}`]);
-    setGame(manualEdit(game, edit));
+    setGameAndSyncLS(manualEdit(game, edit));
     navigate('/');
   };
 
@@ -96,7 +115,7 @@ function App() {
   };
 
   const handleSubstitute = (rotation: string[]) => {
-    setGame(fielderRotate(game, ...rotation));
+    setGameAndSyncLS(fielderRotate(game, ...rotation));
     navigate('/');
   };
 
@@ -115,7 +134,7 @@ function App() {
 
     console.log(newGame);
     setAudit(prev => [...prev, `newgame: ${newGame}`]);
-    clear(start(newGame));
+    clearGameAndSyncLS(start(newGame));
     navigate('/');
   }
 
@@ -133,7 +152,12 @@ function App() {
     if (game.gameStarted) return; 
     setAudit(prev => [...prev, `start`]);
     setGame(start(game));
-  }
+  };
+
+  const loadSave = (serializedGame: string) => {
+    const newGame = hydrateGame(deserializeGame(serializedGame));
+    clearGameAndSyncLS(newGame);
+  };
 
   const gameOver = game.gameOver;
   if (gameOver) {
@@ -193,6 +217,9 @@ function App() {
                 />}
               />
             </Route>
+            <Route path="stash" element={<Stash />} />
+            <Route path="load" element={<Load loadSave={loadSave}/>} />
+            <Route path="share" element={<Share />} />
           </Route>
           <Route path="stats" element={<Stats />}>
             <Route path="batting" element={<BattingStats game={game} />} />

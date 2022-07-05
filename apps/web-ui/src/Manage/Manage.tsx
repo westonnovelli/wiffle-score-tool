@@ -40,7 +40,19 @@ const Manage: React.FC<Props> = ({
 
     const handleRoster = (team: 'home' | 'away') => {
         navigate(`roster/${team}`);
-    }
+    };
+
+    const handleStash = () => {
+        navigate('stash');
+    };
+
+    const handleLoad = () => {
+        navigate('load');
+    };
+
+    const handleShare = () => {
+        navigate('share');
+    };
 
     return (
         <Structure className="manage" title={<h1>Manage game</h1>}>
@@ -58,8 +70,10 @@ const Manage: React.FC<Props> = ({
                 <li role="button" onClick={() => handleRoster('home')}>Home Team ᐳ</li>
                 <li role="button" onClick={() => handleRoster('away')}>Away Team ᐳ</li>
                 <li role="button" onClick={handleManual}>Manually adjust game state ᐳ</li>
-                {/* <li role="button" onClick={handleFielderChange}>Fielders change ᐳ</li> */}
-                <li role="button" onClick={handleNew}>New Game (abandon this game)</li>
+                <li role="button" onClick={handleNew}>New Game<div>abandon this game</div></li>
+                <li role="button" onClick={handleStash}>Save this game<div>game will be available on this device</div></li>
+                <li role="button" onClick={handleLoad}>Load a saved game</li>
+                <li role="button" onClick={handleShare}>Share this game by url</li>
             </ul>
         </Structure>
     );

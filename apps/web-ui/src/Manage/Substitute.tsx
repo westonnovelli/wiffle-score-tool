@@ -40,7 +40,7 @@ const Substitute: React.FC<Props> = ({ game, handleEdit }) => {
             })}
             <ul>
                 {otherPlayers.map((id) => (
-                    <li key={id} onClick={() => selectPlayer(id)}>{defense.roster[id].name}</li>
+                    <li key={id} onClick={() => selectPlayer(id)} role="button">{defense.roster[id].name}</li>
                 ))}
             </ul>
             <div className="summary">

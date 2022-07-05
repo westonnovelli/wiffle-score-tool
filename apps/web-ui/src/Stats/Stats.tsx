@@ -15,7 +15,7 @@ const Stats: React.FC = () => {
 
     React.useEffect(function redirectToChild() {
         if (isRoot) navigate('batting');
-    }, [isRoot]);
+    }, [isRoot, navigate]);
 
     return (
         <motion.div

@@ -1,0 +1,30 @@
+.manage-share {
+    padding: 16px;
+    color: var(--color-text);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.manage-share h1 {
+    margin-bottom: 16px;
+    font-weight: 400;
+    text-align: center;
+}
+
+.manage-share .link {
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.manage-share .link a {
+    color: var(--color-text-subtle);
+}
+
+.manage-share button {
+
+}
+
+.manage-share .confirm {
+
+}

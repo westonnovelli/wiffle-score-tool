@@ -23,3 +23,8 @@
 .manage ul li[role="button"] {
     cursor: pointer;
 }
+
+.manage ul li div {
+    color: var(--color-text-subtle);
+    font-size: .8em;
+}

@@ -48,3 +48,9 @@ export {
     hits,
     inningsPitched,
 } from './stats/statAggregations';
+export {
+    homeScore,
+    awayScore,
+    offenseScore,
+    defenseScore,
+} from './score/score';

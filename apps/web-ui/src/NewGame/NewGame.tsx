@@ -59,7 +59,9 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
         const homeTeam: Team = {
             roster: {},
             lineup: [],
-            defense: {}
+            startingLineup: [],
+            defense: {},
+            startingDefense: {},
         };
         homeTeamLineup.forEach((id) => {
             const name = homeNames[id];
@@ -67,13 +69,17 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
             const player = defaultPlayer(name);
             homeTeam.roster[player.id] = player;
             homeTeam.lineup = [...homeTeam.lineup, player.id];
+            homeTeam.startingLineup = [...homeTeam.lineup, player.id];
             homeTeam.defense[player.id] = position;
+            homeTeam.startingDefense[player.id] = position;
         });
 
         const awayTeam: Team = {
             roster: {},
             lineup: [],
-            defense: {}
+            startingLineup: [],
+            defense: {},
+            startingDefense: {},
         };
         awayTeamLineup.forEach((id) => {
             const name = awayNames[id];
@@ -81,7 +87,9 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
             const player = defaultPlayer(name);
             awayTeam.roster[player.id] = player;
             awayTeam.lineup = [...awayTeam.lineup, player.id];
+            awayTeam.startingLineup = [...awayTeam.lineup, player.id];
             awayTeam.defense[player.id] = position;
+            awayTeam.startingDefense[player.id] = position;
         });
 
         handleStart(config, homeTeam, awayTeam);
