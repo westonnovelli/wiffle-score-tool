@@ -11,8 +11,6 @@ const getPossiblePitches = (game: GameMoment): Pitches[] => {
         // @ts-expect-error
         const pitch: Pitches = Pitches[p];
         switch(pitch) {
-            case Pitches.STRIKE_LOOKING:
-                return game.configuration.rules[OptionalRules.CaughtLookingRule];
             case Pitches.STRIKE_FOUL_ZONE:
                 return game.count.strikes === game.configuration.maxStrikes - 1
                     && game.configuration.rules[OptionalRules.FoulToTheZoneIsStrikeOut];
