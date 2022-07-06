@@ -240,8 +240,8 @@ export function pitch(initial: GameMoment, pitch: Pitches): GameMoment {
             });
             return proceed ? batterUp(next) : next;
         }
-        case Pitches.INTERFERENCE:
-            throw new Error('interference');
+        // case Pitches.INTERFERENCE:
+        //     throw new Error('interference');
         default:
             console.warn('PITCH NOT IMPLEMENTED', pitch);
             return state;

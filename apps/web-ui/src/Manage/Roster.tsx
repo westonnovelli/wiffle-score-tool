@@ -1,5 +1,6 @@
-import { DeepPartial, Team, Position } from "@wiffleball/state-machine";
+import { DeepPartial, Team, Position, defaultPlayer, BattingOrder } from "@wiffleball/state-machine";
 import React from "react";
+import { nanoid } from 'nanoid';
 import Structure from "./Structure";
 import TeamBuilder from "../components/TeamBuilder";
 import './Roster.css';
@@ -28,11 +29,15 @@ const getPositions = (team: Team) => {
 const changedNames = (potential: Record<string, string>, team: Team) => {
     return Object.keys(potential).reduce<Record<string, string>>((acc, id) => {
         const player = team.roster[id];
-        if (player?.name !== potential[id]) {
+        if (player && player.name !== potential[id]) {
             acc[id] = potential[id];
         }
         return acc;
     }, {});
+};
+
+const lineupChanged = (potential: BattingOrder, team: Team): boolean => {
+    return potential.some((id, index) => team.lineup[index] !== id);
 };
 
 const Roster: React.FC<Props> = ({ whichTeam, teamName, team, handleEdit }) => {
@@ -47,6 +52,17 @@ const Roster: React.FC<Props> = ({ whichTeam, teamName, team, handleEdit }) => {
 
         const edit: DeepPartial<Team> = {};
 
+        if (lineupChanged(lineup, team)) {
+            edit.lineup = lineup;
+        }
+
+        Object.keys(positions).forEach((id) => {
+            if (team.defense[id] === undefined || team.defense[id] !== positions[id]) {
+                if (!edit.defense) edit.defense = {};
+                edit.defense[id] = positions[id];
+            }
+        });
+        
         const nameChanges = changedNames(names, team);
         if (Object.keys(nameChanges).length > 0) {
             edit.roster = {};
@@ -56,6 +72,25 @@ const Roster: React.FC<Props> = ({ whichTeam, teamName, team, handleEdit }) => {
                 }
             });
         }
+
+        // if we added a player (id with "temp" in it) we need to create a player object in the roster
+        lineup.forEach((id) => {
+            if (id.includes('temp')) {
+                const player = defaultPlayer(names[id], nanoid(8));
+                if (!edit.roster) edit.roster = {};
+                edit.roster[player.id] = player;
+
+                if (!edit.defense) edit.defense = {};
+                edit.defense[player.id] = edit.defense[id];
+                delete edit.defense[id];
+
+                if (!edit.lineup) edit.lineup = [];
+                edit.lineup = edit.lineup.map((idAgain) => {
+                    if (idAgain === id) return player.id;
+                    return idAgain;
+                });
+            }
+        });
 
         handleEdit(edit);
     };

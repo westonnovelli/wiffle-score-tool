@@ -106,6 +106,7 @@ function App() {
 
   const handleEdit = (edit: DeepPartial<GameMoment>) => {
     setAudit(prev => [...prev, `${edit}`]);
+    console.log(edit);
     setGameAndSyncLS(manualEdit(game, edit));
     navigate('/');
   };

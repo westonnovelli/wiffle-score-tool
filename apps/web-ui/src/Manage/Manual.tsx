@@ -143,6 +143,7 @@ const Manual: React.FC<Props> = ({ game, handleEdit }) => {
             config.recordingStats = recordingStats;
         }
         rulesThatDontMatch(rules, game.configuration.rules).forEach((ruleKey) => {
+            if (!config.rules) config.rules = {};
             // @ts-expect-error
             config.rules[ruleKey] = rules[ruleKey];
         });

@@ -162,13 +162,13 @@ const PITCH_LIST: PitchList = [
         label: 'HR',
         style: { fontSize: '24px' },
     },
-    {
-        pitch: Pitches.INTERFERENCE,
-        gridArea: '_ERROR_',
-        type: 'inplayboth',
-        label: 'I',
-        style: { fontSize: '24px' },
-    },
+    // {
+    //     pitch: Pitches.INTERFERENCE,
+    //     gridArea: '_ERROR_',
+    //     type: 'inplayboth',
+    //     label: 'I',
+    //     style: { fontSize: '24px' },
+    // },
 ];
 
 const variants = {
