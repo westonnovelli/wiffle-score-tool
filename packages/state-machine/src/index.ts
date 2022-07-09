@@ -49,6 +49,10 @@ export {
     inningsPitched,
 } from './stats/statAggregations';
 export {
+    teamEarnedHits,
+    teamLOB,
+} from './stats/teamAggregations';
+export {
     homeScore,
     awayScore,
     offenseScore,

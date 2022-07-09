@@ -1,5 +1,5 @@
 import React from "react";
-import { GameMoment, InningHalf, Score } from "@wiffleball/state-machine";
+import { GameMoment, InningHalf, Score, Team, teamEarnedHits, teamLOB } from "@wiffleball/state-machine";
 import './BoxScore.css';
 import NumberInput from "./NumberInput";
 
@@ -8,13 +8,23 @@ type BoxScoreProps = {
     maxInnings: number;
     inningNumber: number;
     inningHalf: InningHalf;
+    awayTeam: Team;
+    homeTeam: Team;
     setBoxScore?: React.Dispatch<React.SetStateAction<GameMoment['boxScore']>>;
 };
 
 // @ts-expect-error
 const MAX_SCORE = window.WIFFLE_SCORE_TOOL_SETTINGS?.maxScore ?? 99;
 
-const BoxScore = ({ boxScore, inningNumber, inningHalf, maxInnings, setBoxScore }: BoxScoreProps) => {
+const BoxScore = ({
+    boxScore,
+    inningNumber,
+    inningHalf,
+    maxInnings,
+    awayTeam,
+    homeTeam,
+    setBoxScore
+}: BoxScoreProps) => {
     const [awayScore, homeScore] = boxScore.reduce((total, inning) => {
         total[0] += inning.awayTeam;
         total[1] += inning.homeTeam;
@@ -50,7 +60,7 @@ const BoxScore = ({ boxScore, inningNumber, inningHalf, maxInnings, setBoxScore 
                         ))}
                         <td className="runs">R</td>
                         <td>H</td>
-                        <td>E</td>
+                        <td>L</td>
                     </tr>
                 </thead>
                 <tbody>
@@ -67,8 +77,8 @@ const BoxScore = ({ boxScore, inningNumber, inningHalf, maxInnings, setBoxScore 
                         })}
                         {Array.from(Array(inningsDiff)).map((_, i) => <td key={i}></td>)}
                         <th className="runs">{awayScore}</th>
-                        <td>0</td>
-                        <td>0</td>
+                        <td>{teamEarnedHits(awayTeam)}</td>
+                        <td>{teamLOB(awayTeam)}</td>
                     </tr>
                     <tr className="homeScore">
                         <th>HOME</th>
@@ -84,8 +94,8 @@ const BoxScore = ({ boxScore, inningNumber, inningHalf, maxInnings, setBoxScore 
                         })}
                         {Array.from(Array(inningsDiff)).map((_, i) => <td key={i}></td>)}
                         <th className="runs">{homeScore}</th>
-                        <td>0</td>
-                        <td>0</td>
+                        <td>{teamEarnedHits(homeTeam)}</td>
+                        <td>{teamLOB(homeTeam)}</td>
                     </tr>
                 </tbody>
             </table>

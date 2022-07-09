@@ -206,6 +206,8 @@ const Manual: React.FC<Props> = ({ game, handleEdit }) => {
                 inningNumber={game.inning.number}
                 inningHalf={game.inning.half}
                 boxScore={boxScore}
+                awayTeam={game.awayTeam}
+                homeTeam={game.homeTeam}
                 setBoxScore={setBoxScore}
             />
             <fieldset className="count">

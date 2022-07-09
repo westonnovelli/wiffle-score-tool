@@ -30,6 +30,8 @@ const Scoreboard: React.FC<Props> = ({ game }) => {
                 maxInnings={game.configuration.maxInnings}
                 inningNumber={game.inning.number}
                 inningHalf={game.inning.half}
+                awayTeam={game.awayTeam}
+                homeTeam={game.homeTeam}
                 boxScore={game.boxScore}
             />
             <BasesRender

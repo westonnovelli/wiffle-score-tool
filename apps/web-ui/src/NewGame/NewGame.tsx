@@ -1,5 +1,6 @@
 import { defaultConfiguration, defaultPlayer, defaultRules, GameConfig, Position, Team } from "@wiffleball/state-machine";
 import React from "react";
+import { nanoid } from 'nanoid';
 import GameConfigControl from "../components/GameConfigControl";
 import RulesControl from "../components/RulesControl";
 import TeamBuilder from '../components/TeamBuilder';
@@ -67,7 +68,7 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
         homeTeamLineup.forEach((id) => {
             const name = homeNames[id];
             const position = homePositions[id];
-            const player = defaultPlayer(name);
+            const player = defaultPlayer(name, nanoid(4));
             homeTeam.roster[player.id] = player;
             homeTeam.lineup = [...homeTeam.lineup, player.id];
             homeTeam.startingLineup = [...homeTeam.startingLineup, player.id];
@@ -85,7 +86,7 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
         awayTeamLineup.forEach((id) => {
             const name = awayNames[id];
             const position = awayPositions[id];
-            const player = defaultPlayer(name);
+            const player = defaultPlayer(name, nanoid(4));
             awayTeam.roster[player.id] = player;
             awayTeam.lineup = [...awayTeam.lineup, player.id];
             awayTeam.startingLineup = [...awayTeam.startingLineup, player.id];
