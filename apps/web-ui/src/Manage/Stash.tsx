@@ -39,6 +39,7 @@ const Stash: React.FC = () => {
     };
 
     const disabled = !activeGame || saves.includes(saveName);
+    const overwriteEnabled = saves.includes(saveName);
 
     return (
         <Structure className={`manage-stash`} title={<h1>Stash game</h1>}>
@@ -55,6 +56,7 @@ const Stash: React.FC = () => {
                     onFocus={(e) => { e.target?.select(); }}
                 />
                 <button onClick={onSave} disabled={disabled}>Save game</button>
+                {overwriteEnabled && <button onClick={onSave} disabled={!overwriteEnabled}>Overwrite existing game</button>}
             </div>
         </Structure>
     );

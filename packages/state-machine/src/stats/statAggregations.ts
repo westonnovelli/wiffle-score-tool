@@ -5,8 +5,8 @@ import { Player } from "../types";
 // https://www.mlb.com/glossary/standard-stats/batting-average
 export const battingAverage = ({ offenseStats }: Player): number => {
     const { hits, atbats } = offenseStats;
-    if (!hits) return 0.000;
-    return atbats / hits;
+    if (!atbats) return 0.000;
+    return hits / atbats;
 };
 
 // https://www.mlb.com/glossary/standard-stats/extra-base-hit

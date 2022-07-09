@@ -29,7 +29,7 @@ const rulesThatDontMatch = (variant: GameConfig['rules'], control: GameConfig['r
 }
 
 const boxScoresDontMatch = (variant: GameMoment['boxScore'], control: GameMoment['boxScore']) => {
-    return variant.length >= control.length || control.some(({homeTeam, awayTeam}, i) => variant[i]?.homeTeam !== homeTeam && variant[i]?.awayTeam !== awayTeam);
+    return variant.length > control.length || control.some(({homeTeam, awayTeam}, i) => variant[i]?.homeTeam !== homeTeam || variant[i]?.awayTeam !== awayTeam);
 };
 
 const Manual: React.FC<Props> = ({ game, handleEdit }) => {
