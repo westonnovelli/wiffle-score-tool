@@ -73,9 +73,10 @@ const BoxScore = ({ boxScore, inningNumber, inningHalf, maxInnings, setBoxScore 
                     <tr className="homeScore">
                         <th>HOME</th>
                         {boxScore.map(({ homeTeam }, i) => {
+                            const score = inningNumber === i + 1 && inningHalf === InningHalf.TOP ? '-' : homeTeam;
                             const cell = editing
                                 ? <NumberInput min="0" max={MAX_SCORE} value={boxScore[i]?.homeTeam ?? 0} onChange={updateInning('homeTeam', i)} />
-                                : homeTeam;
+                                : score;
                             const isActive = inningNumber === i + 1 && inningHalf === InningHalf.BOTTOM;
                             return (
                                 <td key={i} className={`${isActive ? 'active' : ''}`}>{cell}</td>
