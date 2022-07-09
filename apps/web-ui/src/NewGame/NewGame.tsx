@@ -63,13 +63,14 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
             defense: {},
             startingDefense: {},
         };
+        console.log(homeTeamLineup);
         homeTeamLineup.forEach((id) => {
             const name = homeNames[id];
             const position = homePositions[id];
             const player = defaultPlayer(name);
             homeTeam.roster[player.id] = player;
             homeTeam.lineup = [...homeTeam.lineup, player.id];
-            homeTeam.startingLineup = [...homeTeam.lineup, player.id];
+            homeTeam.startingLineup = [...homeTeam.startingLineup, player.id];
             homeTeam.defense[player.id] = position;
             homeTeam.startingDefense[player.id] = position;
         });
@@ -87,7 +88,7 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
             const player = defaultPlayer(name);
             awayTeam.roster[player.id] = player;
             awayTeam.lineup = [...awayTeam.lineup, player.id];
-            awayTeam.startingLineup = [...awayTeam.lineup, player.id];
+            awayTeam.startingLineup = [...awayTeam.startingLineup, player.id];
             awayTeam.defense[player.id] = position;
             awayTeam.startingDefense[player.id] = position;
         });
