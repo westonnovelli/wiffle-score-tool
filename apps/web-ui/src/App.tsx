@@ -133,7 +133,7 @@ function App() {
     };
 
     console.log(newGame);
-    setAudit(prev => [...prev, `newgame: ${newGame}`]);
+    setAudit(prev => [...prev, `newgame`]);
     clearGameAndSyncLS(start(newGame));
     navigate('/');
   }

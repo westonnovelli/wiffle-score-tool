@@ -40,6 +40,42 @@ describe('[offenseStats]', () => {
             expect(offenseStats(initial, game, event)).toEqual(mergeDeepRight(initial, diff));
         });
 
+        test('a strikeout (swinging) updates for the batter (AB, K)', () => {
+            const game: GameMoment = defaultGame();
+            const initial: Team = game.awayTeam;
+            const event: GameEvent = GameEvent.STRIKEOUT_SWINGING;
+            const diff: DeepPartial<Team> = {
+                roster: {
+                    '0': {
+                        offenseStats: {
+                            atbats: 1,
+                            strikeoutsSwinging: 1,
+                        }
+                    }
+                }
+            };
+
+            expect(offenseStats(initial, game, event)).toEqual(mergeDeepRight(initial, diff));
+        });
+
+        test('a strikeout (looking) updates for the batter (AB, _K)', () => {
+            const game: GameMoment = defaultGame();
+            const initial: Team = game.awayTeam;
+            const event: GameEvent = GameEvent.STRIKEOUT_LOOKING;
+            const diff: DeepPartial<Team> = {
+                roster: {
+                    '0': {
+                        offenseStats: {
+                            atbats: 1,
+                            strikeoutsLooking: 1,
+                        }
+                    }
+                }
+            };
+
+            expect(offenseStats(initial, game, event)).toEqual(mergeDeepRight(initial, diff));
+        });
+
         test('an RBI updates the stat for the batter with the number of runs (currently at the plate)', () => {
             const game: GameMoment = defaultGame();
             const initial: Team = game.awayTeam;
@@ -114,52 +150,6 @@ describe('[offenseStats]', () => {
                         offenseStats: {
                             atbats: 1,
                             strikeoutsSwinging: 1,
-                        }
-                    }
-                }
-            };
-
-            expect(offenseStats(initial, state, thrown)).toEqual(mergeDeepRight(initial, diff));
-        });
-
-        test('a strikeout (swinging) updates for the batter (AB, K)', () => {
-            const game: GameMoment = defaultGame();
-            const initial: Team = game.awayTeam;
-            const state = mergeDeepRight(game, {
-                count: {
-                    strikes: 3,
-                }
-            });
-            const thrown: Pitches = Pitches.STRIKE_SWINGING;
-            const diff: DeepPartial<Team> = {
-                roster: {
-                    '0': {
-                        offenseStats: {
-                            atbats: 1,
-                            strikeoutsSwinging: 1,
-                        }
-                    }
-                }
-            };
-
-            expect(offenseStats(initial, state, thrown)).toEqual(mergeDeepRight(initial, diff));
-        });
-
-        test('a strikeout (looking) updates for the batter (AB, _K)', () => {
-            const game: GameMoment = defaultGame();
-            const initial: Team = game.awayTeam;
-            const state = mergeDeepRight(game, {
-                count: {
-                    strikes: 1,
-                }
-            });
-            const thrown: Pitches = Pitches.STRIKE_LOOKING;
-            const diff: DeepPartial<Team> = {
-                roster: {
-                    '0': {
-                        offenseStats: {
-                            atbats: 1,
-                            strikeoutsLooking: 1,
                         }
                     }
                 }

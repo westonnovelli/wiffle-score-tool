@@ -32,6 +32,26 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Game
                         .done(),
                 }
             };
+        case GameEvent.STRIKEOUT_SWINGING:
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [batter]: record(team.roster[batter])
+                        .strikeoutSwinging()
+                        .done(),
+                }
+            };
+        case GameEvent.STRIKEOUT_LOOKING:
+            return {
+                ...team,
+                roster: {
+                    ...team.roster,
+                    [batter]: record(team.roster[batter])
+                        .strikeoutLooking()
+                        .done(),
+                }
+            };
         case GameEvent.RBI:
             return {
                 ...team,
@@ -62,28 +82,32 @@ export function offenseStats(team: Team, game: GameMoment, pitch: Pitches | Game
                         .done(),
                 }
             };
-        case Pitches.STRIKE_SWINGING: {
-            if (game.count.strikes < game.configuration.maxStrikes) return team;
-            return {
-                ...team,
-                roster: {
-                    ...team.roster,
-                    [batter]: record(team.roster[batter])
-                        .strikeoutSwinging()
-                        .done(),
-                }
-            };
-        }
-        case Pitches.STRIKE_LOOKING:
-            return {
-                ...team,
-                roster: {
-                    ...team.roster,
-                    [batter]: record(team.roster[batter])
-                        .strikeoutLooking()
-                        .done(),
-                }
-            };
+        // case Pitches.STRIKE_SWINGING: {
+        //     if (game.count.strikes < game.configuration.maxStrikes) return team;
+        //     return {
+        //         ...team,
+        //         roster: {
+        //             ...team.roster,
+        //             [batter]: record(team.roster[batter])
+        //                 .strikeoutSwinging()
+        //                 .done(),
+        //         }
+        //     };
+        // }
+        // case Pitches.STRIKE_LOOKING:
+        //     if (game.configuration.rules[OptionalRules.CaughtLookingRule]
+        //         || game.count.strikes >= game.configuration.maxStrikes) {
+        //         return {
+        //             ...team,
+        //             roster: {
+        //                 ...team.roster,
+        //                 [batter]: record(team.roster[batter])
+        //                     .strikeoutLooking()
+        //                     .done(),
+        //             }
+        //         };
+        //     }
+        //     return team;
         case Pitches.INPLAY_INFIELD_GRD_OUT:
             return {
                 ...team,
@@ -329,7 +353,6 @@ export function pitchingStats(team: Team, game: GameMoment, pitch: Pitches | Gam
                     ...team.roster,
                     [pitcher]: record(team.roster[pitcher])
                         .pitching('strikes', 1)
-                        .pitching('strikeoutsLooking', 1)
                         .done(),
                 },
             };

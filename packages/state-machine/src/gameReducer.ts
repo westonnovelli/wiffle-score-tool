@@ -87,165 +87,167 @@ export function pitch(initial: GameMoment, pitch: Pitches): GameMoment {
                     ...state,
                     outs: state.outs + 1,
                     count: NEW_COUNT,
-                });
-                return proceed ? batterUp(next) : next;
-            }
+                    [getDefenseKey(state)]: defenseStats(getDefense(state), state, GameEvent.STRIKEOUT_LOOKING),
+                    [getOffenseKey(state)]: offenseStats(getOffense(state), state, GameEvent.STRIKEOUT_LOOKING)
+            });
+            return proceed ? batterUp(next) : next;
+        }
             // just another strike otherwise
             return strike(state).next;
-        }
+    }
         case Pitches.STRIKE_FOUL_ZONE: {
-            // if enabled, acts like a strikeout
-            if (state.configuration.rules[OptionalRules.FoulToTheZoneIsStrikeOut]
-                && state.count.strikes === state.configuration.maxStrikes - 1) {
-                const { next, proceed } = outsReducer({
-                    ...state,
-                    outs: state.outs + 1,
-                    count: NEW_COUNT,
-                });
-                return proceed ? batterUp(next) : next;
-            }
-            // just another foul otherwise
-            return foulBall(state);
+        // if enabled, acts like a strikeout
+        if (state.configuration.rules[OptionalRules.FoulToTheZoneIsStrikeOut]
+            && state.count.strikes === state.configuration.maxStrikes - 1) {
+            const { next, proceed } = outsReducer({
+                ...state,
+                outs: state.outs + 1,
+                count: NEW_COUNT,
+            });
+            return proceed ? batterUp(next) : next;
         }
+        // just another foul otherwise
+        return foulBall(state);
+    }
         case Pitches.STRIKE_FOUL_CAUGHT:
         case Pitches.INPLAY_INFIELD_GRD_OUT:
         case Pitches.INPLAY_INFIELD_AIR_OUT_INFIELD_FLY: // TODO does this actually do anything different
         case Pitches.INPLAY_INFIELD_AIR_OUT:
         case Pitches.INPLAY_OUTFIELD_OUT: {
-            const { next, proceed } = out(state);
-            return proceed ? batterUp(next) : next;
-        }
+        const { next, proceed } = out(state);
+        return proceed ? batterUp(next) : next;
+    }
         case Pitches.INPLAY_OUTFIELD_OUT_TAG_FAIL: {
-            const { next, proceed } = outsReducer({
-                ...state,
-                outs: state.outs + 2,
-                bases: {
-                    ...state.bases,
-                    [Bases.THIRD]: 0,
-                },
-            });
-            return proceed ? batterUp(next) : next;
-        }
+        const { next, proceed } = outsReducer({
+            ...state,
+            outs: state.outs + 2,
+            bases: {
+                ...state.bases,
+                [Bases.THIRD]: 0,
+            },
+        });
+        return proceed ? batterUp(next) : next;
+    }
         case Pitches.INPLAY_OUTFIELD_OUT_TAG_SUCCESS: {
-            const { next: inningContinues, proceed: checkForRuns } = out(state);
-            if (!checkForRuns) return inningContinues;
-            const { next, proceed } = state.bases[Bases.THIRD] === 1
-                ? basesReducer({
-                    ...inningContinues,
-                    bases: {
-                        ...inningContinues.bases,
-                        [Bases.THIRD]: 0,
-                        [Bases.HOME]: inningContinues.bases[Bases.HOME] + 1
-                    },
-                })
-                : { next: inningContinues, proceed: false };
-            return proceed ? batterUp(next) : next;
-        }
+        const { next: inningContinues, proceed: checkForRuns } = out(state);
+        if (!checkForRuns) return inningContinues;
+        const { next, proceed } = state.bases[Bases.THIRD] === 1
+            ? basesReducer({
+                ...inningContinues,
+                bases: {
+                    ...inningContinues.bases,
+                    [Bases.THIRD]: 0,
+                    [Bases.HOME]: inningContinues.bases[Bases.HOME] + 1
+                },
+            })
+            : { next: inningContinues, proceed: false };
+        return proceed ? batterUp(next) : next;
+    }
         case Pitches.STRIKE_FOUL:
-            return foulBall(state);
+    return foulBall(state);
         case Pitches.INPLAY_INFIELD_OUT_DP_SUCCESS: {
-            const forced = forcedRunner(state.bases);
-            if (forced === undefined) {
-                console.warn('double play attemped without a forced runner', state);
-                return state;
-            }
-            const { next: inningContinues, proceed: checkForRuns } = outsReducer({
-                ...state,
-                outs: state.outs + 2,
-                count: NEW_COUNT,
-                bases: {
-                    ...advanceRunners(state.bases, 1),
-                    [forced + 1]: 0,
-                }
-            });
-            const { next, proceed } = checkForRuns
-                ? basesReducer(inningContinues)
-                : { next: inningContinues, proceed: checkForRuns };
-            return proceed ? batterUp(next) : next;
+        const forced = forcedRunner(state.bases);
+        if (forced === undefined) {
+            console.warn('double play attemped without a forced runner', state);
+            return state;
         }
+        const { next: inningContinues, proceed: checkForRuns } = outsReducer({
+            ...state,
+            outs: state.outs + 2,
+            count: NEW_COUNT,
+            bases: {
+                ...advanceRunners(state.bases, 1),
+                [forced + 1]: 0,
+            }
+        });
+        const { next, proceed } = checkForRuns
+            ? basesReducer(inningContinues)
+            : { next: inningContinues, proceed: checkForRuns };
+        return proceed ? batterUp(next) : next;
+    }
         case Pitches.INPLAY_INFIELD_OUT_DP_FAIL: {
-            const forced = forcedRunner(state.bases);
-            if (forced === undefined) {
-                console.warn('double play attemped without a forced runner', state);
-                return state;
+        const forced = forcedRunner(state.bases);
+        if (forced === undefined) {
+            console.warn('double play attemped without a forced runner', state);
+            return state;
+        }
+        const { next: inningContinues, proceed: checkForRuns } = outsReducer({
+            ...state,
+            outs: state.outs + 1,
+            count: NEW_COUNT,
+            bases: {
+                ...advanceRunners(state.bases, 1),
+                [forced + 1]: 0,
+                [Bases.FIRST]: 1,
             }
-            const { next: inningContinues, proceed: checkForRuns } = outsReducer({
-                ...state,
-                outs: state.outs + 1,
-                count: NEW_COUNT,
-                bases: {
-                    ...advanceRunners(state.bases, 1),
-                    [forced + 1]: 0,
-                    [Bases.FIRST]: 1,
-                }
-            });
-            const { next, proceed } = checkForRuns
-                ? basesReducer(inningContinues)
-                : { next: inningContinues, proceed: checkForRuns };
-            return proceed ? batterUp(next) : next;
-        }
+        });
+        const { next, proceed } = checkForRuns
+            ? basesReducer(inningContinues)
+            : { next: inningContinues, proceed: checkForRuns };
+        return proceed ? batterUp(next) : next;
+    }
         case Pitches.INPLAY_INFIELD_SINGLE: {
-            const { next, proceed } = basesReducer({
-                ...state,
-                count: NEW_COUNT,
-                bases: {
-                    ...advanceRunners(state.bases, 1),
-                    [Bases.FIRST]: 1,
-                },
-            });
-            return proceed ? batterUp(next) : next;
-        }
+        const { next, proceed } = basesReducer({
+            ...state,
+            count: NEW_COUNT,
+            bases: {
+                ...advanceRunners(state.bases, 1),
+                [Bases.FIRST]: 1,
+            },
+        });
+        return proceed ? batterUp(next) : next;
+    }
         case Pitches.INPLAY_OUTFIELD_SINGLE: {
-            const extraBase = state.configuration.rules[OptionalRules.RunnersAdvanceExtraOn2Outs]
-                && state.outs === state.configuration.maxOuts - 1;
-            const { next, proceed } = basesReducer({
-                ...state,
-                count: NEW_COUNT,
-                bases: {
-                    ...advanceRunners(state.bases, extraBase ? 2 : 1),
-                    [Bases.FIRST]: 1,
-                },
-            });
-            return proceed ? batterUp(next) : next;
-        }
+        const extraBase = state.configuration.rules[OptionalRules.RunnersAdvanceExtraOn2Outs]
+            && state.outs === state.configuration.maxOuts - 1;
+        const { next, proceed } = basesReducer({
+            ...state,
+            count: NEW_COUNT,
+            bases: {
+                ...advanceRunners(state.bases, extraBase ? 2 : 1),
+                [Bases.FIRST]: 1,
+            },
+        });
+        return proceed ? batterUp(next) : next;
+    }
         case Pitches.INPLAY_DOUBLE: {
-            const extraBase = state.configuration.rules[OptionalRules.RunnersAdvanceExtraOn2Outs]
-                && state.outs === state.configuration.maxOuts - 1;
-            const { next, proceed } = basesReducer({
-                ...state,
-                count: NEW_COUNT,
-                bases: {
-                    ...advanceRunners(state.bases, extraBase ? 3 : 2),
-                    [Bases.SECOND]: 1,
-                },
-            });
-            return proceed ? batterUp(next) : next;
-        }
+        const extraBase = state.configuration.rules[OptionalRules.RunnersAdvanceExtraOn2Outs]
+            && state.outs === state.configuration.maxOuts - 1;
+        const { next, proceed } = basesReducer({
+            ...state,
+            count: NEW_COUNT,
+            bases: {
+                ...advanceRunners(state.bases, extraBase ? 3 : 2),
+                [Bases.SECOND]: 1,
+            },
+        });
+        return proceed ? batterUp(next) : next;
+    }
         case Pitches.INPLAY_TRIPLE: {
-            const { next, proceed } = basesReducer({
-                ...state,
-                count: NEW_COUNT,
-                bases: {
-                    ...advanceRunners(state.bases, 3),
-                    [Bases.THIRD]: 1,
-                },
-            });
-            return proceed ? batterUp(next) : next;
-        }
+        const { next, proceed } = basesReducer({
+            ...state,
+            count: NEW_COUNT,
+            bases: {
+                ...advanceRunners(state.bases, 3),
+                [Bases.THIRD]: 1,
+            },
+        });
+        return proceed ? batterUp(next) : next;
+    }
         case Pitches.INPLAY_HOMERUN: {
-            const { next, proceed } = basesReducer({
-                ...state,
-                count: NEW_COUNT,
-                bases: advanceRunners(state.bases, 4),
-            });
-            return proceed ? batterUp(next) : next;
-        }
+        const { next, proceed } = basesReducer({
+            ...state,
+            count: NEW_COUNT,
+            bases: advanceRunners(state.bases, 4),
+        });
+        return proceed ? batterUp(next) : next;
+    }
         // case Pitches.INTERFERENCE:
         //     throw new Error('interference');
         default:
-            console.warn('PITCH NOT IMPLEMENTED', pitch);
-            return state;
-    }
+    console.warn('PITCH NOT IMPLEMENTED', pitch);
+    return state;
+}
 }
 
 // **********************
@@ -281,6 +283,7 @@ function countReducer(intermediate: GameMoment): ChainingReducer {
         const withStats = {
             ...intermediate,
             [getDefenseKey(intermediate)]: defenseStats(getDefense(intermediate), intermediate, event),
+            [getOffenseKey(intermediate)]: offenseStats(getOffense(intermediate), intermediate, event),
         }
         const { next, proceed } = outsReducer(mergeDeepRight(withStats, { outs: withStats.outs + 1, count: NEW_COUNT }));
         return { next: proceed ? batterUp(next) : next, proceed };
