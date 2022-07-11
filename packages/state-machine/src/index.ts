@@ -25,6 +25,7 @@ export {
     defaultTeam,
     newTeam,
     EMPTY_BASES,
+    EMPTY_BOX,
 } from './factory';
 export { default as hydrateGame } from './history/hydrate';
 export { serializeGame, deserializeGame } from './io';
