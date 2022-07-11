@@ -2,6 +2,7 @@ import React from "react";
 import { GameMoment, InningHalf, Score, Team, teamEarnedHits, teamLOB } from "@wiffleball/state-machine";
 import './BoxScore.css';
 import NumberInput from "./NumberInput";
+import { safeParseInt } from "../helpers";
 
 type BoxScoreProps = {
     boxScore: GameMoment['boxScore'];
@@ -31,7 +32,7 @@ const BoxScore = ({
         return total;
     }, [0, 0]);
 
-    const inningsToShow = Math.max(boxScore.length, maxInnings);
+    const inningsToShow = Math.max(boxScore.length, maxInnings, inningNumber);
     const inningsDiff = inningsToShow - boxScore.length;
     const editing = Boolean(setBoxScore);
 
@@ -42,7 +43,7 @@ const BoxScore = ({
             const next = [...prev];
             next[inning] = {
                 ...next[inning],
-                [half]: parseInt(e.target.value),
+                [half]: safeParseInt(e.target.value),
             };
             return next;
         });

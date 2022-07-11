@@ -1,5 +1,6 @@
 import { Position, Team } from "@wiffleball/state-machine";
 import React from "react";
+import { safeParseInt } from "../helpers";
 import './TeamBuilder.css';
 
 const allPositions = [
@@ -16,7 +17,7 @@ type PositionSelectProps = {
 
 const PositionSelect: React.FC<PositionSelectProps> = ({ position, setPosition, ...props }) => {
     return (
-        <select value={position} onChange={(e) => setPosition?.(parseInt(e.target.value))} {...props}>
+        <select value={position} onChange={(e) => setPosition?.(safeParseInt(e.target.value))} {...props}>
             {allPositions.map(({ label, value }) => {
                 return (
                     <option key={value} value={value}>{label}</option>
@@ -125,7 +126,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({
                                     <>
                                         <button className="moveup" onClick={() => move(i, -1)} disabled={i === 0}>▲</button>
                                         <input value={name} onChange={(e) => rename(id, e.target.value)} />
-                                        <PositionSelect position={position} onChange={(e) => reposition(id, parseInt(e.target.value))} />
+                                        <PositionSelect position={position} onChange={(e) => reposition(id, safeParseInt(e.target.value))} />
                                         <button className="movedown" onClick={() => move(i, 1)} disabled={i === lineup.length - 1}>▼</button>
                                         <button className="remove" onClick={() => remove(i)}>X</button>
                                     </>

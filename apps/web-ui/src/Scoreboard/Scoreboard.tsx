@@ -26,14 +26,16 @@ const Scoreboard: React.FC<Props> = ({ game }) => {
 
     return (
         <div className="scoreboard">
-            <BoxScore
-                maxInnings={game.configuration.maxInnings}
-                inningNumber={game.inning.number}
-                inningHalf={game.inning.half}
-                awayTeam={game.awayTeam}
-                homeTeam={game.homeTeam}
-                boxScore={game.boxScore}
-            />
+            <div className="boxScoreContainer">
+                <BoxScore
+                    maxInnings={game.configuration.maxInnings}
+                    inningNumber={game.inning.number}
+                    inningHalf={game.inning.half}
+                    awayTeam={game.awayTeam}
+                    homeTeam={game.homeTeam}
+                    boxScore={game.boxScore}
+                />
+            </div>
             <BasesRender
                 first={game.bases[Bases.FIRST]}
                 second={game.bases[Bases.SECOND]}

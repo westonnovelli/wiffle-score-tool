@@ -17,6 +17,11 @@
     display: inline-block;
 }
 
+.manual .boxScoreContainer {
+    width: 100%;
+    overflow-x: auto;
+}
+
 .manual .count {
     display: flex;
     align-items: center;

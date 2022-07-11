@@ -1,4 +1,5 @@
 import React from 'react';
+import { safeParseInt } from '../helpers';
 import './GameConfigControl.css';
 import NumberInput from './NumberInput';
 
@@ -50,7 +51,7 @@ const GameConfigControl: React.FC<Props> = ({
             <div>
                 <NumberInput
                     value={maxStrikes}
-                    onChange={(e) => setMaxStrikes(parseInt(e.target.value))}
+                    onChange={(e) => setMaxStrikes(safeParseInt(e.target.value, 1))}
                     name="maxStrikes"
                     min={1}
                     max={MAX_STRIKES}
@@ -60,7 +61,7 @@ const GameConfigControl: React.FC<Props> = ({
             <div>
                 <NumberInput
                     value={maxBalls}
-                    onChange={(e) => setMaxBalls(parseInt(e.target.value))}
+                    onChange={(e) => setMaxBalls(safeParseInt(e.target.value, 1))}
                     name="maxBalls"
                     min={1}
                     max={MAX_BALLS}
@@ -70,7 +71,7 @@ const GameConfigControl: React.FC<Props> = ({
             <div>
                 <NumberInput
                     value={maxOuts}
-                    onChange={(e) => setMaxOuts(parseInt(e.target.value ?? 0))}
+                    onChange={(e) => setMaxOuts(safeParseInt(e.target.value, 1))}
                     name="maxOuts"
                     min={1}
                     max={MAX_OUTS}
@@ -80,7 +81,7 @@ const GameConfigControl: React.FC<Props> = ({
             <div>
                 <NumberInput
                     value={maxRuns}
-                    onChange={(e) => setMaxRuns(parseInt(e.target.value))}
+                    onChange={(e) => setMaxRuns(safeParseInt(e.target.value, 0))}
                     name="maxRuns"
                     min={0}
                     max={MAX_RUNS}
@@ -90,7 +91,7 @@ const GameConfigControl: React.FC<Props> = ({
             <div>
                 <NumberInput
                     value={maxInnings}
-                    onChange={(e) => setMaxInnings(parseInt(e.target.value))}
+                    onChange={(e) => setMaxInnings(safeParseInt(e.target.value, 1))}
                     name="maxInnings"
                     min={1}
                     max={MAX_INNINGS}
@@ -100,7 +101,7 @@ const GameConfigControl: React.FC<Props> = ({
             <div>
                 <NumberInput
                     value={maxFielders}
-                    onChange={(e) => setMaxFielders(parseInt(e.target.value))}
+                    onChange={(e) => setMaxFielders(safeParseInt(e.target.value, 1))}
                     name="maxFielders"
                     min={1}
                     max={MAX_FIELDERS}

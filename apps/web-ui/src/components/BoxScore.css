@@ -1,13 +1,15 @@
-.boxScore {
-    display: flex;
-    justify-content: center;
-    background-color: var(--color-primary);
-    padding: 0 32px;
-}
+/* .boxScore {} */
 
 .boxScore table {
     border: 1px solid black;
     border-collapse: collapse;
+    background-color: var(--color-primary);
+    display: inline-block;
+    max-width: 100%;
+    position: relative;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    overflow-x: scroll;
 }
 
 .boxScore table thead tr td {

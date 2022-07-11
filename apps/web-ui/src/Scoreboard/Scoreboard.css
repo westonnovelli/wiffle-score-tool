@@ -4,6 +4,11 @@
     padding-top: 32px;
 }
 
+.scoreboard .boxScoreContainer {
+    width: 100%;
+    overflow-x: auto;
+}
+
 /* bases */
 .scoreboard .bases {
     position: relative;

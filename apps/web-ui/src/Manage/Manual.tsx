@@ -3,6 +3,7 @@ import {
     InningHalf,
     OptionalRules,
     EMPTY_BASES,
+    EMPTY_BOX,
     type GameMoment,
     type DeepPartial,
     type GameConfig,
@@ -14,6 +15,7 @@ import RulesControl from "../components/RulesControl";
 import GameConfigControl from "../components/GameConfigControl";
 import BoxScore from "../components/BoxScore";
 import NumberInput from "../components/NumberInput";
+import { safeParseInt } from "../helpers";
 // import { useNavigate } from "react-router-dom";
 
 interface Props {
@@ -176,7 +178,22 @@ const Manual: React.FC<Props> = ({ game, handleEdit }) => {
                 <NumberInput
                     name="inningNumber"
                     value={inningNumber}
-                    onChange={(e) => setInningNumber(parseInt(e.target.value))}
+                    onChange={(e) => {
+                        const newInningNumber = safeParseInt(e.target.value, 1);
+                        setInningNumber(newInningNumber);
+                        if (newInningNumber > boxScore.length) {
+                            const extrasToAdd = newInningNumber - boxScore.length;
+                            setBoxScore(prev => {
+                                return [...prev,
+                                    ...Array.from(Array(extrasToAdd)).map((_) => ({...EMPTY_BOX})),
+                                ]
+                            });
+                        }
+                        if (newInningNumber >= game.boxScore.length && newInningNumber <= boxScore.length) {
+                            console.log(newInningNumber);
+                            setBoxScore(prev => prev.slice(0, newInningNumber));
+                        }
+                    }}
                     min={1}
                     max={20} // arbitrary but so be it
                 />
@@ -201,22 +218,24 @@ const Manual: React.FC<Props> = ({ game, handleEdit }) => {
                     <label htmlFor="inningBottom">Bottom</label>
                 </div>
             </fieldset>
-            <BoxScore
-                maxInnings={game.configuration.maxInnings}
-                inningNumber={game.inning.number}
-                inningHalf={game.inning.half}
-                boxScore={boxScore}
-                awayTeam={game.awayTeam}
-                homeTeam={game.homeTeam}
-                setBoxScore={setBoxScore}
-            />
+            <div className="boxScoreContainer">
+                <BoxScore
+                    maxInnings={game.configuration.maxInnings}
+                    inningNumber={inningNumber}
+                    inningHalf={inningHalf}
+                    boxScore={boxScore}
+                    awayTeam={game.awayTeam}
+                    homeTeam={game.homeTeam}
+                    setBoxScore={setBoxScore}
+                />
+            </div>
             <fieldset className="count">
                 <legend>Count</legend>
                 <label htmlFor="countBalls">Balls</label>
                 <NumberInput
                     name="countBalls"
                     value={balls}
-                    onChange={(e) => void setBalls(parseInt(e.target.value))}
+                    onChange={(e) => void setBalls(safeParseInt(e.target.value))}
                     max={game.configuration.maxBalls - 1}
                     min={0}
                 />
@@ -224,7 +243,7 @@ const Manual: React.FC<Props> = ({ game, handleEdit }) => {
                 <NumberInput
                     name="countStrikes"
                     value={strikes}
-                    onChange={(e) => void setStrikes(parseInt(e.target.value))}
+                    onChange={(e) => void setStrikes(safeParseInt(e.target.value))}
                     max={game.configuration.maxStrikes - 1}
                     min={0}
                 />
@@ -232,7 +251,7 @@ const Manual: React.FC<Props> = ({ game, handleEdit }) => {
                 <NumberInput
                     name="outs"
                     value={outs}
-                    onChange={(e) => void setOuts(parseInt(e.target.value))}
+                    onChange={(e) => void setOuts(safeParseInt(e.target.value))}
                     max={game.configuration.maxOuts - 1}
                     min={0}
                 />
