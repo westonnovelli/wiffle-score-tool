@@ -1,0 +1,38 @@
+.feed {
+    margin: 16px 0 64px 0;
+    padding: 8px;
+    color: var(--color-text);
+    box-shadow: var(--elevation-1);
+}
+
+.feed button {
+    background: var(--color-primary);
+    border: none;
+    cursor: pointer;
+    color: var(--color-text);
+    font-size: initial;
+    width: 100%;
+    text-align: left;
+    position: relative;
+}
+
+.feed button svg {
+    fill: var(--color-text);
+    position: absolute;
+    right: 0;
+    height: 24px;
+}
+
+.feed button.open svg {
+    transform: rotate(.5turn);
+}
+
+.feed ul {
+    list-style: none;
+    margin: 0;
+    padding: 0 8px;
+}
+
+.feed ul li {
+
+}

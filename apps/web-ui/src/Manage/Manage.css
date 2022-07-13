@@ -10,21 +10,31 @@
     margin: 0;
 }
 
-.manage ul li {
-    padding: 32px 16px;
+.manage ul li.menuitem {
+    padding: 24px 16px;
     margin-bottom: 8px;
     box-shadow: var(--elevation-2);
     font-size: 24px;
     background-color: var(--color-primary-light);
     color: var(--color-text);
     border-radius: 4px;
-}
-
-.manage ul li[role="button"] {
     cursor: pointer;
+    display: flex;
+    align-items: center;
 }
 
-.manage ul li div {
-    color: var(--color-text-subtle);
-    font-size: .8em;
+.manage ul li.menuitem div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.manage ul li.menuitem svg {
+    transform: rotate(.75turn);
+    fill: var(--color-text);
+    height: 32px;
+}
+
+.manage ul li.menuitem span {
+    font-size: .6em;
 }

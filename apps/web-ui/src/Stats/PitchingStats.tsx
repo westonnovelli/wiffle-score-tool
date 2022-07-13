@@ -37,7 +37,7 @@ const PitchingTable: React.FC<PitchingTableProps> = ({ team, label, className })
                         <td>Player</td>
                         <td>BF</td>
                         <td>PC</td>
-                        <td>K/B</td>
+                        <td>S/B</td>
                         <td>H</td>
                         <td>K</td>
                         <td>ꓘ</td>

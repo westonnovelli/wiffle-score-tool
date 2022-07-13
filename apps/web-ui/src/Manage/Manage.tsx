@@ -3,6 +3,25 @@ import React from "react";
 import './Manage.css';
 import { useNavigate } from "react-router-dom";
 import Structure from "./Structure";
+import { Chevron } from "../icons";
+import { pitchDescriptions } from "../helpers";
+
+interface MenuItemProps {
+    label: string;
+    icon?: React.ReactNode;
+    description?: string;
+    onClick: React.MouseEventHandler<HTMLLIElement>
+}
+
+const MenuItem: React.FC<MenuItemProps> = ({ onClick, label, icon = <Chevron />, description }) => (
+    <li className="menuitem" role="button" onClick={onClick}>
+        <div>
+            {label}
+            {Boolean(description) && <span>{description}</span>}
+        </div>
+        {icon}
+    </li>
+);
 
 interface Props {
     game: GameMoment;
@@ -23,7 +42,6 @@ const Manage: React.FC<Props> = ({
     canUndo,
     canRedo
 }) => {
-    // TODO abstract friendly pitch names
     const navigate = useNavigate();
 
     const handleManual = () => {
@@ -58,22 +76,26 @@ const Manage: React.FC<Props> = ({
         <Structure className="manage" title={<h1>Manage game</h1>}>
             <ul>
                 {/* TODO figure out better undo/redo UI */}
-                {canUndo && <li role="button" onClick={undo}>
-                    Undo last pitch
-                    <span>{' '}({Pitches[game.pitches[game.pitches.length - 1]]})</span>
-                </li>}
-                {canRedo && <li role="button" onClick={redo}>
-                    Redo last undo
-                    <span>{' '}({Pitches[next.pitches[next.pitches.length - 1]]})</span>
-                </li>}
-                <li role="button" onClick={handleSubstitute}>Substitution (defense) ᐳ</li>
-                <li role="button" onClick={() => handleRoster('home')}>Home Team ᐳ</li>
-                <li role="button" onClick={() => handleRoster('away')}>Away Team ᐳ</li>
-                <li role="button" onClick={handleManual}>Manually adjust game state ᐳ</li>
-                <li role="button" onClick={handleNew}>New Game<div>abandon this game</div></li>
-                <li role="button" onClick={handleStash}>Save this game<div>game will be available on this device</div></li>
-                <li role="button" onClick={handleLoad}>Load a saved game</li>
-                <li role="button" onClick={handleShare}>Share this game by url</li>
+                {canUndo && (
+                    <MenuItem
+                        onClick={undo}
+                        label="Undo last pitch"
+                        description={`(${pitchDescriptions[game.pitches[game.pitches.length - 1]]})`}
+                    />)}
+                {canRedo && (
+                    <MenuItem
+                        onClick={redo}
+                        label="Redo last undo"
+                        description={`(${pitchDescriptions[next.pitches[next.pitches.length - 1]]})`}
+                    />)}
+                <MenuItem onClick={handleSubstitute} label="Substitution (defense)" />
+                <MenuItem onClick={() => handleRoster('home')} label="Home Team" />
+                <MenuItem onClick={() => handleRoster('away')} label="Away Team" />
+                <MenuItem onClick={handleManual} label="Manually adjust game state" />
+                <MenuItem onClick={handleNew} label="New Game" description="abandon this game" />
+                <MenuItem onClick={handleStash} label="Save this game" description="game will be available on this device" />
+                <MenuItem onClick={handleLoad} label="Load a saved game" />
+                <MenuItem onClick={handleShare} label="Share this game by url" />
             </ul>
         </Structure>
     );

@@ -27,6 +27,24 @@
     box-sizing: border-box;
 }
 
+.nav button.nav-btn svg,
+.nav a.nav-btn svg {
+    fill: var(--color-text);
+    height: 36px;
+}
+
+.nav button.nav-btn svg.left,
+.nav a.nav-btn svg.left {
+    transform: rotate(.25turn);
+    margin-left: -16px;
+}
+
+.nav button.nav-btn svg.right,
+.nav a.nav-btn svg.right {
+    transform: rotate(-.25turn);
+    margin-right: -16px;
+}
+
 .nav a.nav-btn:first-child {
     border-radius: 0 8px 0 0;
 }

@@ -49,7 +49,9 @@ export const totalBases = ({ offenseStats }: Player): number => {
 
 // https://www.mlb.com/glossary/standard-stats/number-of-pitches
 export const pitchCount = ({ defenseStats }: Player): number => {
-    return 0; // TODO
+    const { pitching } = defenseStats;
+    const { balls, strikes, groundOuts, flyOuts, singles, doubles, triples, homeruns,  } = pitching;
+    return  balls + strikes + groundOuts + flyOuts + singles + doubles + triples + homeruns;
 };
 
 // https://www.mlb.com/glossary/standard-stats/appearance

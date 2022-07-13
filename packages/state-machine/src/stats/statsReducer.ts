@@ -380,6 +380,7 @@ export function pitchingStats(team: Team, game: GameMoment, pitch: Pitches | Gam
             };
         case Pitches.STRIKE_FOUL_CAUGHT:
         case Pitches.INPLAY_INFIELD_AIR_OUT:
+        case Pitches.INPLAY_INFIELD_AIR_OUT_INFIELD_FLY:
         case Pitches.INPLAY_OUTFIELD_OUT:
         case Pitches.INPLAY_OUTFIELD_OUT_TAG_FAIL:
         case Pitches.INPLAY_OUTFIELD_OUT_TAG_SUCCESS:

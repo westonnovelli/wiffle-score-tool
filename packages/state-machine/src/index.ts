@@ -35,6 +35,7 @@ export { default as manualEdit } from './edits/manualEdit';
 export { getPitcher, getInfield, getOutfield, getBench } from './defense/getPosition';
 export { pitcherSwap, fielderSwap, fielderRotate } from './edits/commonEdits';
 export { default as getPossiblePitches } from './pitches/possiblePitches';
+export { default as lastPitch } from './history/lastPitch';
 export {
     battingAverage,
     extraBaseHit,

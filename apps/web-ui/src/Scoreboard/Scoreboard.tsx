@@ -4,11 +4,14 @@ import {
     getOffense,
     getDefense,
     getPitcher,
-    InningHalf
+    InningHalf,
+    Player,
+    pitchCount,
 } from '@wiffleball/state-machine';
 import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 import BoxScore from '../components/BoxScore';
+import Feed from '../Feed/Feed';
 import './Scoreboard.css';
 
 interface Props {
@@ -20,9 +23,9 @@ const Scoreboard: React.FC<Props> = ({ game }) => {
     const offenseRoster = getOffense(game).roster;
     const defenseRoster = getDefense(game).roster;
     const pitcherId = getPitcher(getDefense(game)) ?? 'cannot find pitcher';
-    const pitcher = defenseRoster[pitcherId]?.name ?? pitcherId;
-    const atBatId = game.atBat ?? `cannot find batter ${game.atBat}`;
-    const batter = offenseRoster[atBatId]?.name ?? atBatId;
+    const pitcher = defenseRoster[pitcherId];
+    const atBatId = game.atBat;
+    const batter = offenseRoster[atBatId];
 
     return (
         <div className="scoreboard">
@@ -49,6 +52,7 @@ const Scoreboard: React.FC<Props> = ({ game }) => {
                 outs={game.outs}
             />
             <Players batter={batter} pitcher={pitcher} inningHalf={game.inning.half} />
+            <Feed game={game} />
         </div >
     );
 };
@@ -148,22 +152,28 @@ const AnimatedName: React.FC<AnimatedNameProps> = ({ children }) => {
 };
 
 interface PlayersProps {
-    batter: string;
-    pitcher: string;
+    batter: Player;
+    pitcher: Player;
     inningHalf: InningHalf;
 }
 
-const Players = React.memo(({ batter, pitcher, inningHalf }: PlayersProps) => (
-    <AnimatePresence>
-        <div className="players">
-            <div className={`batter ${inningHalf === InningHalf.TOP ? 'away' : 'home'}`}>
-                <span>AB:</span> <AnimatedName>{batter}</AnimatedName>
+const Players = React.memo(({ batter, pitcher, inningHalf }: PlayersProps) => {
+    return (
+        <AnimatePresence>
+            <div className="players">
+                <div className={`batter ${inningHalf === InningHalf.TOP ? 'away' : 'home'}`}>
+                    <AnimatedName>{batter?.name}</AnimatedName>
+                    <label>at bat</label>
+                    <span className="stat">{batter?.offenseStats?.hits} for {batter?.offenseStats?.atbats}</span>
+                </div>
+                <div className={`pitcher ${inningHalf === InningHalf.BOTTOM ? 'away' : 'home'}`}>
+                    <AnimatedName>{pitcher?.name}</AnimatedName>
+                    <label>pitching</label>
+                    <span className="stat">{pitchCount(pitcher)} pitches</span>
+                </div>
             </div>
-            <div className={`pitcher ${inningHalf === InningHalf.BOTTOM ? 'away' : 'home'}`}>
-                <span>P:</span> <AnimatedName>{pitcher}</AnimatedName>
-            </div>
-        </div>
-    </AnimatePresence>
-));
+        </AnimatePresence>
+    );
+});
 
 export default Scoreboard;
