@@ -1,7 +1,7 @@
 .scoreboard {
     display: flex;
     flex-direction: column;
-    padding-top: 32px;
+    padding-top: 16px;
     scrollbar-width: 0;
 }
 

@@ -30,6 +30,7 @@ import {
   hydrateGame,
 } from '@wiffleball/state-machine';
 import Nav from './Nav/Nav';
+// import Nav from './NavNew/Nav';
 import Manage from './Manage/Manage';
 import Stats from './Stats/Stats';
 import NewGame from './NewGame/NewGame';

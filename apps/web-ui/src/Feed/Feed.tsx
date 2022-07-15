@@ -1,18 +1,17 @@
 import React from "react";
 import { Collapse } from 'react-collapse';
-import { GameMoment, Pitches } from "@wiffleball/state-machine";
+import { GameMoment } from "@wiffleball/state-machine";
 import './Feed.css';
 import { Chevron } from "../icons";
 import { pitchDescriptions } from "../helpers";
 
 interface Props {
     game: GameMoment;
-    past?: GameMoment[];
 }
 
 const FEED_LENGTH = 10;
 
-const Feed: React.FC<Props> = ({ game, past }) => {
+const Feed: React.FC<Props> = ({ game }) => {
     const [recentPitchesOpen, setRecentPitchesOpen] = React.useState(true);
     return (
         <div className="feed">

@@ -1,4 +1,4 @@
-import { GameMoment, Pitches } from "@wiffleball/state-machine";
+import { GameMoment } from "@wiffleball/state-machine";
 import React from "react";
 import './Manage.css';
 import { useNavigate } from "react-router-dom";
