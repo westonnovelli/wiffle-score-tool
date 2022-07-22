@@ -34,3 +34,13 @@
 .newgame button.start:disabled {
     margin-top: 0;
 }
+
+.newgame button.swap-teams {
+    display: flex;
+    align-items: center;
+    margin: 16px;
+}
+
+.newgame button.swap-teams svg {
+    height: 16px;
+}

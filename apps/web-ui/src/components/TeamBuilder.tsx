@@ -49,7 +49,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({
     editing,
 }) => {
     const [pendingName, setPendingName] = React.useState('');
-    const [pendingPosition, setPendingPosition] = React.useState<Position>(Position.Infield);
+    const [pendingPosition, setPendingPosition] = React.useState<Position>(Position.Pitcher);
 
     const add = () => {
         const tempId = `${pendingName}-temp${lineup.length}`;

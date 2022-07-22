@@ -5,6 +5,7 @@ import GameConfigControl from "../components/GameConfigControl";
 import RulesControl from "../components/RulesControl";
 import TeamBuilder from '../components/TeamBuilder';
 import './NewGame.css';
+import { SwapVert } from "../icons";
 
 interface Props {
     handleStart: (
@@ -38,11 +39,9 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
     const isValid = 
            homeTeamLineup.length >= 1
         && awayTeamLineup.length >= 1
-        && Object.values(homePositions).includes(Position.Pitcher)
-        && Object.values(awayPositions).includes(Position.Pitcher)
+        && Object.values(homePositions).filter(p => p === Position.Pitcher).length === 1
+        && Object.values(awayPositions).filter(p => p === Position.Pitcher).length === 1
         && maxStrikes >= 1 && maxBalls >= 0 && maxOuts >= 0 && maxInnings >= 1;
-
-    console.log({homePositions, awayPositions});
 
     const prepStart = () => {
         const config: GameConfig = {
@@ -64,7 +63,6 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
             defense: {},
             startingDefense: {},
         };
-        console.log(homeTeamLineup);
         homeTeamLineup.forEach((id) => {
             const name = homeNames[id];
             const position = homePositions[id];
@@ -95,6 +93,20 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
         });
 
         handleStart(config, homeTeam, awayTeam);
+    };
+
+    const swapTeams = () => {
+        const tempLineup = [...homeTeamLineup];
+        const tempNames = {...homeNames};
+        const tempPositions = {...homePositions};
+
+        setHomeTeamLineup([...awayTeamLineup]);
+        setHomeNames({...awayNames});
+        setHomePositions({...awayPositions});
+
+        setAwayTeamLineup(tempLineup);
+        setAwayNames(tempNames);
+        setAwayPositions(tempPositions);
     };
 
     return (
@@ -129,6 +141,7 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
                 setPositions={setHomePositions}
                 editing
             />
+            <button className="swap-teams" onClick={swapTeams}><SwapVert/>Swap home/away</button>
             <h2>Away team</h2>
             <TeamBuilder
                 lineup={awayTeamLineup}
