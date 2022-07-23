@@ -44,6 +44,7 @@ import BattingStats from './Stats/BattingStats';
 import Stash from './Manage/Stash';
 import Load from './Manage/Load';
 import Share from './Manage/Share';
+import Export from './Manage/Export';
 
 const getGameSeed = (searchParams: URLSearchParams, lsGame: string | null) => {
   if (searchParams.get('game')) {
@@ -221,6 +222,7 @@ function App() {
             <Route path="stash" element={<Stash />} />
             <Route path="load" element={<Load loadSave={loadSave}/>} />
             <Route path="share" element={<Share />} />
+            <Route path="export" element={<Export game={game} />} />
           </Route>
           <Route path="stats" element={<Stats />}>
             <Route path="batting" element={<BattingStats game={game} />} />

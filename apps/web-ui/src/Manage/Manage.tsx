@@ -1,27 +1,10 @@
-import { GameMoment } from "@wiffleball/state-machine";
 import React from "react";
+import { GameMoment } from "@wiffleball/state-machine";
 import './Manage.css';
 import { useNavigate } from "react-router-dom";
 import Structure from "./Structure";
-import { Chevron } from "../icons";
 import { pitchDescriptions } from "../helpers";
-
-interface MenuItemProps {
-    label: string;
-    icon?: React.ReactNode;
-    description?: string;
-    onClick: React.MouseEventHandler<HTMLLIElement>
-}
-
-const MenuItem: React.FC<MenuItemProps> = ({ onClick, label, icon = <Chevron />, description }) => (
-    <li className="menuitem" role="button" onClick={onClick}>
-        <div>
-            {label}
-            {Boolean(description) && <span>{description}</span>}
-        </div>
-        {icon}
-    </li>
-);
+import MenuItem from '../components/MenuItem';
 
 interface Props {
     game: GameMoment;
@@ -72,6 +55,10 @@ const Manage: React.FC<Props> = ({
         navigate('share');
     };
 
+    const handleExport = () => {
+        navigate('export');
+    };
+
     return (
         <Structure className="manage" title={<h1>Manage game</h1>}>
             <ul>
@@ -96,6 +83,7 @@ const Manage: React.FC<Props> = ({
                 <MenuItem onClick={handleStash} label="Save this game" description="game will be available on this device" />
                 <MenuItem onClick={handleLoad} label="Load a saved game" />
                 <MenuItem onClick={handleShare} label="Share this game by url" />
+                <MenuItem onClick={handleExport} label="Export stats" description="as csv, for current game" />
             </ul>
         </Structure>
     );
