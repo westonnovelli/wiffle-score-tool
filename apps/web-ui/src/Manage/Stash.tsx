@@ -52,10 +52,10 @@ const Stash: React.FC = () => {
                 <div className="prompt">Save this game with the following name</div>
                 <input
                     value={saveName}
-                    onChange={(e) => setSaveName(e.target.value)}
+                    onChange={(e) => setSaveName(((e?.target?.value) ?? '').trim())}
                     onFocus={(e) => { e.target?.select(); }}
                 />
-                <button onClick={onSave} disabled={disabled}>Save game</button>
+                {!overwriteEnabled && <button onClick={onSave} disabled={disabled}>Save game</button>}
                 {overwriteEnabled && <button onClick={onSave} disabled={!overwriteEnabled}>Overwrite existing game</button>}
             </div>
         </Structure>

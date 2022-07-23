@@ -19,14 +19,30 @@ const Load: React.FC<Props> = ({ loadSave }) => {
         navigate('/');
     };
 
+    const clearSaves = () => {
+        if (window.confirm('Are you sure? These games cannot be recovered.')) {
+            saves?.forEach((save) => {
+                localStorage.removeItem(`${SAVE_PREFIX}${save}`);
+            });
+            localStorage.removeItem(SAVES);
+            navigate('/');
+        }
+    };
+
     return (
-        <Structure className="manage" title={<h1>Load game</h1>}>
+        <Structure className="load" title={<h1>Load game</h1>}>
             <ul>
                 {saves && saves.map((saveName) => (
-                    <li key={saveName} role="button" onClick={() => handleLoad(saveName)}>{saveName}</li>
+                    <li key={saveName} role="button" onClick={() => handleLoad(saveName)} className="save">{saveName}</li>
                 ))}
                 {!saves && <div className="empty">No saved games found</div>}
             </ul>
+            {saves && (
+                <>
+                    <button className="clear" onClick={clearSaves}>Clear all saves</button>
+                    <div className="hint">this cannot be undone</div>
+                </>
+            )}
         </Structure>
     );
 };
