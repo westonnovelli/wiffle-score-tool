@@ -12,21 +12,16 @@
     text-align: center;
 }
 
-.manage-share .link {
-    white-space: pre-wrap;
-    word-break: break-all;
-    max-height: 60vh;
-    overflow: hidden;
+.manage-share .qr-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px 0;
 }
 
-.manage-share .link a {
-    color: var(--color-text-subtle);
-}
-
-.manage-share button {
-
-}
-
-.manage-share .confirm {
-
+.manage-share input {
+    border: none;
+    color: var(--color-text);
+    background: var(--color-primary);
 }
