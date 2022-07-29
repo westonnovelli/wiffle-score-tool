@@ -29,8 +29,8 @@ import {
   deserializeGame,
   hydrateGame,
 } from '@wiffleball/state-machine';
-import Nav from './Nav/Nav';
-// import Nav from './NavNew/Nav';
+// import Nav from './Nav/Nav';
+import Nav from './NavNew/Nav';
 import Manage from './Manage/Manage';
 import Stats from './Stats/Stats';
 import NewGame from './NewGame/NewGame';
@@ -45,6 +45,7 @@ import Stash from './Manage/Stash';
 import Load from './Manage/Load';
 import Share from './Manage/Share';
 import Export from './Manage/Export';
+import About from './About/About';
 
 const getGameSeed = (searchParams: URLSearchParams, lsGame: string | null) => {
   if (searchParams.get('game')) {
@@ -187,6 +188,7 @@ function App() {
           <Route index element={
             <Main game={game} selectingPitch={selectingPitch} handlePitch={handlePitch} />
           } />
+          <Route path="about" element={<About />} />
           <Route path="manage">
             <Route index element={
               <Manage

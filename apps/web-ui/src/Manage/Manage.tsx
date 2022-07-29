@@ -59,6 +59,10 @@ const Manage: React.FC<Props> = ({
         navigate('export');
     };
 
+    const handleAbout = () => {
+        navigate('/about');
+    };
+
     return (
         <Structure className="manage" title={<h1>Manage game</h1>}>
             <ul>
@@ -84,6 +88,7 @@ const Manage: React.FC<Props> = ({
                 <MenuItem onClick={handleLoad} label="Load a saved game" />
                 <MenuItem onClick={handleShare} label="Share this game by url" />
                 <MenuItem onClick={handleExport} label="Export stats" description="as csv, for current game" />
+                <MenuItem onClick={handleAbout} label="About" />
             </ul>
         </Structure>
     );

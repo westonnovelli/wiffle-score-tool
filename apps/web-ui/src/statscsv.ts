@@ -7,10 +7,14 @@ import {
     onBasePercentage,
     onBasePlusSlugging,
     sluggingPercentage,
-    totalBases
+    totalBases,
+    pitchCount,
+    hits,
+    walksAndHitsPerInningPitched
 } from "@wiffleball/state-machine";
 
 const battingHeaders = [
+    '',
     'player id',
     'name',
     'plate appearances',
@@ -80,3 +84,49 @@ export const generateBattingCSV = (game: GameMoment) => {
      + battingData.map(d => d.join(',')).join('\r\n');
 };
 
+const pitchingHeaders = [
+    '',
+    'player id',
+    'name',
+    'batters faced',
+    'pitch count',
+    'strikes',
+    'balls',
+    'hits allowed',
+    'strikeouts (swinging)',
+    'strikeouts (looking)',
+    'walks',
+    'runs allowed',
+    'WHIP',
+    'wild pitches',
+];
+
+const pitching = (player: Player) => {
+    return [
+        player.id,
+        player.name,
+        player.defenseStats.pitching.battersFaced,
+        pitchCount(player),
+        player.defenseStats.pitching.strikes,
+        player.defenseStats.pitching.balls,
+        hits(player),
+        player.defenseStats.pitching.strikeoutsSwinging,
+        player.defenseStats.pitching.strikeoutsLooking,
+        player.defenseStats.pitching.walks,
+        player.defenseStats.pitching.runsAllowed,
+        walksAndHitsPerInningPitched(player).toFixed(3),
+        player.defenseStats.pitching.wildPitches,
+    ];
+};
+
+export const generatePitchingCSV = (game: GameMoment) => {
+    const { homeTeam, awayTeam } = game;
+
+    const homePitching = Object.values(homeTeam.roster).map(pitching);
+    const awayPitching = Object.values(awayTeam.roster).map(pitching);
+
+    const pitchingData = [pitchingHeaders, ...homePitching, ...awayPitching];
+
+    return 'data:text/csv;charset=utf-8'
+     + pitchingData.map(d => d.join(',')).join('\r\n');
+};
