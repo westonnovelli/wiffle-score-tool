@@ -1,6 +1,7 @@
 import { GameMoment, getDefense, Team, Position } from '@wiffleball/state-machine';
 import React from 'react';
-import Structure from './Structure';
+import PageHeader from '../components/PageHeader';
+import Structure from '../components/Structure';
 import './Substitute.css';
 
 interface Props {
@@ -25,7 +26,7 @@ const Substitute: React.FC<Props> = ({ game, handleEdit }) => {
     };
 
     return (
-        <Structure title={<h1>Substitute</h1>} className="substitute">
+        <Structure wftitle={<PageHeader title="Substitute"/>} className="substitute">
             {defense.lineup.map((_, i) => {
                 const hasPreviousSelected = i === 0 ? true : Boolean(playerRotation[i - 1]);
                 const selected = playerRotation[i];

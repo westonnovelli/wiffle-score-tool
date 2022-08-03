@@ -9,7 +9,8 @@ import {
     type GameConfig,
 } from "@wiffleball/state-machine";
 import React from "react";
-import Structure from "./Structure";
+import Structure from "../components/Structure";
+import PageHeader from "../components/PageHeader";
 import './Manual.css';
 import RulesControl from "../components/RulesControl";
 import GameConfigControl from "../components/GameConfigControl";
@@ -171,7 +172,7 @@ const Manual: React.FC<Props> = ({ game, handleEdit }) => {
     return (
         <Structure
             className="manage manual"
-            title={<h1>Manual edit</h1>}
+            wftitle={<PageHeader title="Manual Edit"/>}
         >
             <fieldset className="inning">
                 <legend>Inning</legend>
@@ -321,7 +322,7 @@ const Manual: React.FC<Props> = ({ game, handleEdit }) => {
                 setRecordingStats={setRecordingStats}
             />
             <RulesControl rules={rules} setRules={setRules} />
-            <button onClick={submitEdit}>Submit changes</button>
+            <button onClick={submitEdit} className="submit">Submit changes</button>
         </Structure>
     );
 };

@@ -2,11 +2,6 @@
     color: var(--color-text);
 }
 
-.load h1 {
-    text-align: center;
-    font-weight: 400;
-}
-
 .load ul {
     list-style: none;
     padding: 16px;

@@ -1,7 +1,8 @@
 import React from "react";
 import QRCode from "react-qr-code";
 import { useReadLocalStorage, useCopyToClipboard } from 'usehooks-ts';
-import Structure from "./Structure";
+import Structure from "../components/Structure";
+import PageHeader from "../components/PageHeader";
 import './Share.css';
 import { ACTIVE_GAME } from "../localStorage";
 
@@ -15,7 +16,7 @@ const Share: React.FC = () => {
     const handleCopy = () => copy(href);
 
     return (
-        <Structure className={`manage-share`} title={<h1>Share game</h1>}>
+        <Structure className={`manage-share`} wftitle={<PageHeader title="Share Game"/>}>
             <div className="qr-container">
                 <QRCode value={href} />
             </div>

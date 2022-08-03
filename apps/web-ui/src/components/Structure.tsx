@@ -1,8 +1,9 @@
 import React from "react";
-import { motion } from 'framer-motion';
+import { HTMLMotionProps, motion } from 'framer-motion';
+import './Structure.css';
 
-type Props = {
-    title: React.ReactNode;
+type Props = Partial<HTMLMotionProps<'div'>> & {
+    wftitle: React.ReactNode;
     children?: React.ReactNode;
     className: string;
 };
@@ -13,17 +14,18 @@ const animations = {
     exit: { opacity: 0, x: -200 },
 }
 
-const Structure: React.FC<Props> = ({ title, children, ...props }) => {
+const Structure: React.FC<Props> = ({ wftitle, children, className, ...props }) => {
     return (
         <motion.div
             variants={animations}
             initial="initial"
             animate="animate"
             exit="exit"
+            className={`page ${className}`}
             {...props}
         >
-            {title}
-            {children}
+            {wftitle}
+            <div className="page-content">{children}</div>
         </motion.div>
     );
 };

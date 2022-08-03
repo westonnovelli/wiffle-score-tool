@@ -4,11 +4,6 @@
     overflow: auto;
 }
 
-.newgame h1 {
-    text-align: center;
-    font-weight: 400;
-}
-
 .newgame .rules,
 .newgame .config {
     margin-bottom: 8px;

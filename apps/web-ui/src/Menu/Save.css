@@ -1,0 +1,14 @@
+.manage-save {
+    padding: 16px;
+    color: var(--color-text);
+}
+
+.manage-save .summary {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.manage-save .form {
+    text-align: center;
+}

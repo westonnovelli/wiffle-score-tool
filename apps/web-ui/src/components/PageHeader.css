@@ -1,0 +1,24 @@
+.page-header {
+    color: var(--color-text);
+    display: grid;
+    grid-template-columns: 48px 1fr 48px;
+    align-items: center;
+}
+
+.page-header h1 {
+    text-align: center;
+    font-weight: 400;
+    margin: 0;
+}
+
+.page-header button {
+    background: none;
+    border: none;
+    height: 42px;
+}
+
+.page-header svg {
+    transform: rotate(-.75turn);
+    fill: var(--color-text);
+    height: 42px;
+}

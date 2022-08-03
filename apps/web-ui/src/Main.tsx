@@ -8,7 +8,13 @@ import './Main.css';
 
 
 const pitchSelectorAnimations = {
-    hidden: { opacity: 0 },
+    hidden: {
+        opacity: 0,
+        transition: {
+            staggerChildren: 0.02,
+            staggerDirection: -1
+        }
+    },
     show: {
         opacity: 1,
         transition: {
@@ -21,17 +27,9 @@ const animations = {
     initial: { opacity: 0, },
     animate: {
         opacity: 1,
-        transition: {
-            duration: 0.2,
-            staggerChildren: 0.01
-        }
     },
     exit: {
         opacity: 0,
-        transition: {
-            duration: 0.2,
-            staggerChildren: 0.01
-        }
     },
 };
 
@@ -39,9 +37,14 @@ interface Props {
     game: GameMoment;
     selectingPitch: boolean;
     handlePitch: (pitch: Pitches) => void;
+    next: GameMoment;
+    undo: () => void;
+    redo: () => void;
+    canUndo: boolean;
+    canRedo: boolean;
 }
 
-const Main: React.FC<Props> = ({ game, selectingPitch, handlePitch }) => {
+const Main: React.FC<Props> = ({ game, selectingPitch, handlePitch, ...rest }) => {
     return (
         <>
             <motion.div
@@ -63,7 +66,12 @@ const Main: React.FC<Props> = ({ game, selectingPitch, handlePitch }) => {
                         animate="show"
                         exit="hidden"
                     >
-                        <Pitch onPitch={handlePitch} possiblePitches={getPossiblePitches(game)}/>
+                        <Pitch
+                            onPitch={handlePitch}
+                            possiblePitches={getPossiblePitches(game)}
+                            game={game}
+                            {...rest}
+                        />
                     </motion.div>
                 )}
             </AnimatePresence>

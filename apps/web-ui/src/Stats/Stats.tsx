@@ -2,6 +2,8 @@ import React from "react";
 import { motion } from 'framer-motion';
 import { NavLink, Outlet, useMatch, useNavigate } from 'react-router-dom';
 import './Stats.css';
+import Structure from "../components/Structure";
+import PageHeader from "../components/PageHeader";
 
 const animations = {
     initial: { opacity: 0, x: 200 },
@@ -18,15 +20,13 @@ const Stats: React.FC = () => {
     }, [isRoot, navigate]);
 
     return (
-        <motion.div
-            key="stats"
-            variants={animations}
-            initial={isRoot ? 'initial' : ''}
-            animate="animate"
-            exit={isRoot ? 'exit' : ''}
+        <Structure
             className="stats"
+            wftitle={<PageHeader title="Game Stats" destination="/" />}
+            key="stats"
+            initial={isRoot ? 'initial' : ''}
+            exit={isRoot ? 'exit' : ''}
         >
-            <h1>Game stats</h1>
             <nav>
                 <NavLink to="batting" className={({ isActive }) => isActive ? 'active' : ''}><h2>Batting</h2></NavLink>
                 <NavLink to="pitching" className={({ isActive }) => isActive ? 'active' : ''}><h2>Pitching</h2></NavLink>
@@ -41,7 +41,7 @@ const Stats: React.FC = () => {
             >
                 <Outlet />
             </motion.div>
-        </motion.div >
+        </Structure>
     );
 };
 

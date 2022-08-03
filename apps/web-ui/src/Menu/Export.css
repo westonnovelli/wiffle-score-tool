@@ -2,11 +2,6 @@
     color: var(--color-text);
 }
 
-.manage-export h1 {
-    text-align: center;
-    font-weight: 400;
-}
-
 .manage-export ul {
     list-style: none;
     padding: 16px;

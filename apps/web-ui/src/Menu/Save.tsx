@@ -1,10 +1,11 @@
 import React from "react";
 import { useNavigate } from 'react-router-dom';
 import { useLocalStorage, useReadLocalStorage } from 'usehooks-ts';
-import Structure from "./Structure";
-import './Stash.css';
+import Structure from "../components/Structure";
+import './Save.css';
 import { hydrateGame, deserializeGame, awayScore, homeScore, InningHalf } from "@wiffleball/state-machine";
 import { ACTIVE_GAME, SAVES, SAVE_PREFIX } from "../localStorage";
+import PageHeader from "../components/PageHeader";
 
 const numberEnding = (n: number) => {
     if (n === 1) return 'st';
@@ -16,7 +17,7 @@ const displayInningHalf = (half: InningHalf) => {
     return half === InningHalf.TOP ? 'top' : 'bottom';
 };
 
-const Stash: React.FC = () => {
+const Save: React.FC = () => {
     const navigate = useNavigate();
     const activeGame = useReadLocalStorage<string>(`${ACTIVE_GAME}`) ?? '';
     
@@ -42,7 +43,7 @@ const Stash: React.FC = () => {
     const overwriteEnabled = saves.includes(saveName);
 
     return (
-        <Structure className={`manage-stash`} title={<h1>Stash game</h1>}>
+        <Structure className={`manage-save`} wftitle={<PageHeader title="Save Game"/>}>
             <ul className="summary">
                 <li>{`Game is in the ${displayInningHalf(game.inning.half)} of the ${inning}`}</li>
                 <li>{`Away team has scored ${away}`}</li>
@@ -62,4 +63,4 @@ const Stash: React.FC = () => {
     );
 };
 
-export default Stash;
+export default Save;

@@ -1,9 +1,10 @@
 import { DeepPartial, Team, Position, defaultPlayer, BattingOrder } from "@wiffleball/state-machine";
 import React from "react";
 import { nanoid } from 'nanoid';
-import Structure from "./Structure";
+import Structure from "../components/Structure";
 import TeamBuilder from "../components/TeamBuilder";
 import './Roster.css';
+import PageHeader from "../components/PageHeader";
 
 interface Props {
     whichTeam: 'home' | 'away';
@@ -96,7 +97,7 @@ const Roster: React.FC<Props> = ({ whichTeam, teamName, team, handleEdit }) => {
     };
 
     return (
-        <Structure className={`manage-roster ${whichTeam}`} title={<h1>{teamName}</h1>}>
+        <Structure className={`manage-roster ${whichTeam}`} wftitle={<PageHeader title={teamName}/>}>
             <TeamBuilder
                 team={team}
                 names={names}

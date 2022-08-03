@@ -41,11 +41,12 @@ import useHistory from './useHistory';
 import Roster from './Manage/Roster';
 import PitchingStats from './Stats/PitchingStats';
 import BattingStats from './Stats/BattingStats';
-import Stash from './Manage/Stash';
-import Load from './Manage/Load';
-import Share from './Manage/Share';
-import Export from './Manage/Export';
+import Save from './Menu/Save';
+import Load from './Menu/Load';
+import Share from './Menu/Share';
+import Export from './Menu/Export';
 import About from './About/About';
+import Menu from './Menu/Menu';
 
 const getGameSeed = (searchParams: URLSearchParams, lsGame: string | null) => {
   if (searchParams.get('game')) {
@@ -152,7 +153,7 @@ function App() {
   };
 
   const startGame = () => {
-    if (game.gameStarted) return; 
+    if (game.gameStarted) return;
     setAudit(prev => [...prev, `start`]);
     setGame(start(game));
   };
@@ -169,6 +170,8 @@ function App() {
     console.log(audit);
   }
 
+  const togglePitchSelecting = React.useCallback(() => void setSelectingPitch(prev => !prev), [setSelectingPitch]);
+
   return (
     <AnimatePresence exitBeforeEnter>
       <Routes key={location.pathname} location={location}>
@@ -177,30 +180,38 @@ function App() {
             <div className="content"><Outlet /></div>
             <div className="nav-container">
               <Nav
-                onSelectPitch={() => void setSelectingPitch(prev => !prev)}
+                onSelectPitch={togglePitchSelecting}
                 gameOver={gameOver}
                 gameStarted={game.gameStarted}
                 startGame={startGame}
+                selectingPitch={selectingPitch}
               />
             </div>
           </div>
         }>
           <Route index element={
-            <Main game={game} selectingPitch={selectingPitch} handlePitch={handlePitch} />
-          } />
-          <Route path="about" element={<About />} />
-          <Route path="manage">
-            <Route index element={
-              <Manage
-                game={game}
-                last={past[past.length - 1]}
-                next={future[0]}
-                undo={handleUndo}
-                redo={handleRedo}
-                canUndo={canUndo}
-                canRedo={canRedo}
-              />}
+            <Main
+              game={game}
+              selectingPitch={selectingPitch}
+              handlePitch={handlePitch}
+              next={future[0]}
+              undo={handleUndo}
+              redo={handleRedo}
+              canUndo={canUndo}
+              canRedo={canRedo}
             />
+          } />
+          <Route path="menu">
+            <Route index element={<Menu />} />
+            <Route path="new" element={<NewGame handleStart={handleStart} />} />
+            <Route path="save" element={<Save />} />
+            <Route path="load" element={<Load loadSave={loadSave} />} />
+            <Route path="share" element={<Share />} />
+            <Route path="export" element={<Export game={game} />} />
+            <Route path="about" element={<About />} />
+          </Route>
+          <Route path="manage">
+            <Route index element={<Manage/>}/>
             <Route path="manual" element={<Manual game={game} handleEdit={handleEdit} />} />
             <Route path="substitute" element={<Substitute game={game} handleEdit={handleSubstitute} />} />
             <Route path="roster">
@@ -221,17 +232,13 @@ function App() {
                 />}
               />
             </Route>
-            <Route path="stash" element={<Stash />} />
-            <Route path="load" element={<Load loadSave={loadSave}/>} />
-            <Route path="share" element={<Share />} />
-            <Route path="export" element={<Export game={game} />} />
           </Route>
           <Route path="stats" element={<Stats />}>
             <Route path="batting" element={<BattingStats game={game} />} />
             <Route path="pitching" element={<PitchingStats game={game} />} />
             <Route path="fielding" element={<h2>Coming soon</h2>} />
           </Route>
-          <Route path="new" element={<NewGame handleStart={handleStart} />} />
+
         </Route>
       </Routes>
     </AnimatePresence>

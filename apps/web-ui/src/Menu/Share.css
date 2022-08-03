@@ -6,12 +6,6 @@
     gap: 8px;
 }
 
-.manage-share h1 {
-    margin-bottom: 16px;
-    font-weight: 400;
-    text-align: center;
-}
-
 .manage-share .qr-container {
     width: 100%;
     display: flex;

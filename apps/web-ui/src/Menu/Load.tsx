@@ -2,7 +2,8 @@ import React from "react";
 import './Load.css';
 import { useReadLocalStorage } from 'usehooks-ts';
 import { useNavigate } from "react-router-dom";
-import Structure from "./Structure";
+import Structure from "../components/Structure";
+import PageHeader from "../components/PageHeader";
 import { SAVES, SAVE_PREFIX } from "../localStorage";
 
 interface Props {
@@ -30,7 +31,7 @@ const Load: React.FC<Props> = ({ loadSave }) => {
     };
 
     return (
-        <Structure className="load" title={<h1>Load game</h1>}>
+        <Structure className="load" wftitle={<PageHeader title="Load Game"/>}>
             <ul>
                 {saves && saves.map((saveName) => (
                     <li key={saveName} role="button" onClick={() => handleLoad(saveName)} className="save">{saveName}</li>

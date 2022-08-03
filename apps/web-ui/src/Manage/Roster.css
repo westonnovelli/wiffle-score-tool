@@ -2,19 +2,11 @@
     color: var(--color-text);
 }
 
-.manage-roster h1 {
-    text-align: center;
-    font-weight: 400;
-    margin: 0;
-    padding: 32px 0;
-    grid-area: header;
-}
-
-.manage-roster.home h1 {
+.manage-roster.home .page-header {
     background: var(--color-primary-dark);
 }
 
-.manage-roster.away h1 {
+.manage-roster.away .page-header {
     background: var(--color-secondary);
 }
 

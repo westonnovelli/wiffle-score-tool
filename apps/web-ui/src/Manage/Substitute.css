@@ -2,12 +2,6 @@
     color: var(--color-text);
 }
 
-.substitute h1 {
-    color: var(--color-text);
-    text-align: center;
-    font-weight: 400;
-}
-
 .substitute ul {
     list-style: none;
     padding: 16px;
@@ -78,7 +72,7 @@
     place-content: center;
 }
 
-.substitute button {
+.substitute .submit button {
     height: 32px;
     width: 50vw;
 }

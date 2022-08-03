@@ -8,7 +8,7 @@
   max-width: 425px;
   margin: 0 auto;
   overflow: auto;
-  height: calc(100vh - 78px); /* max nav height */
+  height: calc(100vh - 56px); /* max nav height */
   position: relative;
 }
 
