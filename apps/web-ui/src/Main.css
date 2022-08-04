@@ -4,23 +4,23 @@
 
 .pitch-container {
     position: fixed;
-    bottom: 120px;
+    bottom: 56px; /* nav height */
+    top: 0;
     background: rgba(200, 200, 200, 0.413);
     backdrop-filter: blur(8px);
     display: flex;
-    flex-direction: column-reverse;
-    align-items: center;
-    justify-content: flex-end;
+    flex-direction: row-reverse;
+    justify-content: flex-start;
     width: 100vw;
     max-width: 425px;
     box-sizing: border-box;
 
     overflow-y: auto;
-    padding: 16px;
+    padding: 16px 24px 46px 16px; /* aligns first pitch with action button */
 }
 
-@media only screen and (max-width: 400px) {
+/* @media only screen and (max-width: 400px) {
     .pitch-container {
         padding: 4px;
     }
-}
+} */

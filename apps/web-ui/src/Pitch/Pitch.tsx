@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, HTMLMotionProps } from 'framer-motion';
 import { GameMoment, Pitches } from '@wiffleball/state-machine';
 import './Pitch.css';
 import { pitchDescriptions } from '../helpers';
@@ -15,169 +15,177 @@ interface Props {
     canRedo: boolean;
 }
 
-type PitchList = {
-    pitch: Pitches;
-    gridArea: string;
+type PitchInfo = {
     type: 'justpitch' | 'inplayout' | 'inplayboth' | 'inplay';
     label: string;
     subtext?: string;
     description?: string;
     style?: any;
-}[];
+};
 
-const PITCH_LIST: PitchList = [
-    {
-        pitch: Pitches.BALL,
-        gridArea: 'B',
+const PitchInfoMap: Record<Pitches, PitchInfo> = {
+    [Pitches.BALL]: {
         type: 'justpitch',
         label: 'B',
         style: { fontSize: '20px' },
     },
-    {
-        pitch: Pitches.STRIKE_FOUL,
-        gridArea: 'F',
+    [Pitches.BALL_WILD]: {
+        type: 'justpitch',
+        label: 'WP',
+        style: { fontSize: '20px' },
+    },
+    [Pitches.STRIKE_FOUL]: {
         type: 'justpitch',
         label: 'Foul',
     },
-    {
-        pitch: Pitches.STRIKE_FOUL_ZONE,
-        gridArea: 'Z',
+    [Pitches.STRIKE_LOOKING]: {
         type: 'inplayout',
-        label: 'Foul',
-        subtext: 'K',
+        label: 'ꓘ',
+        style: { fontSize: '20px' },
     },
-    {
-        pitch: Pitches.STRIKE_SWINGING,
-        gridArea: 'S',
+    [Pitches.STRIKE_SWINGING]: {
         type: 'justpitch',
         label: 'S',
         style: { fontSize: '20px' },
     },
-    {
-        pitch: Pitches.INPLAY_INFIELD_GRD_OUT,
-        gridArea: 'G',
+    [Pitches.STRIKE_FOUL_ZONE]: {
+        type: 'inplayout',
+        label: 'Foul',
+        subtext: 'K',
+        style: { fontSize: '14px' },
+    },
+    [Pitches.STRIKE_FOUL_CAUGHT]: {
+        type: 'inplayout',
+        label: 'Foul',
+        subtext: 'caught',
+        style: { fontSize: '14px' },
+    },
+    [Pitches.INPLAY_INFIELD_AIR_OUT]: {
+        type: 'inplayout',
+        label: 'Popup',
+        subtext: '(out)',
+        style: { fontSize: '12px' },
+    },
+    [Pitches.INPLAY_INFIELD_AIR_OUT_INFIELD_FLY]: {
+        type: 'inplayboth',
+        label: 'Infield fly',
+        style: { fontSize: '12px' },
+    },
+    [Pitches.INPLAY_INFIELD_GRD_OUT]: {
         type: 'inplayout',
         label: 'Grd out',
+        style: { fontSize: '14px' },
     },
-    {
-        pitch: Pitches.INPLAY_INFIELD_OUT_DP_SUCCESS,
-        gridArea: 'D',
-        type: 'inplayout',
-        label: 'DP',
-    },
-    {
-        pitch: Pitches.INPLAY_INFIELD_OUT_DP_FAIL,
-        gridArea: 'C',
+    [Pitches.INPLAY_INFIELD_OUT_DP_FAIL]: {
         type: 'inplayboth',
         label: 'FC',
         subtext: '(DP fail)',
         style: { fontSize: '10px' },
     },
-    {
-        pitch: Pitches.STRIKE_FOUL_CAUGHT,
-        gridArea: 'Q',
+    [Pitches.INPLAY_INFIELD_OUT_DP_SUCCESS]: {
         type: 'inplayout',
-        label: 'Foul',
-        subtext: 'caught',
-
+        label: 'DP',
     },
-    {
-        pitch: Pitches.STRIKE_LOOKING,
-        gridArea: 'K',
-        type: 'inplayout',
-        label: 'ꓘ',
-        style: { fontSize: '20px' },
-    },
-    {
-        pitch: Pitches.INPLAY_INFIELD_SINGLE,
-        gridArea: 'L',
+    [Pitches.INPLAY_INFIELD_SINGLE]: {
         type: 'inplay',
         label: '1B',
         subtext: '(infield)',
+        style: { fontSize: '12px' },
     },
-    {
-        pitch: Pitches.INPLAY_INFIELD_AIR_OUT,
-        gridArea: 'A',
-        type: 'inplayout',
-        label: 'Popup',
-        subtext: '(out)',
-    },
-    {
-        pitch: Pitches.INPLAY_INFIELD_AIR_OUT_INFIELD_FLY,
-        gridArea: 'I',
-        type: 'inplayboth',
-        label: 'Infield fly',
-    },
-    {
-        pitch: Pitches.INPLAY_OUTFIELD_OUT,
-        gridArea: 'Y',
+    [Pitches.INPLAY_OUTFIELD_OUT]: {
         type: 'inplayout',
         label: 'Fly out',
     },
-    {
-        pitch: Pitches.INPLAY_OUTFIELD_OUT_TAG_FAIL,
-        gridArea: 'O',
+    [Pitches.INPLAY_OUTFIELD_OUT_TAG_FAIL]: {
         type: 'inplayboth',
         label: 'Fly out',
         subtext: 'thrown out',
         style: { fontSize: '10px' },
     },
-    {
-        pitch: Pitches.BALL_WILD,
-        gridArea: 'W',
-        type: 'justpitch',
-        label: 'WP',
-        style: { fontSize: '20px' },
-    },    
-    {
-        pitch: Pitches.INPLAY_OUTFIELD_SINGLE,
-        gridArea: 'single',
+    [Pitches.INPLAY_OUTFIELD_OUT_TAG_SUCCESS]: {
+        type: 'inplayboth',
+        label: 'Fly out',
+        subtext: 'tagged',
+        style: { fontSize: '12px' },
+    },
+    [Pitches.INPLAY_OUTFIELD_SINGLE]: {
         type: 'inplay',
         label: '1B',
         style: { fontSize: '20px' },
     },
-    {
-        pitch: Pitches.INPLAY_DOUBLE,
-        gridArea: 'double',
+    [Pitches.INPLAY_DOUBLE]: {
         type: 'inplay',
         label: '2B',
         style: { fontSize: '20px' },
     },
-    {
-        pitch: Pitches.INPLAY_TRIPLE,
-        gridArea: 'triple',
+    [Pitches.INPLAY_TRIPLE]: {
         type: 'inplay',
         label: '3B',
         style: { fontSize: '20px' },
     },
-    {
-        pitch: Pitches.INPLAY_OUTFIELD_OUT_TAG_SUCCESS,
-        gridArea: 'T',
-        type: 'inplayboth',
-        label: 'Fly out',
-        subtext: 'tagged',
-        style: { fontSize: '10px' },
-    },
-    {
-        pitch: Pitches.INPLAY_HOMERUN,
-        gridArea: 'H',
+    [Pitches.INPLAY_HOMERUN]: {
         type: 'inplay',
         label: 'HR',
         style: { fontSize: '20px' },
     },
-    // {
-    //     pitch: Pitches.INTERFERENCE,
-    //     gridArea: '_ERROR_',
-    //     type: 'inplayboth',
-    //     label: 'I',
-    //     style: { fontSize: '20px' },
-    // },
-];
+    [Pitches.INTERFERENCE]: {
+        type: 'inplayboth',
+        label: 'I',
+        style: { fontSize: '20px' },
+    },
+}
 
 const variants = {
-    hidden: { y: 850, x: 350},
+    hidden: { y: 850, x: 350 },
     show: { y: 0, x: 0 }
 };
+
+const animationProps: HTMLMotionProps<"button"> = {
+    whileHover: { scale: 1.1 },
+    whileTap: { scale: 0.95 },
+    // transition: { bounce: 0.07 },
+};
+
+type PitchButtonProps = PitchInfo & {
+    pitch: Pitches;
+    disabled: boolean;
+    onPitch: (p: Pitches) => void;
+};
+
+const PitchButton: React.FC<PitchButtonProps> = ({
+    pitch,
+    type,
+    label,
+    subtext,
+    style,
+    disabled,
+    onPitch,
+}) => {
+    let motionProps: HTMLMotionProps<"button"> = {};
+    if (!disabled) {
+        motionProps = { ...animationProps };
+    }
+    return (
+        <motion.button
+            style={style}
+            variants={variants}
+            {...motionProps}
+            exit={variants.hidden}
+            className={`pitch-btn ${type}`}
+            onClick={() => onPitch(pitch)}
+            disabled={disabled}
+            data-pitch={label}
+            data-pitchid={pitch}
+        >
+            {!disabled && (
+                <>
+                    {label}
+                    {subtext && (<div>{subtext}</div>)}
+                </>
+            )}
+        </motion.button>
+    );
+}
 
 const PitchSelector: React.FC<Props> = ({
     onPitch,
@@ -189,69 +197,82 @@ const PitchSelector: React.FC<Props> = ({
     canUndo,
     canRedo,
 }) => {
+    const undoMotionProps = !canUndo && { ...animationProps };
+    const redoMotionProps = !canRedo && { ...animationProps };
+
+    const props = (pitch: Pitches) => {
+        return {
+            ...PitchInfoMap[pitch],
+            pitch,
+            disabled: !possiblePitches.includes(pitch),
+            onPitch,
+        };
+    };
+
     return (
         <div className="pitch pitch-menu layout">
-            {PITCH_LIST.map(({ pitch, gridArea, type, label, subtext, style }) =>
-                <motion.div
-                    key={pitch}
-                    style={{ gridArea }}
-                    variants={variants}
-                    // transition={{ bounce: 1, velocity: 2  }}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    exit={variants.hidden}
-                >
-                    <button
-                        className={`pitch-btn ${type}`}
-                        onClick={() => onPitch(pitch)}
-                        disabled={!possiblePitches.includes(pitch)}
-                        style={style}
-                        data-pitch={label}
-                        data-pitchid={pitch}
-                    >
-                        {label}
-                        {subtext && (<div>{subtext}</div>)}
-                    </button>
-                </motion.div>
-            )}
-            {(canUndo || canRedo) && (
-                <motion.div
-                    key="undo"
-                    style={{ gridArea: 'U' }}
-                    variants={variants}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    exit={variants.hidden}
-                >
-                    <button
+            <div className="row">
+                <PitchButton {...props(Pitches.BALL)} />
+                <PitchButton {...props(Pitches.STRIKE_SWINGING)} />
+                <PitchButton {...props(Pitches.STRIKE_LOOKING)} />
+                <PitchButton {...props(Pitches.BALL_WILD)} />
+            </div>
+            <div className="row">
+                <PitchButton {...props(Pitches.STRIKE_FOUL)} />
+                <PitchButton {...props(Pitches.STRIKE_FOUL_ZONE)} />
+                <PitchButton {...props(Pitches.STRIKE_FOUL_CAUGHT)} />
+            </div>
+            <div className="row">
+                <PitchButton {...props(Pitches.INPLAY_INFIELD_SINGLE)} />
+                <PitchButton {...props(Pitches.INPLAY_INFIELD_AIR_OUT_INFIELD_FLY)} />
+                <PitchButton {...props(Pitches.INPLAY_INFIELD_OUT_DP_FAIL)} />
+                <PitchButton {...props(Pitches.INPLAY_OUTFIELD_OUT_TAG_FAIL)} />
+            </div>
+            <div className="row">
+                <PitchButton {...props(Pitches.INPLAY_INFIELD_GRD_OUT)} />
+                <PitchButton {...props(Pitches.INPLAY_INFIELD_AIR_OUT)} />
+                <PitchButton {...props(Pitches.INPLAY_INFIELD_OUT_DP_SUCCESS)} />
+                <PitchButton {...props(Pitches.INPLAY_OUTFIELD_OUT)} />
+            </div>
+            <div className="row">
+                <PitchButton {...props(Pitches.INPLAY_OUTFIELD_SINGLE)} />
+                <PitchButton {...props(Pitches.INPLAY_DOUBLE)} />
+                <PitchButton {...props(Pitches.INPLAY_TRIPLE)} />
+                <PitchButton {...props(Pitches.INPLAY_OUTFIELD_OUT_TAG_SUCCESS)} />
+            </div>
+            <div className="row">
+                <PitchButton {...props(Pitches.INPLAY_HOMERUN)} />
+                {(canUndo || canRedo) && (
+                    <motion.button
+                        key="undo"
+                        style={{ gridArea: 'U', fontSize: '12px' }}
+                        variants={variants}
+                        {...undoMotionProps}
+                        exit={variants.hidden}
                         className={`pitch-btn action`}
                         onClick={undo}
                         disabled={!canUndo}
                     >
                         Undo
                         {canUndo && <div>{pitchDescriptions[game.pitches[game.pitches.length - 1]]}</div>}
-                    </button>
-                </motion.div>
-            )}
-            {(canUndo || canRedo) && (
-                <motion.div
-                    key="redo"
-                    style={{ gridArea: 'R' }}
-                    variants={variants}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    exit={variants.hidden}
-                >
-                    <button
+                    </motion.button>
+                )}
+                {(canUndo || canRedo) && (
+                    <motion.button
+                        key="redo"
+                        style={{ gridArea: 'R', fontSize: '12px' }}
+                        variants={variants}
+                        {...redoMotionProps}
+                        exit={variants.hidden}
                         className={`pitch-btn action`}
                         onClick={redo}
                         disabled={!canRedo}
                     >
                         Redo
                         {canRedo && <div>{pitchDescriptions[next.pitches[next.pitches.length - 1]]}</div>}
-                    </button>
-                </motion.div>
-            )}
+                    </motion.button>
+                )}
+            </div>
         </div>
     );
 };
