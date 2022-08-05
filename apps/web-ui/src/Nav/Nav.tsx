@@ -1,6 +1,7 @@
 import React from 'react';
-import { Link, useMatch, useNavigate } from 'react-router-dom';
-import { Chevron } from '../icons';
+import { NavLink, useMatch } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { ClipboardEdit, Counter, HamburgerMenu } from '../icons';
 import './Nav.css';
 
 interface Props {
@@ -8,27 +9,74 @@ interface Props {
     gameOver: boolean;
     gameStarted: boolean;
     startGame: () => void;
+    selectingPitch: boolean;
 }
 
-const Nav: React.FC<Props> = ({ onSelectPitch, gameOver, gameStarted, startGame }) => {
-    const navigate = useNavigate();
-    const isAbout = useMatch('about');
-    const isManaging = useMatch('manage/*');
-    const isStats = useMatch('stats/*');
-    const isNewgame = useMatch('new');
+const variants = {
+    disabled: {
+        scale: 0.5,
+        translateY: '24px',
+    },
+    enabled: {
+        scale: 1,
+        translateY: '0px',
+    }
+};
 
-    const isHome = !isManaging && !isStats && !isNewgame;
+const Nav: React.FC<Props> = ({ onSelectPitch, gameOver, gameStarted, startGame, selectingPitch }) => {
+    const isHome = useMatch('/');
 
     const primaryBtnLabel = gameOver ? 'Game Over' : !gameStarted ? 'Start Game' : 'Pitch';
-    const primaryOnClick = !gameStarted ? startGame : onSelectPitch;
+    const primaryOnClick = (!gameStarted && !selectingPitch) ? startGame : onSelectPitch;
+    const primaryDisabled = !isHome || gameOver;
 
     return (
         <nav className="nav">
-            {(!isManaging && !isAbout) && <Link className={`nav-btn${!isHome ? ' disabled' : ''}`} to="manage">Manage</Link>}
-            {(isManaging || isAbout) && <button className="nav-btn" onClick={() => navigate(-1)}><Chevron className="left"/> Back</button>}
-            <button className="nav-btn pitch" onClick={primaryOnClick} disabled={!isHome || gameOver}>{primaryBtnLabel}</button>
-            {!isStats && <Link className={`nav-btn${!isHome ? ' disabled' : ''}`} to="stats">Stats</Link>}
-            {isStats && <button className="nav-btn" onClick={() => navigate('')}>Back <Chevron className="right"/></button>}
+            <NavLink
+                to="menu"
+                className={({ isActive }) => `link ${isActive ? 'active' : ''}`.trim()}
+            >
+                {({ isActive }) => 
+                    <>
+                        <HamburgerMenu />
+                        <span>Menu</span>
+                    </>
+                }
+            </NavLink>
+            <NavLink
+                to="manage"
+                className={({ isActive }) => `link ${isActive ? 'active' : ''}`.trim()}
+            >
+                {({ isActive }) => 
+                    <>
+                        <ClipboardEdit />
+                        <span>Manage</span>
+                    </>
+                }
+            </NavLink>
+            <NavLink
+                to="stats"
+                className={({ isActive }) => `link ${isActive ? 'active' : ''}`.trim()}
+            >
+                {({ isActive }) => 
+                    <>
+                        <Counter />
+                        <span>Stats</span>
+                    </>
+                }
+            </NavLink>
+            <motion.button
+                className="nav-btn pitch"
+                onClick={primaryOnClick}
+                disabled={primaryDisabled}
+                variants={variants}
+                initial={false}
+                animate={primaryDisabled ? 'disabled' : 'enabled'}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+            >
+                {primaryBtnLabel}
+            </motion.button>
         </nav>
     );
 };

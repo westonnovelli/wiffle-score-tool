@@ -29,8 +29,7 @@ import {
   deserializeGame,
   hydrateGame,
 } from '@wiffleball/state-machine';
-// import Nav from './Nav/Nav';
-import Nav from './NavNew/Nav';
+import Nav from './Nav/Nav';
 import Manage from './Manage/Manage';
 import Stats from './Stats/Stats';
 import NewGame from './NewGame/NewGame';
@@ -69,7 +68,7 @@ function App() {
   const [audit, setAudit] = React.useState<string[]>([]);
   const {
     state: {
-      past,
+      // past,
       present: game,
       future,
     },
