@@ -6,6 +6,7 @@ import RulesControl from "../components/RulesControl";
 import TeamBuilder from '../components/TeamBuilder';
 import './NewGame.css';
 import { SwapVert } from "../icons";
+import PageHeader from "../components/PageHeader";
 
 interface Props {
     handleStart: (
@@ -111,7 +112,7 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
 
     return (
         <div className="newgame">
-            <h1>New Game</h1>
+            <PageHeader title={"New Game"}/>
             <RulesControl rules={rules} setRules={setRules} />
             <GameConfigControl
                 maxBalls={maxBalls}
