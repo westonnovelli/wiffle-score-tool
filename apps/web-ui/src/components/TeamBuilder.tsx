@@ -1,6 +1,8 @@
-import { Position, Team } from "@wiffleball/state-machine";
+import { Player, Position, Team } from "@wiffleball/state-machine";
 import React from "react";
+import { Reorder, useMotionValue } from 'framer-motion';
 import { safeParseInt } from "../helpers";
+import { Close, Drag } from "../icons";
 import './TeamBuilder.css';
 
 const allPositions = [
@@ -24,6 +26,32 @@ const PositionSelect: React.FC<PositionSelectProps> = ({ position, setPosition, 
                 );
             })}
         </select>
+    );
+};
+
+interface PlayerItemProps {
+    index: number;
+    id: string;
+    player?: Player;
+    name: string;
+    position: Position;
+    rename: (id: string, newName: string) => void;
+    reposition: (id: string, newPosition: Position) => void;
+    remove: (index: number) => void;
+}
+
+const PlayerItem: React.FC<PlayerItemProps> = ({ index, id, name, position, rename, reposition, remove }) => {
+    const y = useMotionValue(0);
+
+    return (
+        <Reorder.Item value={id} style={{ y }}>
+            <div className="player">
+                <div className="drag-handle"><Drag /></div>
+                <input value={name} onChange={(e) => rename(id, e.target.value)} />
+                <PositionSelect position={position} onChange={(e) => reposition(id, safeParseInt(e.target.value))} />
+                <button className="remove" onClick={() => remove(index)}><Close /></button>
+            </div>
+        </Reorder.Item>
     );
 };
 
@@ -60,20 +88,20 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({
         setPendingPosition(Position.Infield);
     };
 
-    const move = (index: number, amt: number) => {
-        if (index === 0 && amt < 0) return;
-        if (index === lineup.length - 1 && amt > 0) return;
-        if (amt === 0 || amt > 1 || amt < -1) return;
-        if (index > lineup.length - 1 || index < 0) return;
+    // const move = (index: number, amt: number) => {
+    //     if (index === 0 && amt < 0) return;
+    //     if (index === lineup.length - 1 && amt > 0) return;
+    //     if (amt === 0 || amt > 1 || amt < -1) return;
+    //     if (index > lineup.length - 1 || index < 0) return;
 
-        const atIndex = lineup[index];
-        setLineup(prev => {
-            const next = [...prev];
-            next[index] = next[index + amt];
-            next[index + amt] = atIndex;
-            return next;
-        });
-    };
+    //     const atIndex = lineup[index];
+    //     setLineup(prev => {
+    //         const next = [...prev];
+    //         next[index] = next[index + amt];
+    //         next[index + amt] = atIndex;
+    //         return next;
+    //     });
+    // };
 
     const rename = (id: string, newName: string) => {
         if (!Object.keys(names).includes(id)) return;
@@ -94,7 +122,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({
     };
 
     const remove = (index: number) => {
-        if (index > lineup.length -1) return;
+        if (index > lineup.length - 1) return;
 
         const id = lineup[index];
         setLineup(prev => {
@@ -114,34 +142,30 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({
 
     return (
         <div className="teambuilder">
-            <ol>
+            <Reorder.Group as="ol" axis="y" onReorder={setLineup} values={lineup}>
                 {lineup.map((id, i) => {
-                    const name = names[id];
-                    const position = positions[id];
-                    const player = team?.roster[id];
                     return (
-                        <li key={`${id}-${i}`}>
-                            <div className="player">
-                                {editing ? (
-                                    <>
-                                        <button className="moveup" onClick={() => move(i, -1)} disabled={i === 0}>▲</button>
-                                        <input value={name} onChange={(e) => rename(id, e.target.value)} />
-                                        <PositionSelect position={position} onChange={(e) => reposition(id, safeParseInt(e.target.value))} />
-                                        <button className="movedown" onClick={() => move(i, 1)} disabled={i === lineup.length - 1}>▼</button>
-                                        <button className="remove" onClick={() => remove(i)}>X</button>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div className="name">{name}</div>
-                                        <div className="position">{Position[position]}</div>
-                                        {player && <div className="pa-stat">{player?.offenseStats?.hits} for {player?.offenseStats?.atbats}</div>}
-                                    </>
-                                )}
-                            </div>
-                        </li>
+                        <PlayerItem
+                            key={id}
+                            id={id}
+                            index={i}
+                            player={team?.roster[id]}
+                            name={names[id]}
+                            position={positions[id]}
+                            rename={rename}
+                            reposition={reposition}
+                            remove={remove}
+                        />
+                        // <li key={`${id}-${i}`}>
+                        //     <div className="player">
+                        //                 <div className="name">{name}</div>
+                        //                 <div className="position">{Position[position]}</div>
+                        //                 {player && <div className="pa-stat">{player?.offenseStats?.hits} for {player?.offenseStats?.atbats}</div>}
+                        //     </div>
+                        // </li>
                     );
                 })}
-            </ol>
+            </Reorder.Group>
             <input type="text" value={pendingName} onChange={(e) => void setPendingName(e.target.value)} />
             <PositionSelect position={pendingPosition} setPosition={setPendingPosition} />
             <button onClick={add}>Add</button>

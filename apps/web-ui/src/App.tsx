@@ -203,7 +203,6 @@ function App() {
                 canRedo={canRedo}
               />
             } />
-            {/* <Route path="player/:playerId" element={<PlayerCard game={game} />} /> */}
             <Route path="menu">
               <Route index element={<Menu />} />
               <Route path="new" element={<NewGame handleStart={handleStart} />} />
