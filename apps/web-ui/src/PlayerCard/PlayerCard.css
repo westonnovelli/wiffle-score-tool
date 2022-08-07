@@ -1,0 +1,76 @@
+.player-card {
+    color: var(--color-text);
+    position: relative;
+    height: 100%;
+}
+
+.player-card h1 {
+    text-align: center;
+    margin: 0;
+    padding: 16px;
+}
+
+.player-card.home h1 {
+    background: var(--color-primary-dark);
+}
+
+.player-card.away h1 {
+    background: var(--color-secondary-dark);
+}
+
+.player-card button.close {
+    position: absolute;
+    top: 20px;
+    right: 16px;
+    padding: 4px;
+    border-radius: 3px;
+    height: 32px;
+    width: 32px;
+    border: none;
+    background: transparent;
+    color: var(--color-text);
+    fill:  var(--color-text);
+}
+
+.player-card .stats {
+    display: flex;
+    justify-content: space-evenly;
+    height: calc(100% - 110px); /* h1 offset */
+    overflow: auto;
+    margin-bottom: 32px;
+}
+
+.player-card .stats table {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+.player-card .stats table tr {}
+
+.player-card .stats table tr th,
+.player-card .stats table tr td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: center;
+}
+
+.player-card .stats table tr th {}
+
+.player-card.home .stats table tr th {
+    background: var(--color-primary-dark);
+}
+.player-card.away .stats table tr th {
+    background: var(--color-secondary-dark);
+}
+
+.player-card .stats table tr td {}
+
+[data-reach-dialog-content] {
+    width: 80%;
+    max-width: 400px;
+    border-radius: 8px;
+    background: var(--color-primary);
+    padding: 0;
+    height: 80vh;
+    overflow: hidden;
+}

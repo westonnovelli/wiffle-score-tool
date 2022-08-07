@@ -10,6 +10,7 @@ import {
 } from '@wiffleball/state-machine';
 import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import BoxScore from '../components/BoxScore';
 import Feed from '../Feed/Feed';
 import './Scoreboard.css';
@@ -158,16 +159,27 @@ interface PlayersProps {
 }
 
 const Players = React.memo(({ batter, pitcher, inningHalf }: PlayersProps) => {
+    const location = useLocation();
     return (
         <AnimatePresence>
             <div className="players">
                 <div className={`batter ${inningHalf === InningHalf.TOP ? 'away' : 'home'}`}>
-                    <AnimatedName>{batter?.name}</AnimatedName>
+                    <Link
+                        to={`player/${batter?.id}`}
+                        state={{ backgroundLocation: location }}
+                    >
+                        <AnimatedName>{batter?.name}</AnimatedName>
+                    </Link>
                     <label>at bat</label>
                     <span className="stat">{batter?.offenseStats?.hits} for {batter?.offenseStats?.atbats}</span>
                 </div>
                 <div className={`pitcher ${inningHalf === InningHalf.BOTTOM ? 'away' : 'home'}`}>
-                    <AnimatedName>{pitcher?.name}</AnimatedName>
+                    <Link
+                        to={`player/${pitcher?.id}`}
+                        state={{ backgroundLocation: location }}
+                    >
+                        <AnimatedName>{pitcher?.name}</AnimatedName>
+                    </Link>
                     <label>pitching</label>
                     <span className="stat">{pitchCount(pitcher)} pitches</span>
                 </div>

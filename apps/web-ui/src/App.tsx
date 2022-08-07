@@ -46,6 +46,7 @@ import Share from './Menu/Share';
 import Export from './Menu/Export';
 import About from './About/About';
 import Menu from './Menu/Menu';
+import PlayerCard from './PlayerCard/PlayerCard';
 
 const getGameSeed = (searchParams: URLSearchParams, lsGame: string | null) => {
   if (searchParams.get('game')) {
@@ -64,6 +65,7 @@ function App() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [lsGame, setlsGame] = useLocalStorage<string | null>('wiffle-st.active-game', null);
+  const routerState = location.state as { backgroundLocation?: Location };
 
   const [audit, setAudit] = React.useState<string[]>([]);
   const {
@@ -172,75 +174,83 @@ function App() {
   const togglePitchSelecting = React.useCallback(() => void setSelectingPitch(prev => !prev), [setSelectingPitch]);
 
   return (
-    <AnimatePresence exitBeforeEnter>
-      <Routes key={location.pathname} location={location}>
-        <Route path="/" element={
-          <div className="App">
-            <div className="content"><Outlet /></div>
-            <div className="nav-container">
-              <Nav
-                onSelectPitch={togglePitchSelecting}
-                gameOver={gameOver}
-                gameStarted={game.gameStarted}
-                startGame={startGame}
-                selectingPitch={selectingPitch}
-              />
+    <>
+      <AnimatePresence exitBeforeEnter>
+        <Routes key={location.pathname} location={routerState?.backgroundLocation || location}>
+          <Route path="/" element={
+            <div className="App" key="app">
+              <div className="content"><Outlet /></div>
+              <div className="nav-container">
+                <Nav
+                  onSelectPitch={togglePitchSelecting}
+                  gameOver={gameOver}
+                  gameStarted={game.gameStarted}
+                  startGame={startGame}
+                  selectingPitch={selectingPitch}
+                />
+              </div>
             </div>
-          </div>
-        }>
-          <Route index element={
-            <Main
-              game={game}
-              selectingPitch={selectingPitch}
-              handlePitch={handlePitch}
-              next={future[0]}
-              undo={handleUndo}
-              redo={handleRedo}
-              canUndo={canUndo}
-              canRedo={canRedo}
-            />
-          } />
-          <Route path="menu">
-            <Route index element={<Menu />} />
-            <Route path="new" element={<NewGame handleStart={handleStart} />} />
-            <Route path="save" element={<Save />} />
-            <Route path="load" element={<Load loadSave={loadSave} />} />
-            <Route path="share" element={<Share />} />
-            <Route path="export" element={<Export game={game} />} />
-            <Route path="about" element={<About />} />
-          </Route>
-          <Route path="manage">
-            <Route index element={<Manage/>}/>
-            <Route path="manual" element={<Manual game={game} handleEdit={handleEdit} />} />
-            <Route path="substitute" element={<Substitute game={game} handleEdit={handleSubstitute} />} />
-            <Route path="roster">
-              <Route path="home" element={
-                <Roster
-                  whichTeam="home"
-                  teamName="Home team"
-                  team={game.homeTeam}
-                  handleEdit={(e) => handleTeamEdit(e, 'homeTeam')}
-                />}
+          }>
+            <Route index element={
+              <Main
+                game={game}
+                selectingPitch={selectingPitch}
+                handlePitch={handlePitch}
+                next={future[0]}
+                undo={handleUndo}
+                redo={handleRedo}
+                canUndo={canUndo}
+                canRedo={canRedo}
               />
-              <Route path="away" element={
-                <Roster
-                  whichTeam="away"
-                  teamName="Away team"
-                  team={game.awayTeam}
-                  handleEdit={(e) => handleTeamEdit(e, 'awayTeam')}
-                />}
-              />
+            } />
+            {/* <Route path="player/:playerId" element={<PlayerCard game={game} />} /> */}
+            <Route path="menu">
+              <Route index element={<Menu />} />
+              <Route path="new" element={<NewGame handleStart={handleStart} />} />
+              <Route path="save" element={<Save />} />
+              <Route path="load" element={<Load loadSave={loadSave} />} />
+              <Route path="share" element={<Share />} />
+              <Route path="export" element={<Export game={game} />} />
+              <Route path="about" element={<About />} />
             </Route>
-          </Route>
-          <Route path="stats" element={<Stats />}>
-            <Route path="batting" element={<BattingStats game={game} />} />
-            <Route path="pitching" element={<PitchingStats game={game} />} />
-            <Route path="fielding" element={<h2>Coming soon</h2>} />
-          </Route>
+            <Route path="manage">
+              <Route index element={<Manage />} />
+              <Route path="manual" element={<Manual game={game} handleEdit={handleEdit} />} />
+              <Route path="substitute" element={<Substitute game={game} handleEdit={handleSubstitute} />} />
+              <Route path="roster">
+                <Route path="home" element={
+                  <Roster
+                    whichTeam="home"
+                    teamName="Home team"
+                    team={game.homeTeam}
+                    handleEdit={(e) => handleTeamEdit(e, 'homeTeam')}
+                  />}
+                />
+                <Route path="away" element={
+                  <Roster
+                    whichTeam="away"
+                    teamName="Away team"
+                    team={game.awayTeam}
+                    handleEdit={(e) => handleTeamEdit(e, 'awayTeam')}
+                  />}
+                />
+              </Route>
+            </Route>
+            <Route path="stats" element={<Stats />}>
+              <Route path="batting" element={<BattingStats game={game} />} />
+              <Route path="pitching" element={<PitchingStats game={game} />} />
+              <Route path="fielding" element={<h2>Coming soon</h2>} />
+            </Route>
 
-        </Route>
-      </Routes>
-    </AnimatePresence>
+          </Route>
+        </Routes>
+      </AnimatePresence>
+      {routerState?.backgroundLocation && (
+        <Routes>
+          <Route path="/player/:playerId" element={<PlayerCard game={game} />} />
+        </Routes>
+      )}
+    </>
   );
 }
 

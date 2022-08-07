@@ -1,5 +1,6 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
+import { motion, AnimatePresence, HTMLMotionProps } from 'framer-motion';
 import { GameMoment, Pitches, getPossiblePitches } from '@wiffleball/state-machine';
 import Scoreboard from './Scoreboard/Scoreboard';
 // import Feed from './Feed/Feed';
@@ -45,13 +46,23 @@ interface Props {
 }
 
 const Main: React.FC<Props> = ({ game, selectingPitch, handlePitch, ...rest }) => {
+    const location = useLocation();
+    const routerState = location.state as { backgroundLocation?: Location };
+    const backgroundLocation = routerState?.backgroundLocation;
+    const shouldAnimate = !Boolean(backgroundLocation);
+    const animationProps: Partial<HTMLMotionProps<"div">> = {
+        animate: 'animate'
+    };
+    if (shouldAnimate) {
+        animationProps.initial = 'initial';
+        animationProps.exit = 'exit';
+    }
     return (
         <>
             <motion.div
                 variants={animations}
-                initial="initial"
                 animate="animate"
-                exit="exit"
+                {...animationProps}
                 className="main"
             >
                 <Scoreboard game={game} />
