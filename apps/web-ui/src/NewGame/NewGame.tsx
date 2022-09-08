@@ -153,7 +153,7 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
                 setPositions={setAwayPositions}
                 editing
             />
-            {!isValid && <div className="validation">both teams need at least 1 pitcher</div>}
+            {!isValid && <div className="validation">both teams need exactly 1 pitcher</div>}
             <button className="start" onClick={prepStart} disabled={!isValid}>Start game</button>
         </div>
     );
