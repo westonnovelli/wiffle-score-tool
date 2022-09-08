@@ -41,3 +41,14 @@
     text-align: right;
     flex: 1;
 }
+
+.manage-roster .submit-btn {
+    height: 32px;
+    width: 50vw;
+
+    margin-top: 32px;
+}
+
+.manage-roster .validation {
+    font-style: italic;
+}

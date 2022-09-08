@@ -47,7 +47,7 @@ const PlayerItem: React.FC<PlayerItemProps> = ({ index, id, name, position, rena
         <Reorder.Item value={id} style={{ y }}>
             <div className="player">
                 <div className="drag-handle"><Drag /></div>
-                <input value={name} onChange={(e) => rename(id, e.target.value)} />
+                <input type="text" className="name" value={name} onChange={(e) => rename(id, e.target.value)} />
                 <PositionSelect position={position} onChange={(e) => reposition(id, safeParseInt(e.target.value))} />
                 <button className="remove" onClick={() => remove(index)}><Close /></button>
             </div>
@@ -166,9 +166,11 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({
                     );
                 })}
             </Reorder.Group>
-            <input type="text" value={pendingName} onChange={(e) => void setPendingName(e.target.value)} />
-            <PositionSelect position={pendingPosition} setPosition={setPendingPosition} />
-            <button onClick={add}>Add</button>
+            <div className="add-player">
+                <input className="name-input" type="text" value={pendingName} onChange={(e) => void setPendingName(e.target.value)} />
+                <PositionSelect position={pendingPosition} setPosition={setPendingPosition} />
+                <button onClick={add} disabled={pendingName === ''} className="add-btn">Add</button>
+            </div>
         </div>
     );
 };

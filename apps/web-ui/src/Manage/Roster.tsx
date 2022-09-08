@@ -13,22 +13,26 @@ interface Props {
     handleEdit?: (edit: DeepPartial<Team>) => void;
 }
 
+type Names = Record<string, string>;
+type Positions = Record<string, Position>;
+type Lineup = string[];
+
 const getNames = (team: Team) => {
-    return Object.keys(team.roster).reduce<Record<string, string>>((acc, id) => {
+    return Object.keys(team.roster).reduce<Names>((acc, id) => {
         acc[id] = team.roster[id].name;
         return acc;
     }, {});
 };
 
 const getPositions = (team: Team) => {
-    return Object.keys(team.roster).reduce<Record<string, Position>>((acc, id) => {
+    return Object.keys(team.roster).reduce<Positions>((acc, id) => {
         acc[id] = team.defense[id];
         return acc;
     }, {});
 };
 
-const changedNames = (potential: Record<string, string>, team: Team) => {
-    return Object.keys(potential).reduce<Record<string, string>>((acc, id) => {
+const changedNames = (potential: Names, team: Team) => {
+    return Object.keys(potential).reduce<Names>((acc, id) => {
         const player = team.roster[id];
         if (player && player.name !== potential[id]) {
             acc[id] = potential[id];
@@ -41,10 +45,17 @@ const lineupChanged = (potential: BattingOrder, team: Team): boolean => {
     return potential.some((id, index) => team.lineup[index] !== id);
 };
 
+const isValidRoster = (names: Names, positions: Positions, lineup: Lineup): [boolean, string] => {
+    if (Object.values(names).some((name) => name === '')) return [false, 'all players need a name'];
+    if (Object.values(positions).filter((position) => position === Position.Pitcher).length !== 1) return [false, 'team needs exactly 1 pitcher'];
+    if (lineup.length < 1) return [false, 'team needs at least 1 batter'];
+    return [true, ''];
+};
+
 const Roster: React.FC<Props> = ({ whichTeam, teamName, team, handleEdit }) => {
-    const [lineup, setLineup] = React.useState<string[]>(team.lineup);
-    const [names, setNames] = React.useState<Record<string, string>>(getNames(team));
-    const [positions, setPositions] = React.useState<Record<string, Position>>(getPositions(team));
+    const [lineup, setLineup] = React.useState<Lineup>(team.lineup);
+    const [names, setNames] = React.useState<Names>(getNames(team));
+    const [positions, setPositions] = React.useState<Positions>(getPositions(team));
 
     const editing = Boolean(handleEdit);
 
@@ -63,7 +74,7 @@ const Roster: React.FC<Props> = ({ whichTeam, teamName, team, handleEdit }) => {
                 edit.defense[id] = positions[id];
             }
         });
-        
+
         const nameChanges = changedNames(names, team);
         if (Object.keys(nameChanges).length > 0) {
             edit.roster = {};
@@ -96,8 +107,12 @@ const Roster: React.FC<Props> = ({ whichTeam, teamName, team, handleEdit }) => {
         handleEdit(edit);
     };
 
+    const [isValidTeam, errorMessage] = React.useMemo(() => {
+        return isValidRoster(names, positions, lineup);
+    }, [names, positions, lineup]);
+
     return (
-        <Structure className={`manage-roster ${whichTeam}`} wftitle={<PageHeader title={teamName}/>}>
+        <Structure className={`manage-roster ${whichTeam}`} wftitle={<PageHeader title={teamName} />}>
             <TeamBuilder
                 team={team}
                 names={names}
@@ -108,7 +123,8 @@ const Roster: React.FC<Props> = ({ whichTeam, teamName, team, handleEdit }) => {
                 setLineup={setLineup}
                 editing
             />
-            {editing && <button onClick={onSave}>Save changes</button>}
+            {editing && <button onClick={onSave} disabled={!isValidTeam} className="submit-btn">Save changes</button>}
+            {!isValidTeam && <div className="validation">{errorMessage}</div>}
         </Structure>
     );
 };
