@@ -42,13 +42,43 @@
     flex: 1;
 }
 
-.manage-roster .submit-btn {
-    height: 32px;
-    width: 50vw;
+.manage-roster .actions {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
 
     margin-top: 32px;
+}
+
+.manage-roster .actions .update-btn {
+    height: 32px;
+    width: 60%;
 }
 
 .manage-roster .validation {
     font-style: italic;
 }
+
+.manage-roster .actions .save-check {
+    font-size: 1.2rem;
+    font-weight: bold;
+    line-height: 1.1;
+    display: grid;
+    grid-template-columns: 1em auto;
+    gap: 0.5em;
+}
+
+/* .manage-roster .actions .already-saved {} */
+
+.manage-roster .actions .already-saved a,
+.manage-roster .actions .already-saved a:visited {
+    text-decoration: none;
+    color: var(--color-text);
+    padding: 4px 8px;
+    border-radius: 1em;
+    background: var(--color-primary-light);
+}
+
+

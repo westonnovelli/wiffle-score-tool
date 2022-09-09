@@ -47,6 +47,7 @@ import Export from './Menu/Export';
 import About from './About/About';
 import Menu from './Menu/Menu';
 import PlayerCard from './PlayerCard/PlayerCard';
+import TeamManager from './TeamManager/TeamManager';
 
 const getGameSeed = (searchParams: URLSearchParams, lsGame: string | null) => {
   if (searchParams.get('game')) {
@@ -240,7 +241,7 @@ function App() {
               <Route path="pitching" element={<PitchingStats game={game} />} />
               <Route path="fielding" element={<h2>Coming soon</h2>} />
             </Route>
-
+            <Route path="team-manager" element={<TeamManager />}/>
           </Route>
         </Routes>
       </AnimatePresence>

@@ -1,8 +1,7 @@
+import { deserializeTeam, Team } from '@wiffleball/state-machine';
 import React from 'react';
 import { useReadLocalStorage } from 'usehooks-ts';
 import { TEAMS, TEAM_PREFIX } from "../localStorage";
-
-const deserializeTeam = (team: string) => {/* TODO */};
 
 const TeamManager: React.FC = () => {
     const localTeamList = useReadLocalStorage<string[]>(TEAMS);
@@ -14,8 +13,8 @@ const TeamManager: React.FC = () => {
     return (
         <div>
             <ul>
-                {localTeams.map((team: string) => {
-                    const teamObj = deserializeTeam(team);
+                {localTeams.map((serializedTeam: string) => {
+                    const team: Team = deserializeTeam(serializedTeam);
                     return (
                         <li key={team.id}>{team.name}</li>
                     );

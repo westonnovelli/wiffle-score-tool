@@ -1,10 +1,13 @@
-import { DeepPartial, Team, Position, defaultPlayer, BattingOrder } from "@wiffleball/state-machine";
+import { DeepPartial, Team, Position, defaultPlayer, BattingOrder, serializeTeam, newTeam } from "@wiffleball/state-machine";
 import React from "react";
 import { nanoid } from 'nanoid';
 import Structure from "../components/Structure";
 import TeamBuilder from "../components/TeamBuilder";
 import './Roster.css';
 import PageHeader from "../components/PageHeader";
+import { TEAMS, TEAM_PREFIX } from "../localStorage";
+import { useLocalStorage } from "usehooks-ts";
+import { Link } from "react-router-dom";
 
 interface Props {
     whichTeam: 'home' | 'away';
@@ -57,9 +60,15 @@ const Roster: React.FC<Props> = ({ whichTeam, teamName, team, handleEdit }) => {
     const [names, setNames] = React.useState<Names>(getNames(team));
     const [positions, setPositions] = React.useState<Positions>(getPositions(team));
 
+    const [saves, setSaves] = useLocalStorage<string[]>(TEAMS, []);
+    const isSaved = React.useMemo(() => {
+        return saves?.includes(team.id);
+    }, [saves, team.id]);
+    const [plsSave, setPlsSave] = React.useState(isSaved);
+
     const editing = Boolean(handleEdit);
 
-    const onSave = () => {
+    const onUpdate = () => {
         if (!handleEdit) return;
 
         const edit: DeepPartial<Team> = {};
@@ -105,6 +114,17 @@ const Roster: React.FC<Props> = ({ whichTeam, teamName, team, handleEdit }) => {
         });
 
         handleEdit(edit);
+        if (plsSave) {
+            const wouldBeTeam = newTeam(lineup.map((id) => ({
+                id,
+                name: names[id],
+                position: positions[id],
+            })), team.id, team.name);
+            if (wouldBeTeam) {
+                setSaves([...saves, team.id]);
+                localStorage.setItem(`${TEAM_PREFIX}${team.id}`, serializeTeam(wouldBeTeam));
+            }
+        }
     };
 
     const [isValidTeam, errorMessage] = React.useMemo(() => {
@@ -113,6 +133,7 @@ const Roster: React.FC<Props> = ({ whichTeam, teamName, team, handleEdit }) => {
 
     return (
         <Structure className={`manage-roster ${whichTeam}`} wftitle={<PageHeader title={teamName} />}>
+            {['home', 'away'].includes(team.name) && <h2>{team.name}</h2>}
             <TeamBuilder
                 team={team}
                 names={names}
@@ -123,8 +144,16 @@ const Roster: React.FC<Props> = ({ whichTeam, teamName, team, handleEdit }) => {
                 setLineup={setLineup}
                 editing
             />
-            {editing && <button onClick={onSave} disabled={!isValidTeam} className="submit-btn">Save changes</button>}
-            {!isValidTeam && <div className="validation">{errorMessage}</div>}
+            <div className="actions">
+                {isSaved
+                    ? <label className="already-saved">Team already on device, see in <Link to="/team-manager">Team Manager</Link></label>
+                    : <label className="save-check"><input type="checkbox" className="save-btn" disabled={isSaved} onChange={(e) => {
+                        setPlsSave(e.target.checked);
+                    }} />Keep team on this device</label>
+                }
+                {editing && <button onClick={onUpdate} disabled={!isValidTeam} className="update-btn">Update team</button>}
+                {!isValidTeam && <div className="validation">{errorMessage}</div>}
+            </div>
         </Structure>
     );
 };

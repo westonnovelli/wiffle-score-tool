@@ -7,6 +7,7 @@ import TeamBuilder from '../components/TeamBuilder';
 import './NewGame.css';
 import { SwapVert } from "../icons";
 import PageHeader from "../components/PageHeader";
+import { Link } from "react-router-dom";
 
 interface Props {
     handleStart: (
@@ -58,6 +59,8 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
         };
 
         const homeTeam: Team = {
+            id: nanoid(4),
+            name: 'home',
             roster: {},
             lineup: [],
             startingLineup: [],
@@ -76,6 +79,8 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
         });
 
         const awayTeam: Team = {
+            id: nanoid(4),
+            name: 'away',
             roster: {},
             lineup: [],
             startingLineup: [],
@@ -132,7 +137,9 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
                 recordingStats={recordingStats}
                 setRecordingStats={setRecordingStats}
             />
-            <h2>Home team</h2>
+            <h2>Teams</h2>
+            {/* <Link to="../teams">Use teams from device</Link> */}
+            <h3>Home team</h3>
             <TeamBuilder
                 lineup={homeTeamLineup}
                 setLineup={setHomeTeamLineup}
@@ -143,7 +150,7 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
                 editing
             />
             <button className="swap-teams" onClick={swapTeams}><SwapVert/>Swap home/away</button>
-            <h2>Away team</h2>
+            <h3>Away team</h3>
             <TeamBuilder
                 lineup={awayTeamLineup}
                 setLineup={setAwayTeamLineup}
