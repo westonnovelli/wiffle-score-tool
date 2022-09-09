@@ -1,6 +1,9 @@
 import { deserializeTeam, Team } from '@wiffleball/state-machine';
 import React from 'react';
 import { useReadLocalStorage } from 'usehooks-ts';
+import MenuItem from '../components/MenuItem';
+import PageHeader from '../components/PageHeader';
+import Structure from '../components/Structure';
 import { TEAMS, TEAM_PREFIX } from "../localStorage";
 
 const TeamManager: React.FC = () => {
@@ -11,16 +14,16 @@ const TeamManager: React.FC = () => {
     }) ?? [];
 
     return (
-        <div>
+        <Structure className="menu" wftitle={<PageHeader title="Team Manager" destination="/" />}>
             <ul>
                 {localTeams.map((serializedTeam: string) => {
                     const team: Team = deserializeTeam(serializedTeam);
                     return (
-                        <li key={team.id}>{team.name}</li>
+                        <MenuItem label={team.name} />
                     );
                 })}
             </ul>
-        </div>
+        </Structure>
     );
 };
 

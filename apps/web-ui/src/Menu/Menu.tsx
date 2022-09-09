@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Structure from "../components/Structure";
 import PageHeader from "../components/PageHeader";
 import MenuItem from '../components/MenuItem';
+import { People } from "../icons";
 
 interface Props {}
 
@@ -27,6 +28,10 @@ const Menu: React.FC<Props> = () => {
         navigate('share');
     };
 
+    const handleTeamManager = () => {
+        navigate('/team-manager');
+    };
+
     const handleAbout = () => {
         navigate('about');
     };
@@ -38,6 +43,7 @@ const Menu: React.FC<Props> = () => {
                 <MenuItem onClick={handleStash} label="Save this game" description="game will be available on this device" />
                 <MenuItem onClick={handleLoad} label="Load a saved game" />
                 <MenuItem onClick={handleShare} label="Share this game by url" />
+                <MenuItem onClick={handleTeamManager} label={<div className="iconed"><People/><div>Team Manager</div></div>} />
                 <MenuItem onClick={handleAbout} label="About" />
             </ul>
         </Structure>

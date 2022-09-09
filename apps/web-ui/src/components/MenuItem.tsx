@@ -15,7 +15,7 @@ type PolymorphicComponentProp<
     & Omit<React.ComponentPropsWithoutRef<C>, PropsToOmit<C, Props>>;
 
 interface MenuItemProps {
-    label: string;
+    label: React.ReactNode;
     icon?: React.ReactNode;
     description?: string;
     onClick?: React.MouseEventHandler<HTMLLIElement>;
