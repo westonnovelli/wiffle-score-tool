@@ -19,7 +19,7 @@ const TeamManager: React.FC = () => {
                     return (
                         <li key={team.id}>{team.name}</li>
                     );
-                )}
+                })}
             </ul>
         </div>
     );

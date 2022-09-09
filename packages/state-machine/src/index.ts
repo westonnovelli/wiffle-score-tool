@@ -28,7 +28,7 @@ export {
     EMPTY_BOX,
 } from './factory';
 export { default as hydrateGame } from './history/hydrate';
-export { serializeGame, deserializeGame } from './io';
+export { serializeGame, deserializeGame, serializeTeam, deserializeTeam } from './io';
 export { getOffense, getDefense } from './teams/getTeams';
 export { pitch as handlePitch, start } from './gameReducer';
 export { default as manualEdit } from './edits/manualEdit';

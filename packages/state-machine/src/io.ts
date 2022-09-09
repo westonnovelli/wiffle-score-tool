@@ -1,8 +1,8 @@
 import pickBy from 'ramda/src/pickBy.js';
 import mergeDeepRight from 'ramda/src/mergeDeepRight.js';
 import pick from 'ramda/src/pick.js';
-import { defaultConfiguration, defaultGame, defaultRules, newTeam } from './factory';
-import { GameConfig, GameMoment, Player, Team, TeamSeed } from "./types";
+import { defaultConfiguration, defaultGame, defaultRules, defaultTeam, newTeam } from './factory';
+import { GameConfig, GameMoment, Player, Team } from "./types";
 import { start } from './gameReducer';
 
 const stripTeam = (team: Team) => {
@@ -15,6 +15,8 @@ const stripTeam = (team: Team) => {
         startingLineup: team.startingLineup,
         startingDefense: team.startingDefense,
         roster: rosterEssentials,
+        id: team.id,
+        name: team.name,
     };
 };
 
@@ -57,8 +59,16 @@ export const deserializeGame = (serialized: string): GameMoment => {
     }
     if (!parsed) return defaultGame();
 
-    const awayTeam = newTeam(parsed?.awayTeam.startingLineup.map(parseRoster(parsed.awayTeam)) ?? []);
-    const homeTeam = newTeam(parsed?.homeTeam.startingLineup.map(parseRoster(parsed.homeTeam)) ?? []);
+    const awayTeam = newTeam(
+        parsed?.awayTeam.startingLineup.map(parseRoster(parsed.awayTeam)) ?? [],
+        parsed?.awayTeam.id,
+        parsed?.awayTeam.name
+    );
+    const homeTeam = newTeam(
+        parsed?.homeTeam.startingLineup.map(parseRoster(parsed.homeTeam)) ?? [],
+        parsed?.homeTeam.id,
+        parsed?.homeTeam.name,
+    );
 
     const initialGame = defaultGame(awayTeam, homeTeam);
     const toBeMerged = pick(['configuration'], parsed);
@@ -69,3 +79,26 @@ export const deserializeGame = (serialized: string): GameMoment => {
         manualEdits: parsed?.manualEdits ?? [],
     };
 };
+
+
+export const serializeTeam = (team: Team): string => {
+    return btoa(JSON.stringify(stripTeam(team)));
+};
+
+export const deserializeTeam = (serialized: string): Team => {
+    let parsed: Team | undefined;
+    try {
+        parsed = JSON.parse(atob(serialized));
+    } catch (e) {
+        console.error('error parsing serialized team', e);
+        return defaultTeam();
+    }
+    if (!parsed) return defaultTeam();
+
+    return newTeam(
+        parsed?.startingLineup.map(parseRoster(parsed)) ?? [],
+        parsed?.id,
+        parsed?.name,
+    ) ?? defaultTeam();
+};
+

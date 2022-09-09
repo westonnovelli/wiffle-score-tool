@@ -203,6 +203,8 @@ export enum Position {
 };
 
 export interface Team {
+    id: string;
+    name: string;
     roster: Record<string, Player>;
     lineup: BattingOrder;
     defense: Record<string, Position>;
@@ -210,7 +212,7 @@ export interface Team {
     startingLineup: BattingOrder;
 };
 
-export interface TeamSeed {
+export interface PlayerSeed {
     id: string;
     name: string;
     position: Position;

@@ -5,7 +5,7 @@ import {
     OptionalRules,
     Position,
     Score,
-    TeamSeed,
+    PlayerSeed,
     type GameConfig,
     type GameMoment,
     type Player,
@@ -13,6 +13,7 @@ import {
 } from './types';
 
 let pid = 0;
+let tid = 0;
 
 export const defaultTeam = (
     name: string = '',
@@ -26,6 +27,9 @@ export const defaultTeam = (
         `${name && `${name} - `}playerD`,
     ];
 
+    const id = tid;
+    tid += 1;
+
     return names.reduce<Team>((acc, player, index) => {
         const newPlayer = defaultPlayer(player);
         acc.roster[newPlayer.id] = newPlayer;
@@ -34,13 +38,25 @@ export const defaultTeam = (
         acc.defense[newPlayer.id] = index; // enum hack of Position
         acc.startingDefense[newPlayer.id] = index; // also here
         return acc;
-    }, { roster: {}, lineup: [], defense: {}, startingLineup: [], startingDefense: {} });
+    }, {
+        roster: {},
+        lineup: [],
+        defense: {},
+        startingLineup: [],
+        startingDefense: {},
+        id: `${id}`,
+        name: `team-${id}`
+    });
 };
 
 export const newTeam = (
-    players: TeamSeed[]
+    players: PlayerSeed[],
+    teamId?: string,
+    teamName?: string
 ): Team | undefined => {
     if (players.length === 0) return undefined;
+    const id = teamId || tid;
+    tid += 1;
     return players.reduce<Team>((acc, player) => {
         const newPlayer = defaultPlayer(player.name, player.id);
         acc.roster[player.id] = newPlayer;
@@ -49,7 +65,15 @@ export const newTeam = (
         acc.defense[player.id] = player.position;
         acc.startingDefense[player.id] = player.position;
         return acc;
-    }, { roster: {}, lineup: [], defense: {}, startingLineup: [], startingDefense: {} });
+    }, {
+        roster: {},
+        lineup: [],
+        defense: {},
+        startingLineup: [],
+        startingDefense: {},
+        id: `${id}`,
+        name: teamName || `team-${id}`
+    });
 };
 
 export const defaultGame = (awayTeam: Team = defaultTeam('away', 'away'), homeTeam: Team = defaultTeam('home')): GameMoment => {
