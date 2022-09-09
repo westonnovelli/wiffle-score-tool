@@ -16,19 +16,17 @@ let pid = 0;
 let tid = 0;
 
 export const defaultTeam = (
-    name: string = '',
-    alignment: 'home' | 'away' = 'away',
+    id: string = `${tid}`,
+    name: string = `team-${id}`,
     playerNames?: string[]
 ): Team => {
+    tid += 1;
     const names: string[] = playerNames || [
         `${name && `${name} - `}playerA`,
         `${name && `${name} - `}playerB`,
         `${name && `${name} - `}playerC`,
         `${name && `${name} - `}playerD`,
     ];
-
-    const id = tid;
-    tid += 1;
 
     return names.reduce<Team>((acc, player, index) => {
         const newPlayer = defaultPlayer(player);
@@ -45,7 +43,7 @@ export const defaultTeam = (
         startingLineup: [],
         startingDefense: {},
         id: `${id}`,
-        name: `team-${id}`
+        name
     });
 };
 
@@ -76,7 +74,7 @@ export const newTeam = (
     });
 };
 
-export const defaultGame = (awayTeam: Team = defaultTeam('away', 'away'), homeTeam: Team = defaultTeam('home')): GameMoment => {
+export const defaultGame = (awayTeam: Team = defaultTeam('away'), homeTeam: Team = defaultTeam('home')): GameMoment => {
     pid = 0;
     const firstBatter = awayTeam.lineup[0] ?? 'mockBatter';
     const homesFirstBatter = homeTeam.lineup[0] ?? 'mockBatterHome';

@@ -2,7 +2,7 @@ import mergeDeepRight from 'ramda/src/mergeDeepRight.js';
 
 import { GameMoment, DeepPartial, Pitches, InningHalf, Bases, Position } from './types';
 import hydrateGame from './history/hydrate';
-import { defaultGame, EMPTY_BASES } from './factory';
+import { defaultGame, defaultTeam, EMPTY_BASES } from './factory';
 import { pitch as handlePitch, start } from './gameReducer';
 import { deserializeGame, serializeGame } from './io';
 import manualEdit from './edits/manualEdit';
@@ -12,7 +12,11 @@ type atBat = {
     expected: DeepPartial<GameMoment>
 }[];
 
-let game: GameMoment = start(defaultGame());
+let game: GameMoment = start(defaultGame(defaultTeam('1', 'away'), defaultTeam('2', 'home')));
+
+function getBaseGame() {
+    return start(defaultGame(defaultTeam(game.awayTeam.id, game.awayTeam.name), defaultTeam(game.homeTeam.id, game.homeTeam.name)));
+}
 
 test('1st batter: Lead off walk', () => {
     const atBat: atBat = [
@@ -112,7 +116,7 @@ test('1st batter: Lead off walk', () => {
 
     atBat.forEach(({ pitch, expected }) => {
         game = handlePitch(game, pitch);
-        expect(game).toEqual(mergeDeepRight(start(defaultGame()), expected));
+        expect(game).toEqual(mergeDeepRight(getBaseGame(), expected));
     });
 });
 
