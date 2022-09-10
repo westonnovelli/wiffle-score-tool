@@ -7,7 +7,10 @@
 .player-card h1 {
     text-align: center;
     margin: 0;
-    padding: 16px;
+    padding: 16px 50px 16px 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .player-card.home h1 {
