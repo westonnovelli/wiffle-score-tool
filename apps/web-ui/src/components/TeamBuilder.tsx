@@ -82,21 +82,6 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({
         setPendingPosition(Position.Infield);
     };
 
-    // const move = (index: number, amt: number) => {
-    //     if (index === 0 && amt < 0) return;
-    //     if (index === lineup.length - 1 && amt > 0) return;
-    //     if (amt === 0 || amt > 1 || amt < -1) return;
-    //     if (index > lineup.length - 1 || index < 0) return;
-
-    //     const atIndex = lineup[index];
-    //     setLineup(prev => {
-    //         const next = [...prev];
-    //         next[index] = next[index + amt];
-    //         next[index + amt] = atIndex;
-    //         return next;
-    //     });
-    // };
-
     const rename = (id: string, newName: string) => {
         if (!Object.keys(names).includes(id)) return;
 

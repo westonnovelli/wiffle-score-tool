@@ -121,7 +121,9 @@ const Roster: React.FC<Props> = ({ whichTeam, teamName, team, handleEdit }) => {
                 position: positions[id],
             })), team.id, team.name);
             if (wouldBeTeam) {
-                setSaves([...saves, team.id]);
+                if (!isSaved) {
+                    setSaves([...saves, team.id]);
+                }
                 localStorage.setItem(`${TEAM_PREFIX}${team.id}`, JSON.stringify(serializeTeam(wouldBeTeam)));
             }
         }
@@ -134,7 +136,7 @@ const Roster: React.FC<Props> = ({ whichTeam, teamName, team, handleEdit }) => {
     // TODO rename teams
     return (
         <Structure className={`manage-roster ${whichTeam}`} wftitle={<PageHeader title={teamName} />}>
-            {['home', 'away'].includes(team.name) && <h2>{team.name}</h2>}
+            {!['home', 'away'].includes(team.name) && <h2>{team.name}</h2>}
             <TeamBuilder
                 team={team}
                 names={names}

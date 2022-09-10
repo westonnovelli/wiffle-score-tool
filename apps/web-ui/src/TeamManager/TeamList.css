@@ -1,0 +1,12 @@
+ul.team-list {
+    list-style: none;
+    padding: 16px;
+    margin: 0;
+    margin-bottom: 64px;
+}
+
+.team-list.empty {
+    width: 100%;
+    text-align: center;
+    color: var(--color-text-subtle);
+}

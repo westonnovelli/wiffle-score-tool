@@ -39,3 +39,25 @@
 .newgame button.swap-teams svg {
     height: 16px;
 }
+
+.newgame .team-header {
+    display: flex;
+    gap: 8px;
+}
+
+.newgame .team-header .team-name {
+    color: var(--color-text);
+    background-color: var(--color-primary-light);
+    border: none;
+    padding: 0 4px;
+    margin: 16px 0;
+}
+
+.newgame .team-header .team-name-btn {
+    background: transparent;
+    border: none;
+    color: var(--color-text);
+    text-decoration: underline;
+
+    margin: 16px 0;
+}
