@@ -1,0 +1,84 @@
+.team-summary {
+    color: var(--color-text);
+}
+
+
+.team-summary ol {
+    position: relative;
+    padding-inline-start: 20px;
+}
+
+.team-summary li {
+    position: relative;
+}
+
+.team-summary .player {
+    display: flex;
+    align-items: center;
+    border-radius: 19px;
+    box-shadow: var(--elevation-1);
+    gap: 4px;
+    justify-content: space-between;
+
+    margin-bottom: 4px;
+}
+
+.team-summary .player .drag-handle-placeholder {
+    height: 16px;
+    width: 16px;
+    padding: 4px;
+    border-radius: 50%;
+    fill: var(--color-text);
+    margin-left: 4px;
+}
+
+.team-summary .player .remove-btn-placeholder {
+    border-radius: 50%;
+    aspect-ratio: 1;
+    border: none;
+    margin: 4px;
+    display: flex;
+    place-items: center;
+    padding: 4px;
+    height: 16px;
+    width: 16px;
+}
+
+.team-summary .player .name {
+    padding: 4px 8px;
+    flex: 1;
+}
+
+/* .team-summary .player .position {} */
+
+.team-summary .share {
+    padding: 16px;
+    color: var(--color-text);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.team-summary .share .qr-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px 0;
+}
+
+.team-summary .share input {
+    border: none;
+    color: var(--color-text);
+    background: var(--color-primary);
+}
+
+.team-summary .remove {
+    background: var(--color-primary);
+    color: var(--color-text);
+    padding: 8px;
+    border: 1px solid var(--color-primary-light);
+    width: 100%;
+
+    margin-top: 32px;
+}

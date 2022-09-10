@@ -4,13 +4,7 @@ import { Reorder, useMotionValue } from 'framer-motion';
 import { safeParseInt } from "../helpers";
 import { Close, Drag } from "../icons";
 import './TeamBuilder.css';
-
-const allPositions = [
-    { label: 'Pitcher', value: Position.Pitcher },
-    { label: 'Infield', value: Position.Infield },
-    { label: 'Outfield', value: Position.Outfield },
-    { label: 'Bench', value: Position.Bench },
-];
+import { allPositions } from "../translations";
 
 type PositionSelectProps = {
     position: Position;

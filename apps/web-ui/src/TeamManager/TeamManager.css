@@ -1,0 +1,9 @@
+.team-manager {
+    color: var(--color-text);
+}
+
+.team-manager .empty {
+    width: 100%;
+    text-align: center;
+    color: var(--color-text-subtle);
+}

@@ -18,5 +18,6 @@ test('a serializedTeam can be deserialized and result in the same team', () => {
     }]) ?? defaultTeam();
 
     const saved = serializeTeam(initial);
+    // console.log(saved);
     expect(deserializeTeam(saved)).toEqual(initial);
 });

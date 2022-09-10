@@ -122,7 +122,7 @@ const Roster: React.FC<Props> = ({ whichTeam, teamName, team, handleEdit }) => {
             })), team.id, team.name);
             if (wouldBeTeam) {
                 setSaves([...saves, team.id]);
-                localStorage.setItem(`${TEAM_PREFIX}${team.id}`, serializeTeam(wouldBeTeam));
+                localStorage.setItem(`${TEAM_PREFIX}${team.id}`, JSON.stringify(serializeTeam(wouldBeTeam)));
             }
         }
     };
