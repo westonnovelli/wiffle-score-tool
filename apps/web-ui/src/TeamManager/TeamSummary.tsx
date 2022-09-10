@@ -1,13 +1,13 @@
 import { deserializeTeam } from '@wiffleball/state-machine';
 import React from 'react';
-import QRCode from 'react-qr-code';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useCopyToClipboard, useLocalStorage, useReadLocalStorage } from 'usehooks-ts';
+import { useLocalStorage, useReadLocalStorage } from 'usehooks-ts';
 import PageHeader from '../components/PageHeader';
 import Structure from '../components/Structure';
 import { TEAMS, TEAM_PREFIX } from "../localStorage";
-import { allPositions } from '../translations';
+import ShareTeam from './ShareTeam';
 import './TeamSummary.css';
+import TeamView from './TeamView';
 
 const useTeamFromUrl = () => {
     const location = useLocation();
@@ -33,11 +33,7 @@ const TeamSummary: React.FC = () => {
     const { key: lsKey, team, serializedTeam } = useTeamFromUrl();
     const [teamList, setTeamList] = useLocalStorage(`${TEAMS}`, []);
 
-    const [value, copy] = useCopyToClipboard();
-
-    const href = `${window.location.protocol}//${window.location.host}?team=${serializedTeam}`;
-
-    const handleCopy = () => copy(href);
+    const href = `${window.location.protocol}//${window.location.host}/team-manager?team=${serializedTeam}`;
 
     const handleRemove = () => {
         if (window.confirm('Are you sure? This team will be removed from this device.')) {
@@ -49,30 +45,8 @@ const TeamSummary: React.FC = () => {
 
     return (
         <Structure className="team-summary" wftitle={<PageHeader title={team?.name ?? 'oops'} destination="/team-manager" />}>
-            <ol>
-                {team?.startingLineup.map((id) => {
-                    return (
-                        <li key={id}>
-                            <div className="player">
-                                <div className="drag-handle-placeholder"/>
-                                <div className="name">{team?.roster[id]?.name}</div>
-                                <div className="position">
-                                    {allPositions.find(({ value }) => value === team?.startingDefense[id])?.label}
-                                </div>
-                                <div className="remove-btn-placeholder"/>
-                            </div>
-                        </li>
-                    );
-                })}
-            </ol>
-            <div className="share">
-                <div className="qr-container">
-                    <QRCode value={href} />
-                </div>
-                <button onClick={handleCopy}>Copy to clipboard</button>
-                {value === href && <div className="confirm">Copied!</div>}
-                <input value={href} onFocus={(e) => void e.target?.select()} onChange={() => {}}/>
-            </div>
+            <TeamView team={team}/>
+            <ShareTeam href={href} />
             <button onClick={handleRemove} className="remove">Remove this team</button>
         </Structure>
     );

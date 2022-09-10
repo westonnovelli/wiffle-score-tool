@@ -1,0 +1,47 @@
+ol.team-view  {
+    position: relative;
+    padding-inline-start: 20px;
+}
+
+.team-view li {
+    position: relative;
+}
+
+.team-view .player {
+    display: flex;
+    align-items: center;
+    border-radius: 19px;
+    box-shadow: var(--elevation-1);
+    gap: 4px;
+    justify-content: space-between;
+
+    margin-bottom: 4px;
+}
+
+.team-view .player .drag-handle-placeholder {
+    height: 16px;
+    width: 16px;
+    padding: 4px;
+    border-radius: 50%;
+    fill: var(--color-text);
+    margin-left: 4px;
+}
+
+.team-view .player .remove-btn-placeholder {
+    border-radius: 50%;
+    aspect-ratio: 1;
+    border: none;
+    margin: 4px;
+    display: flex;
+    place-items: center;
+    padding: 4px;
+    height: 16px;
+    width: 16px;
+}
+
+.team-view .player .name {
+    padding: 4px 8px;
+    flex: 1;
+}
+
+/* .team-view .player .position {} */

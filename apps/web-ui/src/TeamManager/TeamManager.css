@@ -2,6 +2,13 @@
     color: var(--color-text);
 }
 
+.team-manager ul {
+    list-style: none;
+    padding: 16px;
+    margin: 0;
+    margin-bottom: 64px;
+}
+
 .team-manager .empty {
     width: 100%;
     text-align: center;

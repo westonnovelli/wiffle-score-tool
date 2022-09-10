@@ -1,0 +1,57 @@
+.external-team {
+    color: var(--color-text);
+    position: relative;
+    height: 100%;
+}
+
+.external-team h1 {
+    text-align: center;
+    margin: 0;
+    padding: 16px 50px 16px 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.external-team button.close {
+    position: absolute;
+    top: 20px;
+    right: 16px;
+    padding: 4px;
+    border-radius: 3px;
+    height: 32px;
+    width: 32px;
+    border: none;
+    background: transparent;
+    color: var(--color-text);
+    fill:  var(--color-text);
+}
+
+.external-team .content {
+    padding: 0 16px 16px 16px;
+}
+
+.external-team .content .import {
+    background: var(--color-secondary);
+    color: var(--color-text);
+    padding: 8px;
+    border: none;
+    width: 100%;
+
+    margin-top: 32px;
+}
+
+.external-team .content .import:disabled {
+    background: var(--color-disabled);
+    color: var(--color-text-disabled);
+}
+
+[data-reach-dialog-content] {
+    width: 90%;
+    max-width: 400px;
+    border-radius: 8px;
+    background: var(--color-primary);
+    padding: 0;
+    height: 80vh;
+    overflow: hidden;
+}
