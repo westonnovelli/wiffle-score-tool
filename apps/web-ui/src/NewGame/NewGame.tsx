@@ -138,8 +138,8 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
                 setRecordingStats={setRecordingStats}
             />
             <h2>Teams</h2>
-            {/* <Link to="../teams">Use teams from device</Link> */}
-            <h3>Home team</h3>
+            {/* TODO <Link to="../teams">Use teams from device</Link> */}
+            <h3>Home team</h3> {/* TODO rename teams */}
             <TeamBuilder
                 lineup={homeTeamLineup}
                 setLineup={setHomeTeamLineup}

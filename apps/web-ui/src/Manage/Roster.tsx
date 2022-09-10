@@ -131,6 +131,7 @@ const Roster: React.FC<Props> = ({ whichTeam, teamName, team, handleEdit }) => {
         return isValidRoster(names, positions, lineup);
     }, [names, positions, lineup]);
 
+    // TODO rename teams
     return (
         <Structure className={`manage-roster ${whichTeam}`} wftitle={<PageHeader title={teamName} />}>
             {['home', 'away'].includes(team.name) && <h2>{team.name}</h2>}
