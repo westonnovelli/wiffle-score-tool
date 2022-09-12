@@ -72,8 +72,8 @@ const Nav: React.FC<Props> = ({ onSelectPitch, gameOver, gameStarted, startGame,
                 variants={variants}
                 initial={false}
                 animate={primaryDisabled ? 'disabled' : 'enabled'}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={primaryDisabled ? {} : { scale: 1.1 }}
+                whileTap={primaryDisabled ? {} : { scale: 0.95 }}
             >
                 {primaryBtnLabel}
             </motion.button>

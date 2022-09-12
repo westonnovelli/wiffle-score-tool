@@ -1,6 +1,7 @@
 import { defaultConfiguration, defaultPlayer, defaultRules, GameConfig, Position, Team } from "@wiffleball/state-machine";
 import React from "react";
 import { nanoid } from 'nanoid';
+import { useReadLocalStorage } from 'usehooks-ts';
 import GameConfigControl from "../components/GameConfigControl";
 import RulesControl from "../components/RulesControl";
 import TeamBuilder from '../components/TeamBuilder';
@@ -8,6 +9,7 @@ import './NewGame.css';
 import { SwapVert } from "../icons";
 import PageHeader from "../components/PageHeader";
 import TeamSelect from "./TeamSelect";
+import { TEAMS } from "../localStorage";
 
 const roster2Names = (roster: Team['roster']): Record<string, string> => {
     return Object.values(roster).reduce<Record<string, string>>((acc, player) => {
@@ -37,7 +39,8 @@ interface Props {
 const NewGame: React.FC<Props> = ({ handleStart }) => {
     const [rules, setRules] = React.useState(defaultRules());
 
-    // TODO only show select existing team if any exist
+    const localTeamList = useReadLocalStorage<string[]>(TEAMS);
+    const hasSavedTeams = (localTeamList?.length ?? 0) > 0;
 
     const defaultConfig = defaultConfiguration();
     const [maxStrikes, setMaxStrikes] = React.useState(defaultConfig.maxStrikes);
@@ -199,7 +202,7 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
                     : <button className="team-name-btn" onClick={() => void setNamingHomeTeam(true)}>add name</button>
                 }
             </div>
-            <button onClick={() => { setIsSelectingTeam('home') }}>Select a saved team</button>
+            {hasSavedTeams && <button onClick={() => { setIsSelectingTeam('home') }}>Select a saved team</button>}
             <TeamBuilder
                 lineup={homeTeamLineup}
                 setLineup={setHomeTeamLineup}
@@ -217,7 +220,7 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
                     : <button className="team-name-btn" onClick={() => void setNamingAwayTeam(true)}>add name</button>
                 }
             </div>
-            <button onClick={() => { setIsSelectingTeam('away') }}>Select a saved team</button>
+            {hasSavedTeams && <button onClick={() => { setIsSelectingTeam('away') }}>Select a saved team</button>}
             <TeamBuilder
                 lineup={awayTeamLineup}
                 setLineup={setAwayTeamLineup}

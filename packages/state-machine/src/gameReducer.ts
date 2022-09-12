@@ -352,10 +352,17 @@ function runsReducer(intermediate: GameMoment): ChainingReducer {
     // assumes runs have already been tallied, need to adjust if rules indicate
     const runsThisInning = intermediate.boxScore[intermediate.inning.number - 1][getOffenseKey(intermediate)];
 
+    const runLimitSet = intermediate.configuration.maxRuns > 0;
+    const practicalRunLimit = (
+        intermediate.configuration.rules[OptionalRules.DoubleRunLimitInLastInning]
+        && intermediate.inning.number >= intermediate.configuration.maxInnings
+    )
+        ? intermediate.configuration.maxRuns * 2
+        : intermediate.configuration.maxRuns;
     // hit max runs
-    if (runsThisInning >= intermediate.configuration.maxRuns && intermediate.configuration.maxRuns > 0) {
+    if (runLimitSet && runsThisInning >= practicalRunLimit) {
         const shouldSetRunsToMax = !intermediate.configuration.rules[OptionalRules.AllowSinglePlayRunsToPassLimit];
-        const newScore = shouldSetRunsToMax ? intermediate.configuration.maxRuns : runsThisInning;
+        const newScore = shouldSetRunsToMax ? practicalRunLimit : runsThisInning;
         const newBoxes = [...intermediate.boxScore];
         newBoxes[intermediate.inning.number - 1][getOffenseKey(intermediate)] = newScore;
 
@@ -371,7 +378,7 @@ function runsReducer(intermediate: GameMoment): ChainingReducer {
         return { next: batterUp(needsBatterSwitch, true), proceed: false };
     }
 
-    // walkoff
+    // walkoff TODO Earlier walk off due to run limit
     if (
         intermediate.inning.number >= intermediate.configuration.maxInnings
         && intermediate.inning.half === InningHalf.BOTTOM

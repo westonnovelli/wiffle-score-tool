@@ -191,6 +191,7 @@ export enum OptionalRules {
     ThirdBaseCanTag,
     AllowSinglePlayRunsToPassLimit,
     InFieldFly,
+    DoubleRunLimitInLastInning,
 }
 
 export type BattingOrder = string[];

@@ -190,6 +190,7 @@ export const defaultRules = (): Record<OptionalRules, boolean> => {
         [OptionalRules.ThirdBaseCanTag]: true,
         [OptionalRules.AllowSinglePlayRunsToPassLimit]: false,
         [OptionalRules.InFieldFly]: true,
+        [OptionalRules.DoubleRunLimitInLastInning]: true,
     };
 };
 

@@ -1093,7 +1093,7 @@ describe('[7.02]', () => {
 
         expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
     });
-    
+
     test('FLO.003t!: outfield fly out with successful tag, with a runner on third, scores the runner', () => {
         const initial: GameMoment = mergeDeepRight(noStatsGame(), { bases: { [Bases.THIRD]: 1 } });
         const thrown: Pitches = Pitches.INPLAY_OUTFIELD_OUT_TAG_SUCCESS;
@@ -1291,6 +1291,88 @@ describe('[Optional Rules]', () => {
             const thrown: Pitches = Pitches.INPLAY_HOMERUN;
             const diff: DeepPartial<GameMoment> = {
                 boxScore: [{ homeTeam: 0, awayTeam: 8 }],
+                inning: { half: InningHalf.BOTTOM },
+                atBat: '4',
+                nextHalfAtBat: '1',
+                bases: {
+                    [Bases.FIRST]: 0,
+                    [Bases.SECOND]: 0,
+                    [Bases.THIRD]: 0,
+                },
+            };
+
+            expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        });
+    });
+
+    describe('[DoubleRunLimitInLastInning = true]', () => {
+        test('Run limit is increased to 2x for the last inning', () => {
+            const initial: GameMoment = {
+                ...noStatsGame(),
+                boxScore: [{ awayTeam: 0, homeTeam: 0 }, { awayTeam: 0, homeTeam: 0 }],
+                bases: {
+                    [Bases.FIRST]: 1,
+                    [Bases.SECOND]: 1,
+                    [Bases.THIRD]: 1,
+                    [Bases.HOME]: 0
+                },
+                inning: { number: 2, half: InningHalf.TOP }, // last Inning
+                configuration: {
+                    ...defaultConfiguration(),
+                    maxRuns: 2,
+                    maxInnings: 2,
+                    recordingStats: false,
+                    rules: {
+                        ...defaultRules(),
+                        [OptionalRules.DoubleRunLimitInLastInning]: true,
+                    }
+                }
+            };
+
+            const thrown: Pitches = Pitches.INPLAY_HOMERUN;
+            const diff: DeepPartial<GameMoment> = {
+                boxScore: [{ homeTeam: 0, awayTeam: 0 }, { homeTeam: 0, awayTeam: 4 }],
+                inning: { half: InningHalf.BOTTOM },
+                atBat: '4',
+                nextHalfAtBat: '1',
+                bases: {
+                    [Bases.FIRST]: 0,
+                    [Bases.SECOND]: 0,
+                    [Bases.THIRD]: 0,
+                },
+            };
+
+            expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+        });
+    });
+
+    describe('[DoubleRunLimitInLastInning = false]', () => {
+        test('Run limit is increased to 2x for the last inning', () => {
+            const initial: GameMoment = {
+                ...noStatsGame(),
+                boxScore: [{ awayTeam: 0, homeTeam: 0 }, { awayTeam: 0, homeTeam: 0 }],
+                bases: {
+                    [Bases.FIRST]: 1,
+                    [Bases.SECOND]: 1,
+                    [Bases.THIRD]: 1,
+                    [Bases.HOME]: 0
+                },
+                inning: { number: 2, half: InningHalf.TOP }, // last Inning
+                configuration: {
+                    ...defaultConfiguration(),
+                    maxRuns: 2,
+                    maxInnings: 2,
+                    recordingStats: false,
+                    rules: {
+                        ...defaultRules(),
+                        [OptionalRules.DoubleRunLimitInLastInning]: false,
+                    }
+                }
+            };
+
+            const thrown: Pitches = Pitches.INPLAY_HOMERUN;
+            const diff: DeepPartial<GameMoment> = {
+                boxScore: [{ homeTeam: 0, awayTeam: 0 }, { homeTeam: 0, awayTeam: 2 }],
                 inning: { half: InningHalf.BOTTOM },
                 atBat: '4',
                 nextHalfAtBat: '1',
