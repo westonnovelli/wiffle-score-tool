@@ -1,7 +1,7 @@
 import React from 'react';
-import { safeParseInt } from '../helpers';
+import { safeParseInt } from '../../helpers';
 import './GameConfigControl.css';
-import NumberInput from './NumberInput';
+import NumberInput from '../NumberInput';
 
 // @ts-expect-error
 const MAX_INNINGS = window.WIFFLE_SCORE_TOOL_SETTINGS?.maxInnings ?? 99;
@@ -18,21 +18,21 @@ const MAX_RUNS = window.WIFFLE_SCORE_TOOL_SETTINGS?.maxRuns ?? 99;
 
 interface Props {
     maxBalls: number;
-    setMaxBalls: React.Dispatch<React.SetStateAction<number>>;
+    setMaxBalls: React.Dispatch<number>;
     maxStrikes: number;
-    setMaxStrikes: React.Dispatch<React.SetStateAction<number>>;
+    setMaxStrikes: React.Dispatch<number>;
     maxOuts: number;
-    setMaxOuts: React.Dispatch<React.SetStateAction<number>>;
+    setMaxOuts: React.Dispatch<number>;
     maxRuns: number;
-    setMaxRuns: React.Dispatch<React.SetStateAction<number>>;
+    setMaxRuns: React.Dispatch<number>;
     maxFielders: number;
-    setMaxFielders: React.Dispatch<React.SetStateAction<number>>;
+    setMaxFielders: React.Dispatch<number>;
     maxInnings: number;
-    setMaxInnings: React.Dispatch<React.SetStateAction<number>>;
+    setMaxInnings: React.Dispatch<number>;
     allowExtras: boolean | undefined;
-    setAllowExtras: React.Dispatch<React.SetStateAction<boolean | undefined>>;
+    setAllowExtras: React.Dispatch<boolean | undefined>;
     recordingStats: boolean;
-    setRecordingStats: React.Dispatch<React.SetStateAction<boolean>>;
+    setRecordingStats: React.Dispatch<boolean>;
 }
 
 const GameConfigControl: React.FC<Props> = ({
@@ -114,7 +114,7 @@ const GameConfigControl: React.FC<Props> = ({
                     name="allowExtras"
                     value="allowExtras"
                     defaultChecked={allowExtras}
-                    onChange={() => void setAllowExtras(prev => !prev)}
+                    onChange={() => void setAllowExtras(!allowExtras)}
                 />
                 <label htmlFor="allowExtras">allow extra innings</label>
             </div>
@@ -124,7 +124,7 @@ const GameConfigControl: React.FC<Props> = ({
                     name="recordingStats"
                     value="recordingStats"
                     defaultChecked={recordingStats}
-                    onChange={() => void setRecordingStats(prev => !prev)}
+                    onChange={() => void setRecordingStats(!recordingStats)}
                 />
                 <label htmlFor="recordingStats">recording stats</label>
             </div>

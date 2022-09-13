@@ -3,7 +3,7 @@ import { GameConfig, OptionalRules } from '@wiffleball/state-machine';
 
 interface Props {
     rules: GameConfig['rules'];
-    setRules: React.Dispatch<React.SetStateAction<GameConfig['rules']>>;
+    setRules: React.Dispatch<GameConfig['rules']>;
 }
 
 const RulesControl: React.FC<Props> = ({ rules, setRules }) => {
@@ -14,17 +14,20 @@ const RulesControl: React.FC<Props> = ({ rules, setRules }) => {
                 // @ts-expect-error
                 const display = OptionalRules[key];
                 // @ts-expect-error
-                const value = rules[key];
+                const value: boolean = rules[key];
                 return (
                     <div key={key}>
-                        <input
-                            type="checkbox"
-                            name={key}
-                            value={display}
-                            defaultChecked={value}
-                            onChange={() => void setRules(prev => ({ ...prev, [key]: !value }))}
-                        />
-                        <label>{display}</label>
+                        <label>
+                            <input
+                                key={`${key}-${value}`}
+                                type="checkbox"
+                                name={key}
+                                value={display}
+                                defaultChecked={value}
+                                onChange={() => void setRules({ ...rules, [key]: !value })}
+                            />
+                            {display}
+                        </label>
                     </div>
                 );
             })}

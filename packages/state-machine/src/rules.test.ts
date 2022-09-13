@@ -1473,6 +1473,34 @@ describe('[game over]', () => {
         expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
     });
 
+    // TODO get this working
+    test.skip('if the last inning ends in a tie and extras are NOT allowed, the game ends', () => {
+        const initial: GameMoment = mergeDeepRight(noStatsGame(), {
+            configuration: {
+                maxInnings: 1,
+            },
+            inning: {
+                half: InningHalf.BOTTOM
+            },
+            outs: 2,
+            atBat: '5',
+            nextHalfAtBat: '1',
+        });
+        const thrown: Pitches = Pitches.INPLAY_INFIELD_GRD_OUT;
+        const diff: DeepPartial<GameMoment> = {
+            boxScore: [
+                { ...EMPTY_BOX },
+                { ...EMPTY_BOX }
+            ],
+            outs: 0,
+            atBat: '1',
+            nextHalfAtBat: '6',
+            gameOver: true,
+        };
+
+        expect(pitch(initial, thrown)).toEqual(mergeDeepRight(initial, diff));
+    });
+
     test('a walk off run in the bottom of the last inning to take the lead ends the game', () => {
         const initial: GameMoment = mergeDeepRight(noStatsGame(), {
             configuration: {

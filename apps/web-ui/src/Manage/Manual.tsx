@@ -12,12 +12,14 @@ import React from "react";
 import Structure from "../components/Structure";
 import PageHeader from "../components/PageHeader";
 import './Manual.css';
-import RulesControl from "../components/RulesControl";
-import GameConfigControl from "../components/GameConfigControl";
+import RulesControl from "../components/GameConfig/RulesControl";
+import GameConfigControl from "../components/GameConfig/GameConfigControl";
 import BoxScore from "../components/BoxScore";
 import NumberInput from "../components/NumberInput";
 import { safeParseInt } from "../helpers";
-// import { useNavigate } from "react-router-dom";
+import configReducer from "../components/GameConfig/configReducer";
+// import presets from "../presets/configPresets";
+// import PresetSelector from "../components/GameConfig/PresetSelector";
 
 interface Props {
     game: GameMoment;
@@ -32,7 +34,7 @@ const rulesThatDontMatch = (variant: GameConfig['rules'], control: GameConfig['r
 }
 
 const boxScoresDontMatch = (variant: GameMoment['boxScore'], control: GameMoment['boxScore']) => {
-    return variant.length > control.length || control.some(({homeTeam, awayTeam}, i) => variant[i]?.homeTeam !== homeTeam || variant[i]?.awayTeam !== awayTeam);
+    return variant.length > control.length || control.some(({ homeTeam, awayTeam }, i) => variant[i]?.homeTeam !== homeTeam || variant[i]?.awayTeam !== awayTeam);
 };
 
 const Manual: React.FC<Props> = ({ game, handleEdit }) => {
@@ -53,16 +55,13 @@ const Manual: React.FC<Props> = ({ game, handleEdit }) => {
 
     const [atBat, setAtBat] = React.useState(game.atBat);
 
-    const [rules, setRules] = React.useState(game.configuration.rules);
-
-    const [maxStrikes, setMaxStrikes] = React.useState(game.configuration.maxStrikes);
-    const [maxBalls, setMaxBalls] = React.useState(game.configuration.maxBalls);
-    const [maxOuts, setMaxOuts] = React.useState(game.configuration.maxOuts);
-    const [maxRuns, setMaxRuns] = React.useState(game.configuration.maxRuns);
-    const [maxInnings, setMaxInnings] = React.useState(game.configuration.maxInnings);
-    const [maxFielders, setMaxFielders] = React.useState(game.configuration.maxFielders);
-    const [allowExtras, setAllowExtras] = React.useState(game.configuration.allowExtras);
-    const [recordingStats, setRecordingStats] = React.useState(game.configuration.recordingStats);
+    const [{
+        config: gameConfig
+    }, dispatch] = React.useReducer(configReducer, {
+        id: 'unknown',
+        label: 'unknown',
+        config: game.configuration,
+    });
 
     const [boxScore, setBoxScore] = React.useState(game.boxScore);
 
@@ -121,31 +120,31 @@ const Manual: React.FC<Props> = ({ game, handleEdit }) => {
         }
 
         const config: DeepPartial<GameConfig> = {};
-        if (maxStrikes !== game.configuration.maxStrikes) {
-            config.maxStrikes = maxStrikes;
+        if (gameConfig.maxStrikes !== game.configuration.maxStrikes) {
+            config.maxStrikes = gameConfig.maxStrikes;
         }
-        if (maxBalls !== game.configuration.maxBalls) {
-            config.maxBalls = maxBalls;
+        if (gameConfig.maxBalls !== game.configuration.maxBalls) {
+            config.maxBalls = gameConfig.maxBalls;
         }
-        if (maxOuts !== game.configuration.maxOuts) {
-            config.maxOuts = maxOuts;
+        if (gameConfig.maxOuts !== game.configuration.maxOuts) {
+            config.maxOuts = gameConfig.maxOuts;
         }
-        if (maxRuns !== game.configuration.maxRuns) {
-            config.maxRuns = maxRuns;
+        if (gameConfig.maxRuns !== game.configuration.maxRuns) {
+            config.maxRuns = gameConfig.maxRuns;
         }
-        if (maxInnings !== game.configuration.maxInnings) {
-            config.maxInnings = maxInnings;
+        if (gameConfig.maxInnings !== game.configuration.maxInnings) {
+            config.maxInnings = gameConfig.maxInnings;
         }
-        if (maxFielders !== game.configuration.maxFielders) {
-            config.maxFielders = maxFielders;
+        if (gameConfig.maxFielders !== game.configuration.maxFielders) {
+            config.maxFielders = gameConfig.maxFielders;
         }
-        if (allowExtras !== game.configuration.allowExtras) {
-            config.allowExtras = allowExtras;
+        if (gameConfig.allowExtras !== game.configuration.allowExtras) {
+            config.allowExtras = gameConfig.allowExtras;
         }
-        if (recordingStats !== game.configuration.recordingStats) {
-            config.recordingStats = recordingStats;
+        if (gameConfig.recordingStats !== game.configuration.recordingStats) {
+            config.recordingStats = gameConfig.recordingStats;
         }
-        rulesThatDontMatch(rules, game.configuration.rules).forEach((ruleKey) => {
+        rulesThatDontMatch(gameConfig.rules, game.configuration.rules).forEach((ruleKey) => {
             if (!config.rules) config.rules = {};
             // @ts-expect-error
             config.rules[ruleKey] = rules[ruleKey];
@@ -172,7 +171,7 @@ const Manual: React.FC<Props> = ({ game, handleEdit }) => {
     return (
         <Structure
             className="manage manual"
-            wftitle={<PageHeader title="Manual Edit"/>}
+            wftitle={<PageHeader title="Manual Edit" />}
         >
             <fieldset className="inning">
                 <legend>Inning</legend>
@@ -186,12 +185,11 @@ const Manual: React.FC<Props> = ({ game, handleEdit }) => {
                             const extrasToAdd = newInningNumber - boxScore.length;
                             setBoxScore(prev => {
                                 return [...prev,
-                                    ...Array.from(Array(extrasToAdd)).map((_) => ({...EMPTY_BOX})),
+                                ...Array.from(Array(extrasToAdd)).map((_) => ({ ...EMPTY_BOX })),
                                 ]
                             });
                         }
                         if (newInningNumber >= game.boxScore.length && newInningNumber <= boxScore.length) {
-                            console.log(newInningNumber);
                             setBoxScore(prev => prev.slice(0, newInningNumber));
                         }
                     }}
@@ -303,25 +301,31 @@ const Manual: React.FC<Props> = ({ game, handleEdit }) => {
                     ))}
                 </select>
             </div>
+            {/* TODO detect available preset or show custom */}
+            {/* <PresetSelector
+                presets={presets}
+                selected={presetId}
+                onChange={(e) => void dispatch({ type: 'preset', payload: presets[e.target.value] })}
+            /> */}
+            <RulesControl rules={gameConfig.rules} setRules={(payload: GameConfig['rules']) => void dispatch({ type: 'rules', payload })} />
             <GameConfigControl
-                maxBalls={maxBalls}
-                setMaxBalls={setMaxBalls}
-                maxStrikes={maxStrikes}
-                setMaxStrikes={setMaxStrikes}
-                maxOuts={maxOuts}
-                setMaxOuts={setMaxOuts}
-                maxRuns={maxRuns}
-                setMaxRuns={setMaxRuns}
-                maxFielders={maxFielders}
-                setMaxFielders={setMaxFielders}
-                maxInnings={maxInnings}
-                setMaxInnings={setMaxInnings}
-                allowExtras={allowExtras}
-                setAllowExtras={setAllowExtras}
-                recordingStats={recordingStats}
-                setRecordingStats={setRecordingStats}
+                maxBalls={gameConfig.maxBalls}
+                setMaxBalls={(payload: number) => void dispatch({ type: 'maxBalls', payload })}
+                maxStrikes={gameConfig.maxStrikes}
+                setMaxStrikes={(payload: number) => void dispatch({ type: 'maxStrikes', payload })}
+                maxOuts={gameConfig.maxOuts}
+                setMaxOuts={(payload: number) => void dispatch({ type: 'maxOuts', payload })}
+                maxRuns={gameConfig.maxRuns}
+                setMaxRuns={(payload: number) => void dispatch({ type: 'maxRuns', payload })}
+                maxFielders={gameConfig.maxFielders}
+                setMaxFielders={(payload: number) => void dispatch({ type: 'maxFielders', payload })}
+                maxInnings={gameConfig.maxInnings}
+                setMaxInnings={(payload: number) => void dispatch({ type: 'maxInnings', payload })}
+                allowExtras={gameConfig.allowExtras}
+                setAllowExtras={(payload: boolean | undefined) => void dispatch({ type: 'allowExtras', payload })}
+                recordingStats={gameConfig.recordingStats}
+                setRecordingStats={(payload: boolean) => void dispatch({ type: 'recordingStats', payload })}
             />
-            <RulesControl rules={rules} setRules={setRules} />
             <button onClick={submitEdit} className="submit">Submit changes</button>
         </Structure>
     );

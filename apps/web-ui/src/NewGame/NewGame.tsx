@@ -1,15 +1,18 @@
-import { defaultConfiguration, defaultPlayer, defaultRules, GameConfig, Position, Team } from "@wiffleball/state-machine";
+import { defaultPlayer, GameConfig, Position, Team } from "@wiffleball/state-machine";
 import React from "react";
 import { nanoid } from 'nanoid';
 import { useReadLocalStorage } from 'usehooks-ts';
-import GameConfigControl from "../components/GameConfigControl";
-import RulesControl from "../components/RulesControl";
+import GameConfigControl from "../components/GameConfig/GameConfigControl";
+import RulesControl from "../components/GameConfig/RulesControl";
 import TeamBuilder from '../components/TeamBuilder';
 import './NewGame.css';
 import { SwapVert } from "../icons";
 import PageHeader from "../components/PageHeader";
 import TeamSelect from "./TeamSelect";
 import { TEAMS } from "../localStorage";
+import presets from "../presets/configPresets";
+import configReducer from "../components/GameConfig/configReducer";
+import PresetSelector from "../components/GameConfig/PresetSelector";
 
 const roster2Names = (roster: Team['roster']): Record<string, string> => {
     return Object.values(roster).reduce<Record<string, string>>((acc, player) => {
@@ -37,20 +40,13 @@ interface Props {
 }
 
 const NewGame: React.FC<Props> = ({ handleStart }) => {
-    const [rules, setRules] = React.useState(defaultRules());
-
     const localTeamList = useReadLocalStorage<string[]>(TEAMS);
     const hasSavedTeams = (localTeamList?.length ?? 0) > 0;
 
-    const defaultConfig = defaultConfiguration();
-    const [maxStrikes, setMaxStrikes] = React.useState(defaultConfig.maxStrikes);
-    const [maxBalls, setMaxBalls] = React.useState(defaultConfig.maxBalls);
-    const [maxOuts, setMaxOuts] = React.useState(defaultConfig.maxOuts);
-    const [maxRuns, setMaxRuns] = React.useState(defaultConfig.maxRuns);
-    const [maxInnings, setMaxInnings] = React.useState(defaultConfig.maxInnings);
-    const [maxFielders, setMaxFielders] = React.useState(defaultConfig.maxFielders);
-    const [allowExtras, setAllowExtras] = React.useState(defaultConfig.allowExtras);
-    const [recordingStats, setRecordingStats] = React.useState(defaultConfig.recordingStats);
+    const [{
+        id: presetId,
+        config: gameConfig
+    }, dispatch] = React.useReducer(configReducer, presets.cpCasual);
 
     const [homeTeamId, setHomeTeamId] = React.useState<string | undefined>(undefined);
     const [homeTeamName, setHomeTeamName] = React.useState('Home');
@@ -71,20 +67,13 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
         && awayTeamLineup.length >= 1
         && Object.values(homePositions).filter(p => p === Position.Pitcher).length === 1
         && Object.values(awayPositions).filter(p => p === Position.Pitcher).length === 1
-        && maxStrikes >= 1 && maxBalls >= 0 && maxOuts >= 0 && maxInnings >= 1;
+        && gameConfig.maxStrikes >= 1
+        && gameConfig.maxBalls >= 0
+        && gameConfig.maxOuts >= 0
+        && gameConfig.maxInnings >= 1;
 
     const prepStart = () => {
-        const config: GameConfig = {
-            maxBalls,
-            maxStrikes,
-            maxOuts,
-            maxRuns,
-            maxInnings,
-            maxFielders,
-            allowExtras,
-            recordingStats,
-            rules,
-        };
+        const config: GameConfig = { ...gameConfig };
 
         const homeTeam: Team = stubTeam();
         if (homeTeamId) {
@@ -115,9 +104,9 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
         });
 
         homeTeam.lineup = [...homeTeam?.startingLineup];
-        homeTeam.defense = {...homeTeam?.startingDefense};
+        homeTeam.defense = { ...homeTeam?.startingDefense };
         awayTeam.lineup = [...awayTeam?.startingLineup];
-        awayTeam.defense = {...awayTeam?.startingDefense};
+        awayTeam.defense = { ...awayTeam?.startingDefense };
 
         handleStart(config, homeTeam, awayTeam);
     };
@@ -169,24 +158,29 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
     return (
         <div className="newgame">
             <PageHeader title={"New Game"} />
-            <RulesControl rules={rules} setRules={setRules} />
+            <PresetSelector
+                presets={presets}
+                selected={presetId}
+                onChange={(e) => void dispatch({ type: 'preset', payload: presets[e.target.value] })}
+            />
+            <RulesControl rules={gameConfig.rules} setRules={(payload: GameConfig['rules']) => void dispatch({ type: 'rules', payload })} />
             <GameConfigControl
-                maxBalls={maxBalls}
-                setMaxBalls={setMaxBalls}
-                maxStrikes={maxStrikes}
-                setMaxStrikes={setMaxStrikes}
-                maxOuts={maxOuts}
-                setMaxOuts={setMaxOuts}
-                maxRuns={maxRuns}
-                setMaxRuns={setMaxRuns}
-                maxFielders={maxFielders}
-                setMaxFielders={setMaxFielders}
-                maxInnings={maxInnings}
-                setMaxInnings={setMaxInnings}
-                allowExtras={allowExtras}
-                setAllowExtras={setAllowExtras}
-                recordingStats={recordingStats}
-                setRecordingStats={setRecordingStats}
+                maxBalls={gameConfig.maxBalls}
+                setMaxBalls={(payload: number) => void dispatch({ type: 'maxBalls', payload })}
+                maxStrikes={gameConfig.maxStrikes}
+                setMaxStrikes={(payload: number) => void dispatch({ type: 'maxStrikes', payload })}
+                maxOuts={gameConfig.maxOuts}
+                setMaxOuts={(payload: number) => void dispatch({ type: 'maxOuts', payload })}
+                maxRuns={gameConfig.maxRuns}
+                setMaxRuns={(payload: number) => void dispatch({ type: 'maxRuns', payload })}
+                maxFielders={gameConfig.maxFielders}
+                setMaxFielders={(payload: number) => void dispatch({ type: 'maxFielders', payload })}
+                maxInnings={gameConfig.maxInnings}
+                setMaxInnings={(payload: number) => void dispatch({ type: 'maxInnings', payload })}
+                allowExtras={gameConfig.allowExtras}
+                setAllowExtras={(payload: boolean | undefined) => void dispatch({ type: 'allowExtras', payload })}
+                recordingStats={gameConfig.recordingStats}
+                setRecordingStats={(payload: boolean) => void dispatch({ type: 'recordingStats', payload })}
             />
             {isSelectingTeam && (
                 <TeamSelect
@@ -198,7 +192,7 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
             <div className="team-header">
                 <h3>Home team</h3>
                 {namingHomeTeam
-                    ? <input className="team-name home" value={homeTeamName} onChange={(e) => void setHomeTeamName(e.target.value)}/>
+                    ? <input className="team-name home" value={homeTeamName} onChange={(e) => void setHomeTeamName(e.target.value)} />
                     : <button className="team-name-btn" onClick={() => void setNamingHomeTeam(true)}>add name</button>
                 }
             </div>
@@ -216,7 +210,7 @@ const NewGame: React.FC<Props> = ({ handleStart }) => {
             <div className="team-header">
                 <h3>Away team</h3>
                 {namingAwayTeam
-                    ? <input className="team-name away" value={awayTeamName} onChange={(e) => void setAwayTeamName(e.target.value)}/>
+                    ? <input className="team-name away" value={awayTeamName} onChange={(e) => void setAwayTeamName(e.target.value)} />
                     : <button className="team-name-btn" onClick={() => void setNamingAwayTeam(true)}>add name</button>
                 }
             </div>

@@ -135,13 +135,6 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({
                             reposition={reposition}
                             remove={remove}
                         />
-                        // <li key={`${id}-${i}`}>
-                        //     <div className="player">
-                        //                 <div className="name">{name}</div>
-                        //                 <div className="position">{Position[position]}</div>
-                        //                 {player && <div className="pa-stat">{player?.offenseStats?.hits} for {player?.offenseStats?.atbats}</div>}
-                        //     </div>
-                        // </li>
                     );
                 })}
             </Reorder.Group>
