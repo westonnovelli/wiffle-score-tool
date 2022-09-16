@@ -2,7 +2,7 @@ import { Player, Position, Team } from "@wiffleball/state-machine";
 import React from "react";
 import { Reorder, useMotionValue } from 'framer-motion';
 import { safeParseInt } from "../helpers";
-import { Close, Drag } from "../icons";
+import { Batting, Close, Drag, PersonRemove } from "../icons";
 import './TeamBuilder.css';
 import { allPositions } from "../translations";
 
@@ -31,19 +31,25 @@ interface PlayerItemProps {
     position: Position;
     rename: (id: string, newName: string) => void;
     reposition: (id: string, newPosition: Position) => void;
+    addToLineup?: (id: string) => void;
+    benchFromLineup?: (id: string) => void;
     remove: (index: number) => void;
 }
 
-const PlayerItem: React.FC<PlayerItemProps> = ({ index, id, name, position, rename, reposition, remove }) => {
+const PlayerItem: React.FC<PlayerItemProps> = ({ index, id, name, position, rename, reposition, addToLineup = () => {}, benchFromLineup, remove }) => {
     const y = useMotionValue(0);
+
+    const inLineup = Boolean(benchFromLineup);
+    const toggleBat = benchFromLineup ?? addToLineup;
 
     return (
         <Reorder.Item value={id} style={{ y }}>
             <div className="player">
                 <div className="drag-handle"><Drag /></div>
-                <input type="text" className="name" value={name} onChange={(e) => rename(id, e.target.value)} />
-                <PositionSelect position={position} onChange={(e) => reposition(id, safeParseInt(e.target.value))} />
-                <button className="remove" onClick={() => remove(index)}><Close /></button>
+                <input type="text" className="name" value={name} onChange={(e) => void rename(id, e.target.value)} />
+                <PositionSelect position={position} onChange={(e) => void reposition(id, safeParseInt(e.target.value))} />
+                <button className="player-action" onClick={() => void toggleBat(id)}>{inLineup ? <PersonRemove/> : <Batting />}</button>
+                <button className="player-action remove" onClick={() => void remove(index)}><Close /></button>
             </div>
         </Reorder.Item>
     );
@@ -119,6 +125,11 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({
         });
     };
 
+    const nonBattingPlayerIds = Object.keys(names).filter((name) => !lineup.includes(name));
+
+    const addToLineup = (id: string) => {}; // TODO implement non-batting player
+    const benchFromLineup = (id: string) => {};  // TODO implement non-batting player
+
     return (
         <div className="teambuilder">
             <Reorder.Group as="ol" axis="y" onReorder={setLineup} values={lineup}>
@@ -133,11 +144,32 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({
                             position={positions[id]}
                             rename={rename}
                             reposition={reposition}
+                            benchFromLineup={benchFromLineup}
                             remove={remove}
                         />
                     );
                 })}
             </Reorder.Group>
+            {nonBattingPlayerIds.length > 0 && (
+                <ul>
+                    {nonBattingPlayerIds.map((id, i) => {
+                        return (
+                            <PlayerItem
+                                key={id}
+                                id={id}
+                                index={i}
+                                player={team?.roster[id]}
+                                name={names[id]}
+                                position={positions[id]}
+                                rename={rename}
+                                reposition={reposition}
+                                addToLineup={addToLineup}
+                                remove={remove}
+                            />
+                        );
+                    })}
+                </ul>
+            )}
             <div className="add-player">
                 <input className="name-input" type="text" value={pendingName} onChange={(e) => void setPendingName(e.target.value)} />
                 <PositionSelect position={pendingPosition} setPosition={setPendingPosition} />

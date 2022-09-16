@@ -149,7 +149,7 @@ const Roster: React.FC<Props> = ({ whichTeam, teamName, team, handleEdit }) => {
             />
             <div className="actions">
                 {isSaved
-                    ? <label className="already-saved">Team already on device, see in <Link to="/team-manager">Team Manager</Link></label>
+                    ? <label className="already-saved">Team already on device, see in <Link to={`/team-manager/${team.id}`}>Team Manager</Link></label>
                     : <label className="save-check"><input type="checkbox" className="save-btn" disabled={isSaved} onChange={(e) => {
                         setPlsSave(e.target.checked);
                     }} />Keep team on this device</label>

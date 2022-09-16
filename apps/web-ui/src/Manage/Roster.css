@@ -79,6 +79,7 @@
     padding: 4px 8px;
     border-radius: 1em;
     background: var(--color-primary-light);
+    box-shadow: var(--elevation-1);
 }
 
 

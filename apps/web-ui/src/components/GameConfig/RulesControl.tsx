@@ -1,5 +1,6 @@
 import React from 'react';
 import { GameConfig, OptionalRules } from '@wiffleball/state-machine';
+import { rules as rulesTranslations } from '../../translations';
 
 interface Props {
     rules: GameConfig['rules'];
@@ -11,10 +12,12 @@ const RulesControl: React.FC<Props> = ({ rules, setRules }) => {
         <fieldset className="rules">
             <legend>Game Rules</legend>
             {Object.keys(rules).map((key) => {
-                // @ts-expect-error
-                const display = OptionalRules[key];
-                // @ts-expect-error
-                const value: boolean = rules[key];
+                const ruleKey: OptionalRules = (key as unknown) as OptionalRules;
+                const match = rulesTranslations.find((rule) => {
+                    return rule.value === parseInt(`${ruleKey}`); // string to number comparison...
+                })?.label
+                const display = match ?? OptionalRules[ruleKey];
+                const value: boolean = rules[ruleKey];
                 return (
                     <div key={key}>
                         <label>
@@ -28,6 +31,7 @@ const RulesControl: React.FC<Props> = ({ rules, setRules }) => {
                             />
                             {display}
                         </label>
+                        
                     </div>
                 );
             })}
