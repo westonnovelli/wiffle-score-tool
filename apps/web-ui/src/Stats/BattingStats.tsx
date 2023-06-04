@@ -24,8 +24,7 @@ const BattingTable: React.FC<BattingTableProps> = ({ team, label, className }) =
                     </tr>
                 </thead>
                 <tbody>
-                    {team.lineup.map((id) => {
-                        const player = team.roster[id];
+                    {Object.entries(team.roster).map(([id, player]) => {
                         return (
                             <tr key={id}>
                                 <th>{player.name}</th>
