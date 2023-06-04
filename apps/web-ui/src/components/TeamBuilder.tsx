@@ -42,8 +42,10 @@ const PlayerItem: React.FC<PlayerItemProps> = ({ index, id, name, position, rena
     const inLineup = Boolean(benchFromLineup);
     const toggleBat = benchFromLineup ?? addToLineup;
 
+    const Component = inLineup ? Reorder.Item : 'li';
+
     return (
-        <Reorder.Item value={id} style={{ y }}>
+        <Component value={id} style={{ y }}>
             <div className="player">
                 <div className="drag-handle"><Drag /></div>
                 <input type="text" className="name" value={name} onChange={(e) => void rename(id, e.target.value)} />
@@ -51,7 +53,7 @@ const PlayerItem: React.FC<PlayerItemProps> = ({ index, id, name, position, rena
                 <button className="player-action" onClick={() => void toggleBat(id)}>{inLineup ? <PersonRemove/> : <Batting />}</button>
                 <button className="player-action remove" onClick={() => void remove(index)}><Close /></button>
             </div>
-        </Reorder.Item>
+        </Component>
     );
 };
 
@@ -127,8 +129,12 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({
 
     const nonBattingPlayerIds = Object.keys(names).filter((name) => !lineup.includes(name));
 
-    const addToLineup = (id: string) => {}; // TODO implement non-batting player
-    const benchFromLineup = (id: string) => {};  // TODO implement non-batting player
+    const addToLineup = (id: string) => {
+        setLineup(prev => [...prev, id]);
+    };
+    const benchFromLineup = (id: string) => {
+        setLineup(prev => prev.filter(existingId => existingId !== id));
+    };
 
     return (
         <div className="teambuilder">
@@ -151,6 +157,8 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({
                 })}
             </Reorder.Group>
             {nonBattingPlayerIds.length > 0 && (
+                <>
+                Not batting:
                 <ul>
                     {nonBattingPlayerIds.map((id, i) => {
                         return (
@@ -169,6 +177,7 @@ const TeamBuilder: React.FC<TeamBuilderProps> = ({
                         );
                     })}
                 </ul>
+                </>
             )}
             <div className="add-player">
                 <input className="name-input" type="text" value={pendingName} onChange={(e) => void setPendingName(e.target.value)} />
