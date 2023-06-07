@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "https://cpwiffleball.novelli.dev/static/css/main.1a9f5c42.css",
-    "main.js": "https://cpwiffleball.novelli.dev/static/js/main.06983f4f.js",
+    "main.css": "https://cpwiffleball.novelli.dev/static/css/main.3f8bcb5f.css",
+    "main.js": "https://cpwiffleball.novelli.dev/static/js/main.33c948c7.js",
     "static/js/415.fd65d8b9.chunk.js": "https://cpwiffleball.novelli.dev/static/js/415.fd65d8b9.chunk.js",
     "index.html": "https://cpwiffleball.novelli.dev/index.html",
-    "main.1a9f5c42.css.map": "https://cpwiffleball.novelli.dev/static/css/main.1a9f5c42.css.map",
-    "main.06983f4f.js.map": "https://cpwiffleball.novelli.dev/static/js/main.06983f4f.js.map",
+    "main.3f8bcb5f.css.map": "https://cpwiffleball.novelli.dev/static/css/main.3f8bcb5f.css.map",
+    "main.33c948c7.js.map": "https://cpwiffleball.novelli.dev/static/js/main.33c948c7.js.map",
     "415.fd65d8b9.chunk.js.map": "https://cpwiffleball.novelli.dev/static/js/415.fd65d8b9.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.1a9f5c42.css",
-    "static/js/main.06983f4f.js"
+    "static/css/main.3f8bcb5f.css",
+    "static/js/main.33c948c7.js"
   ]
 }
